@@ -1,9 +1,3 @@
-Import-Module PSEventViewer # Install-Module -Name PSEventViewer
-Import-Module PSWriteColor # Install-Module -Name PSEventViewer
-Import-Module PSADReporting # Install-Module -Name PSADReporting
-
-Clear-Host
-
 $EmailParameters = @{
     EmailFrom            = "notifications@domain.com"
     EmailTo              = "przemyslaw.klys@domain.com, admin@domain.com"
@@ -107,4 +101,6 @@ $ReportOptions = @{
     }
 }
 
+### Starts Module (Requires config above)
+Clear-Host
 Start-ADReporting $EmailParameters $ReportOptions $FormattingParameters
