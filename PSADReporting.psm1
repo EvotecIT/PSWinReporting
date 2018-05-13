@@ -848,7 +848,7 @@ function Get-GroupPolicyChanges ($Servers, $Dates) {
     Write-Color @script:WriteParameters "[i] Ending ", "Group Policy Changes Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     return $GroupMembershipChangesOutput
 }
-function Get-LogonEvents($Servers, $Dates, $ReportOptions) {
+function Get-LogonEvents($Servers, $Dates) {
 
     Write-Color @script:WriteParameters "[i] Running ", "Logon Events Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
 
@@ -870,7 +870,7 @@ function Get-LogonEvents($Servers, $Dates, $ReportOptions) {
     Write-Color @script:WriteParameters "[i] Ending ", "Logon Events Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     return $Events
 }
-function Get-RebootEvents($Servers, $Dates, $ReportOptions) {
+function Get-RebootEvents($Servers, $Dates) {
 
     Write-Color @script:WriteParameters "[i] Running ", "Reboot Events Report (Troubleshooting Only)", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
 
@@ -893,7 +893,7 @@ function Get-RebootEvents($Servers, $Dates, $ReportOptions) {
     Write-Color @script:WriteParameters "[i] Ending ", "Reboot Events Report (Troubleshooting Only)", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     return $Events | Select-Object ID, Computer, TimeCreated, Message
 }
-function Get-GroupCreateDelete($Servers, $Dates, $ReportOptions) {
+function Get-GroupCreateDelete($Servers, $Dates) {
 
     # 4727: A security-enabled global group was created                   https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4727
     # 4730: A security-enabled global group was deleted                   https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4730
@@ -926,7 +926,7 @@ function Get-GroupCreateDelete($Servers, $Dates, $ReportOptions) {
     Write-Color @script:WriteParameters "[i] Ending ", "Group Create/Delete Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     return $GroupMembershipChangesOutput
 }
-function Get-GroupMembershipChanges($Servers, $Dates, $ReportOptions) {
+function Get-GroupMembershipChanges($Servers, $Dates) {
 
     # Events processed
     # 4728: A member was added to a security-enabled global group -       https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4728
@@ -959,7 +959,7 @@ function Get-GroupMembershipChanges($Servers, $Dates, $ReportOptions) {
     Write-Color @script:WriteParameters "[i] Ending ", "Group Membership Changes Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     return $GroupMembershipChangesOutput
 }
-function Get-UserStatuses($Servers, $Dates, $ReportOptions) {
+function Get-UserStatuses($Servers, $Dates) {
 
     Write-Color @script:WriteParameters "[i] Running ", "User Statues Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     $UserChangesID = 4722, 4725, 4767, 4723, 4724, 4726
@@ -982,7 +982,7 @@ function Get-UserStatuses($Servers, $Dates, $ReportOptions) {
     Write-Color @script:WriteParameters "[i] Ending ", "User Statues Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     return $UserChangesOutput
 }
-function Get-UserLockouts($Servers, $Dates, $ReportOptions) {
+function Get-UserLockouts($Servers, $Dates) {
 
     Write-Color @script:WriteParameters "[i] Running ", "User Lockouts Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     $UserChangesID = 4740
@@ -1007,7 +1007,7 @@ function Get-UserLockouts($Servers, $Dates, $ReportOptions) {
     return $UserChangesOutput
 
 }
-function Get-UserChanges($Servers, $Dates, $ReportOptions) {
+function Get-UserChanges($Servers, $Dates) {
 
     Write-Color @script:WriteParameters "[i] Running ", "User Changes Report", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
     $userChangesCleanedUp = @()
@@ -1557,42 +1557,42 @@ function Start-Report([hashtable] $Dates, [hashtable] $EmailParameters, [hashtab
     }
     if ($ReportOptions.IncludeGroupEvents -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer St
-        $GroupsEventsTable = Get-GroupMembershipChanges -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $GroupsEventsTable = Get-GroupMembershipChanges -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeGroupEvents.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeUserEvents -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer
-        $UsersEventsTable = Get-UserChanges -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $UsersEventsTable = Get-UserChanges -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeUserEvents.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeUserStatuses -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer
-        $UsersEventsStatusesTable = Get-UserStatuses -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $UsersEventsStatusesTable = Get-UserStatuses -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeUserStatuses.Total = Set-TimeLog -Time $ExecutionTime
     }
     If ($ReportOptions.IncludeUserLockouts -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer
-        $UsersLockoutsTable = Get-UserLockouts -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $UsersLockoutsTable = Get-UserLockouts -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeUserLockouts.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeLogonEvents -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer
-        $LogonEvents = Get-LogonEvents -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $LogonEvents = Get-LogonEvents -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeLogonEvents.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeGroupCreateDelete -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer
-        $GroupCreateDeleteTable = Get-GroupCreateDelete -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $GroupCreateDeleteTable = Get-GroupCreateDelete -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeGroupCreateDelete.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeDomainControllersReboots -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer
-        $RebootEventsTable = Get-RebootEvents -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $RebootEventsTable = Get-RebootEvents -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeDomainControllersReboots.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeGroupPolicyChanges -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer
-        $TableGroupPolicyChanges = Get-GroupPolicyChanges -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
+        $TableGroupPolicyChanges = Get-GroupPolicyChanges -Servers $Servers -Dates $Dates
         $script:TimeToGenerateReports.Reports.IncludeGroupPolicyChanges.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeTimeToGenerate -eq $true) {
