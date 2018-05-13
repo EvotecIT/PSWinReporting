@@ -1558,7 +1558,6 @@ function Start-Report([hashtable] $Dates, [hashtable] $EmailParameters, [hashtab
     if ($ReportOptions.IncludeGroupEvents -eq $true) {
         $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew() # Timer St
         $GroupsEventsTable = Get-GroupMembershipChanges -Servers $Servers -Dates $Dates -ReportOptions $ReportOptions
-        $TimeToExecute = "$($ExecutionTime.Elapsed.Days) days, $($ExecutionTime.Elapsed.Hours) hours, $($ExecutionTime.Elapsed.Minutes) minutes, $($ExecutionTime.Elapsed.Seconds) seconds, $($ExecutionTime.Elapsed.Milliseconds) milliseconds"
         $script:TimeToGenerateReports.Reports.IncludeGroupEvents.Total = Set-TimeLog -Time $ExecutionTime
     }
     if ($ReportOptions.IncludeUserEvents -eq $true) {
