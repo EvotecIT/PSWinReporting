@@ -9,10 +9,10 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule        = 'PSADReporting.psm1'
+    RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.9'
+    ModuleVersion     = '0.91'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -30,7 +30,7 @@
     Copyright         = 'Evotec (c) 2018. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description       = 'Basic reporting for Events in AD'
+    Description       = 'Basic reporting for Events'
 
     # Minimum version of the Windows PowerShell engine required by this module
     # PowerShellVersion = ''
@@ -87,7 +87,7 @@
     # ModuleList = @()
 
     # List of all files packaged with this module
-    FileList          = 'PSADReporting.psm1', 'PSADReporting.psd1'
+    FileList          = 'PSWinReporting.psm1', 'PSWinReporting.psd1'
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData       = @{
 
@@ -100,7 +100,7 @@
             # LicenseUri = ''
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/EvotecIT/PSADReporting'
+            ProjectUri = 'https://github.com/EvotecIT/PSWinReporting'
 
             # A URL to an icon representing this module.
             # IconUri = ''
@@ -113,7 +113,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    HelpInfoURI       = 'https://github.com/EvotecIT/PSADReporting'
+    HelpInfoURI       = 'https://github.com/EvotecIT/PSWinReporting'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
