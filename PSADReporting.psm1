@@ -801,6 +801,7 @@ function Set-TimeLog([System.Diagnostics.Stopwatch] $Time) {
 
 function Get-EventLogClearedLogs($Servers, $Dates) {
 
+
     $EventID = 1102
     $Events = @()
     foreach ($Server in $Servers) {
