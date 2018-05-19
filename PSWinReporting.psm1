@@ -17,4 +17,4 @@ Foreach ($import in @($Public + $Private)) {
 # Set variables visible to the module and its functions only
 
 #Export-ModuleMember -Function $Public.Basename
-Export-ModuleMember -Function Start-ADReporting
+Export-ModuleMember -Function 'Start-ADReporting'
