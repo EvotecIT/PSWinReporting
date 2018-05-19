@@ -103,4 +103,5 @@ $ReportOptions = @{
 
 ### Starts Module (Requires config above)
 Clear-Host
+Import-Module PSWinReporting -Force
 Start-ADReporting $EmailParameters $ReportOptions $FormattingParameters
