@@ -27,7 +27,6 @@ $FormattingParameters = @{
 }
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
-    IncludeTimeToGenerate = $false # report with time it takes to generate (need this for debugging)
 
     AsExcel               = $true # attaches Excel to email with all events, required ImportExcel module
     AsCSV                 = $false # attaches CSV to email with all events,
@@ -56,7 +55,7 @@ $ReportTimes = @{
     # Report Per Week
     OnDay                = @{
         Enabled = $true
-        Days    = '"Monday'#, 'Tuesday'
+        Days    = 'Monday'#, 'Tuesday'
     }
     # Report Per Month
     PastMonth            = @{
@@ -88,7 +87,9 @@ $ReportTimes = @{
 }
 
 $ReportDefinitions = @{
-    ReportsAD = @{
+    TimeToGenerate = $true
+
+    ReportsAD      = @{
         Servers    = @{
             Automatic = $true
             OnlyPDC   = $false
@@ -96,32 +97,20 @@ $ReportDefinitions = @{
         }
         EventBased = @{
             UserChanges            = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 4720, 4738
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
             UserStatus             = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 4722, 4725, 4767, 4723, 4724, 4726
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
             UserLockouts           = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 4740
-                LogName     = 'Security'
-                IgnoreWords = ''
-            }
-            GroupMembershipChanges = @{
-                Enabled     = $false
-                Events      = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
-                LogName     = 'Security'
-                IgnoreWords = ''
-            }
-            GroupCreateDelete      = @{
-                Enabled     = $false
-                Events      = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
@@ -131,26 +120,38 @@ $ReportDefinitions = @{
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
+            GroupMembershipChanges = @{
+                Enabled     = $true
+                Events      = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
+            GroupCreateDelete      = @{
+                Enabled     = $true
+                Events      = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
             GroupPolicyChanges     = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
             LogsClearedSecurity    = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 1102
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
             LogsClearedOther       = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 104
                 LogName     = 'System' # Source: EventLog, Task: 'Log clear'
                 IgnoreWords = ''
             }
             EventsReboots          = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
                 LogName     = 'System'
                 IgnoreWords = ''
