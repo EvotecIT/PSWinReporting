@@ -1,11 +1,11 @@
-function Set-EmailHead($FormattingOptions) {
+function Set-EmailHead($FormattingParameters) {
     $Head = "<style>" +
-    "BODY{background-color:white;font-family:$($FormattingOptions.FontFamily);font-size:$($FormattingOptions.FontSize)}" +
+    "BODY{background-color:white;font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)}" +
     "TABLE{border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse}" +
     "TH{border-width: 1px;padding: 3px;border-style: solid;border-color: black;background-color:`"#00297A`";font-color:white}" +
     "TD{border-width: 1px;padding-right: 2px;padding-left: 2px;padding-top: 0px;padding-bottom: 0px;border-style: solid;border-color: black;background-color:white}" +
-    "H2{font-family:$($FormattingOptions.FontHeadingFamily);font-size:$($FormattingOptions.FontHeadingSize)}" +
-    "P{font-family:$($FormattingOptions.FontFamily);font-size:$($FormattingOptions.FontSize)}" +
+    "H2{font-family:$($FormattingParameters.FontHeadingFamily);font-size:$($FormattingParameters.FontHeadingSize)}" +
+    "P{font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)}" +
     "</style>"
     return $Head
 }
@@ -35,27 +35,27 @@ function Set-EmailBodyPreparedTable ($TableData, $TableWelcomeMessage) {
     $body += $TableData
     return $body
 }
-function Set-EmailReportBrading($FormattingOptions) {
-    $Report = "<a style=`"text-decoration:none`" href=`"$($FormattingOptions.CompanyBranding.Link)`" class=`"clink logo-container`">" +
-    #"<img width=171 height=15 src=`"$($FormattingOptions.CompanyLogo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
-    "<img width=<fix> height=<fix> src=`"$($FormattingOptions.CompanyBranding.Logo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
+function Set-EmailReportBrading($FormattingParameters) {
+    $Report = "<a style=`"text-decoration:none`" href=`"$($FormattingParameters.CompanyBranding.Link)`" class=`"clink logo-container`">" +
+    #"<img width=171 height=15 src=`"$($FormattingParameters.CompanyLogo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
+    "<img width=<fix> height=<fix> src=`"$($FormattingParameters.CompanyBranding.Logo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
     "</a>"
-    if ($FormattingOptions.CompanyBranding.Width -ne "") {
-        $report = $report -replace "width=<fix>", "width=$($FormattingOptions.CompanyBranding.Width)"
+    if ($FormattingParameters.CompanyBranding.Width -ne "") {
+        $report = $report -replace "width=<fix>", "width=$($FormattingParameters.CompanyBranding.Width)"
     } else {
         $report = $report -replace "width=<fix>", ""
     }
-    if ($FormattingOptions.CompanyBranding.Height -ne "") {
-        $report = $report -replace "height=<fix>", "height=$($FormattingOptions.CompanyBranding.Height)"
+    if ($FormattingParameters.CompanyBranding.Height -ne "") {
+        $report = $report -replace "height=<fix>", "height=$($FormattingParameters.CompanyBranding.Height)"
     } else {
         $report = $report -replace "height=<fix>", ""
     }
     return $Report
 }
-function Set-EmailReportDetails($FormattingOptions, $Dates) {
+function Set-EmailReportDetails($FormattingParameters, $Dates) {
     $DateReport = get-date
     # HTML Report settings
-    $Report = "<p style=`"background-color:white;font-family:$($FormattingOptions.FontFamily);font-size:$($FormattingOptions.FontSize)`">" +
+    $Report = "<p style=`"background-color:white;font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)`">" +
     "<strong>Report Time:</strong> $DateReport <br>" +
     "<strong>Report Period:</strong> $($Dates.DateFrom) to $($Dates.DateTo) <br>" +
     "<strong>Account Executing Report :</strong> $env:userdomain\$($env:username.toupper()) on $($env:ComputerName.toUpper()) <br>" +
