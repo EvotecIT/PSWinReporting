@@ -11,12 +11,14 @@ Function Get-ModulesAvailability ([string]$Name) {
     } else { return $true } #module already loaded
 }
 function Test-Key ($ConfigurationTable, $ConfigurationSection = "", $ConfigurationKey, $DisplayProgress = $false) {
+
     if ($ConfigurationTable -eq $null) { return $false }
     try {
         $value = $ConfigurationTable.ContainsKey($ConfigurationKey)
     } catch {
         $value = $false
     }
+
     if ($value -eq $true) {
         if ($DisplayProgress -eq $true) {
             Write-Color @script:WriteParameters -Text "[i] ", "Parameter in configuration of ", "$ConfigurationSection.$ConfigurationKey", " exists." -Color White, White, Green, White
@@ -27,6 +29,16 @@ function Test-Key ($ConfigurationTable, $ConfigurationSection = "", $Configurati
             Write-Color @script:WriteParameters -Text "[i] ", "Parameter in configuration of ", "$ConfigurationSection.$ConfigurationKey", " doesn't exist." -Color White, White, Red, White
         }
         return $false
+    }
+}
+function Set-DisplayParameters($ReportOptions) {
+    $Test0 = Test-Key -ConfigurationTable $ReportOptions -ConfigurationKey 'DisplayConsole' -DisplayProgress $false
+    if ($Test0 -eq $true) {
+        $Test1 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "DisplayConsole.ShowTime" -DisplayProgress $false
+        $Test2 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "DisplayConsole.LogFile" -DisplayProgress $false
+        $Test3 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "DisplayConsole.TimeFormat" -DisplayProgress $false
+
+        if ($Test1 -and $Test2 -and $Test3) { $script:WriteParameters = $ScriptParameters }
     }
 }
 function Convert-Size {
