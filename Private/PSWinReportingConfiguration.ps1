@@ -1,6 +1,11 @@
-function Test-Configuration ($EmailParameters, $ReportOptions, $FormattingParameters) {
+function Test-ConfigurationReportsAD () {
+    $parameter = 'Enabled', 'Events', 'LogName', 'IgnoreWords'
+
+}
+
+function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOptions, $ReportTimes, $ReportDefinitions) {
     Write-Warning "[i] Testing for configuration consistency. This is to make sure the script can be safely executed..."
-    if ($EmailParameters -eq $null -or $ReportOptions -eq $null -or $FormattingParameters -eq $null) {
+    if ($EmailParameters -eq $null -or $ReportOptions -eq $null -or $FormattingParameters -eq $null -or $ReportTimes -eq $null -or $ReportDefinitions -eq $null) {
         Write-Warning "[i] There is not enough parameters passed to the Start-Reporting. Make sure there are 4 parameter groups (hashtables). Check documentation - you would be better to just start from scratch!"
         Exit
     }
@@ -8,6 +13,7 @@ function Test-Configuration ($EmailParameters, $ReportOptions, $FormattingParame
     $ConfigurationFormatting = @()
     $ConfigurationReport = @()
     $ConfigurationEmail = @()
+    $ConfigurationDefinitions = @()
 
     #region EmailParameters
 
@@ -39,76 +45,76 @@ function Test-Configuration ($EmailParameters, $ReportOptions, $FormattingParame
     $ConfigurationFormatting += Test-Key $FormattingParameters "FormattingParameters" "FontHeadingFamily" -DisplayProgress $true
     $ConfigurationFormatting += Test-Key $FormattingParameters "FormattingParameters" "FontHeadingSize" -DisplayProgress $true
     #endregion FormattingParameters
-    #region ReportOptions Reports
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "OnlyPrimaryDC" -DisplayProgress $true
+    #region Report Definions
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions "ReportDefinitions" "ReportsAD" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD "ReportDefinitions.ReportsAD" "Servers" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "Automatic" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "OnlyPDC" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "DC" -DisplayProgress $true
 
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeDomainControllers" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeClearedLogs"    -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeGroupEvents" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeUserEvents" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeUserStatuses" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeUserLockouts" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeDomainControllersReboots" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeLogonEvents" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeGroupPolicyChanges" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeGroupCreateDelete" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeTimeToGenerate" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD "ReportDefinitions.ReportsAD" "EventBased" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.EventBased "ReportDefinitions.ReportsAD.EventBased" "UserChanges" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.EventBased.UserChanges "ReportDefinitions.ReportsAD.EventBased.UserChanges" "Enabled" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.EventBased.UserChanges "ReportDefinitions.ReportsAD.EventBased.UserChanges" "Events" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.EventBased.UserChanges "ReportDefinitions.ReportsAD.EventBased.UserChanges" "LogName" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.EventBased.UserChanges "ReportDefinitions.ReportsAD.EventBased.UserChanges" "IgnoreWords" -DisplayProgress $true
 
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "IncludeEventLogSize" -DisplayProgress $true
-    if ($ConfigurationReport[ - 1] -eq $true) {
-        $ConfigurationReport += Test-Key $ReportOptions.IncludeEventLogSize "ReportOptions.IncludeEventLogSize" "Use" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.IncludeEventLogSize "ReportOptions.IncludeEventLogSize" "Logs" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.IncludeEventLogSize "ReportOptions.IncludeEventLogSize" "SortBy" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD "ReportDefinitions.ReportsAD" "Custom" -DisplayProgress $true
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Custom "ReportDefinitions.ReportsAD.Custom" "EventLogSize" -DisplayProgress $true
+    if ($ConfigurationDefinitions[ - 1] -eq $true) {
+        $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Custom.EventLogSize "ReportDefinitions.ReportsAD.Custom.EventLogSize" "Enabled" -DisplayProgress $true
+        $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Custom.EventLogSize "ReportDefinitions.ReportsAD.Custom.EventLogSize" "Logs" -DisplayProgress $true
+        $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Custom.EventLogSize "ReportDefinitions.ReportsAD.Custom.EventLogSize" "SortBy" -DisplayProgress $true
     }
-    #endregion ReportOptions Reports
+    #endregion Repor Report Definions
 
     #region ReportOptions Per Hour
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportPastHour" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportCurrentHour" -DisplayProgress $true
-    #endregion ReportOptions Per Hour
-    #region ReportOptions Per Day
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportPastDay" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportCurrentDay" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportOnDay" -DisplayProgress $true
-    if ($ConfigurationReport[ - 1] -eq $true) {
-        $ConfigurationReport += Test-Key $ReportOptions.ReportOnDay "ReportOptions.ReportOnDay" "Use" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.ReportOnDay "ReportOptions.ReportOnDay" "Days" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "PastHour" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CurrentHour" -DisplayProgress $true
+    #endregion ReportTimes Per Hour
+    #region ReportTimes Per Day
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "PastDay" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CurrentDay" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "OnDay" -DisplayProgress $true
+    if ($ConfigurationReportTimes[ - 1] -eq $true) {
+        $ConfigurationReportTimes += Test-Key $ReportTimes.OnDay "ReportTimes.OnDay" "Enabled" -DisplayProgress $true
+        $ConfigurationReportTimes += Test-Key $ReportTimes.OnDay "ReportTimes.OnDay" "Days" -DisplayProgress $true
     }
-    #region ReportOptions Per Month
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportPastMonth" -DisplayProgress $true
-    if ($ConfigurationReport[ - 1] -eq $true) {
-        $ConfigurationReport += Test-Key $ReportOptions.ReportPastMonth "ReportOptions.ReportPastMonth" "Use" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.ReportPastMonth "ReportOptions.ReportPastMonth" "Force" -DisplayProgress $true
+    #region ReportTimes Per Month
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "PastMonth" -DisplayProgress $true
+    if ($ConfigurationReportTimes[ - 1] -eq $true) {
+        $ConfigurationReportTimes += Test-Key $ReportTimes.PastMonth "ReportTimes.PastMonth" "Enabled" -DisplayProgress $true
+        $ConfigurationReportTimes += Test-Key $ReportTimes.PastMonth "ReportTimes.PastMonth" "Force" -DisplayProgress $true
     }
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportCurrentMonth" -DisplayProgress $true
-    #endregion ReportOptions Per Month
-    #region ReportOptions Per Quarter
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CurrentMonth" -DisplayProgress $true
+    #endregion ReportTimes Per Month
+    #region ReportTimes Per Quarter
 
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportPastQuarter" -DisplayProgress $true
-    if ($ConfigurationReport[ - 1] -eq $true) {
-        $ConfigurationReport += Test-Key $ReportOptions.ReportPastQuarter "ReportOptions.ReportPastQuarter" "Use" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.ReportPastQuarter "ReportOptions.ReportPastQuarter" "Force" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "PastQuarter" -DisplayProgress $true
+    if ($ConfigurationReportTimes[ - 1] -eq $true) {
+        $ConfigurationReportTimes += Test-Key $ReportTimes.PastQuarter "ReportTimes.PastQuarter" "Enabled" -DisplayProgress $true
+        $ConfigurationReportTimes += Test-Key $ReportTimes.PastQuarter "ReportTimes.PastQuarter" "Force" -DisplayProgress $true
     }
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportCurrentQuarter" -DisplayProgress $true
-    #endregion ReportOptions Per Quarter
-    #region ReportOptions Custom Dates
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportCurrentDayMinusDayX" -DisplayProgress $true
-    if ($ConfigurationReport[ - 1] -eq $true) {
-        $ConfigurationReport += Test-Key $ReportOptions.ReportCurrentDayMinusDayX "ReportOptions.ReportCurrentDayMinusDayX" "Use" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.ReportCurrentDayMinusDayX "ReportOptions.ReportCurrentDayMinusDayX" "Days" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CurrentQuarter" -DisplayProgress $true
+    #endregion ReportTimes Per Quarter
+    #region ReportTimes Custom Dates
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CurrentDayMinusDayX" -DisplayProgress $true
+    if ($ConfigurationReportTimes[ - 1] -eq $true) {
+        $ConfigurationReportTimes += Test-Key $ReportTimes.CurrentDayMinusDayX "ReportTimes.CurrentDayMinusDayX" "Enabled" -DisplayProgress $true
+        $ConfigurationReportTimes += Test-Key $ReportTimes.CurrentDayMinusDayX "ReportTimes.CurrentDayMinusDayX" "Days" -DisplayProgress $true
     }
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportCurrentDayMinuxDaysX" -DisplayProgress $true
-    if ($ConfigurationReport[ - 1] -eq $true) {
-        $ConfigurationReport += Test-Key $ReportOptions.ReportCurrentDayMinuxDaysX "ReportOptions.ReportCurrentDayMinuxDaysX" "Use" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.ReportCurrentDayMinuxDaysX "ReportOptions.ReportCurrentDayMinuxDaysX" "Days" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CurrentDayMinuxDaysX" -DisplayProgress $true
+    if ($ConfigurationReportTimes[ - 1] -eq $true) {
+        $ConfigurationReportTimes += Test-Key $ReportTimes.CurrentDayMinuxDaysX "ReportTimes.CurrentDayMinuxDaysX" "Enabled" -DisplayProgress $true
+        $ConfigConfigurationReportTimesurationReport += Test-Key $ReportTimes.CurrentDayMinuxDaysX "ReportTimes.CurrentDayMinuxDaysX" "Days" -DisplayProgress $true
     }
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "ReportCustomDate" -DisplayProgress $true
-    if ($ConfigurationReport[ - 1] -eq $true) {
-        $ConfigurationReport += Test-Key $ReportOptions.ReportCustomDate "ReportOptions.ReportCustomDate" "Use" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.ReportCustomDate "ReportOptions.ReportCustomDate" "DateFrom" -DisplayProgress $true
-        $ConfigurationReport += Test-Key $ReportOptions.ReportCustomDate "ReportOptions.ReportCustomDate" "DateTo" -DisplayProgress $true
+    $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CustomDate" -DisplayProgress $true
+    if ($ConfigurationReportTimes[ - 1] -eq $true) {
+        $ConfigurationReportTimes += Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "Enabled" -DisplayProgress $true
+        $ConfigurationReportTimes += Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "DateFrom" -DisplayProgress $true
+        $ConfigurationReportTimes += Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "DateTo" -DisplayProgress $true
     }
-    #endregion ReportOptions Custom Dates
+    #endregion ReportTimes Custom Dates
 
     #region ReportOptions Options
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "AsExcel" -DisplayProgress $true
@@ -119,14 +125,25 @@ function Test-Configuration ($EmailParameters, $ReportOptions, $FormattingParame
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePattern" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePatternDateFormat" -DisplayProgress $true
     #endregion ReportOptions Options
-    if ($ConfigurationFormatting -notcontains $false -and $ConfigurationReport -notcontains $false -and $ConfigurationEmail -notcontains $false) {
+    if ($ConfigurationFormatting -notcontains $false -and
+        $ConfigurationReport -notcontains $false -and
+        $ConfigurationEmail -notcontains $false -and
+        $ConfigurationDefinitions -notcontains $false -and
+        $ConfigurationReportTimes -notcontains $false) {
         return $true
     } else {
         return $false
     }
 }
-Function Test-Prerequisite ([hashtable] $EmailParameters, [hashtable] $ReportOptions, [hashtable]  $FormattingParameters) {
-    $Configuration = Test-Configuration $EmailParameters $ReportOptions $FormattingParameters
+Function Test-Prerequisite () {
+    param (
+        [hashtable] $EmailParameters,
+        [hashtable] $FormattingParameters,
+        [hashtable] $ReportOptions,
+        [hashtable] $ReportTimes,
+        [hashtable] $ReportDefinitions
+    )
+    $Configuration = Test-Configuration $EmailParameters $FormattingParameters $ReportOptions $ReportTimes $ReportDefinitions
     if (-not $Configuration) {
         Write-Color @script:WriteParameters "[i] ", "There are parameters missing in configuration file. Can't continue running...", "Terminated!" -Color White, Yellow, Red
         Exit
