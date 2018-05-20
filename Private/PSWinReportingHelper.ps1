@@ -41,6 +41,18 @@ function Set-DisplayParameters($ReportOptions) {
         if ($Test1 -and $Test2 -and $Test3) { $script:WriteParameters = $ScriptParameters }
     }
 }
+
+function Find-EventsNeeded ($Events, $EventsNeeded, $EventsType = 'Security') {
+    $EventsFound = @()
+    foreach ($Event in $Events) {
+        if ($Event.LogName -eq $EventsType) {
+            if ($EventsNeeded -contains $Event.ID) {
+                $EventsFound += $Event
+            }
+        }
+    }
+    return $EventsFound
+}
 function Convert-Size {
     # Original - https://techibee.com/powershell/convert-from-any-to-any-bytes-kb-mb-gb-tb-using-powershell/2376
     #
@@ -112,6 +124,17 @@ function Export-ReportToCSV ($Report, $ReportOptions, $Extension, $ReportName, $
         return ""
     }
 }
+function Export-ReportToHTML($Report, $ReportTable, $ReportTableText, [switch] $Special) {
+    if ($Report -eq $true) {
+        if ($special) {
+            return Set-EmailBodyPreparedTable -TableData $ReportTable -TableWelcomeMessage $ReportTableText
+        }
+        return Set-Emailbody -TableData $ReportTable -TableWelcomeMessage $ReportTableText
+    } else {
+        return ''
+    }
+}
+
 function Set-ReportFileName($ReportOptions, $ReportExtension, $ReportName = "") {
     $ReportTime = $(get-date -f $ReportOptions.FilePatternDateFormat)
     if ($ReportOptions.KeepReportsPath -ne "") { $Path = $ReportOptions.KeepReportsPath} else { $Path = $env:TEMP }

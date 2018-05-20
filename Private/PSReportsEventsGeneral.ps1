@@ -1,6 +1,6 @@
-function Get-RebootEvents($Servers, $Dates) {
+function Get-RebootEvents($Events) {
 
-    Write-Color @script:WriteParameters "[i] Running ", "Reboot Events Report (Troubleshooting Only)", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
+    Write-Color @script:WriteParameters "[i] Running ", "Reboot Events Report (Troubleshooting Only)." -Color White, Green, White, Green, White, Green, White
 
     # -LogName "System" -Provider "User32"
     # -LogName "System" -Provider "Microsoft-Windows-WER-SystemErrorReporting" -EventID 1001, 1018
@@ -9,33 +9,27 @@ function Get-RebootEvents($Servers, $Dates) {
     # -LogName "System" -Provider "Microsoft-Windows-Power-Troubleshooter" -EventID 1
     # -LogName "System" -Provider "Eventlog" -EventID 6005, 6006, 6008, 6013
 
-    $EventIds = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
-    foreach ($Server in $Servers) {
-        $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew()
-
-        $Events = Get-Events -Server $Server -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo -EventID $EventIds -LogType "System"
-
-        $script:TimeToGenerateReports.Reports.IncludeDomainControllersReboots.$($server) = = Set-TimeLog -Time $ExecutionTime
-    }
-
-    Write-Color @script:WriteParameters "[i] Ending ", "Reboot Events Report (Troubleshooting Only)", " for dates from: ", "$($Dates.DateFrom)", " to: ", "$($Dates.DateTo)", "." -Color White, Green, White, Green, White, Green, White
-    return $Events | Select-Object ID, Computer, TimeCreated, Message
+    $EventsNeeded = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013 | Sort-Object -Unique
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType 'System'
+    Write-Color @script:WriteParameters "[i] Ending ", "Reboot Events Report (Troubleshooting Only)." -Color White, Green, White, Green, White, Green, White
+    return $EventsFound | Select-Object ID, Computer, TimeCreated, Message
 }
 
-function Get-EventLogClearedLogs($Servers, $Dates) {
-    $EventID = 1102
-    $Events = @()
-    foreach ($Server in $Servers) {
-        $ExecutionTime = Start-TimeLog
-        $Events += Get-Events -Server $Server -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo -EventID $EventID -LogType "Security" -ProviderName "Microsoft-Windows-Eventlog"
-        $script:TimeToGenerateReports.Reports.IncludeClearedLogs.$($Server) = Stop-TimeLog -Time $ExecutionTime
+function Get-EventLogClearedLogs($Events, $Type) {
+    if ($Type -eq 'Security') {
+        $EventsNeeded = 1102
+        $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType 'Security'
+    } else {
+        $EventsNeeded = 104
+        $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType 'System'
     }
-    $EventsOutput = $Events | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
+    $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
+
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
-    @{label = 'Record ID'; expression = { $_.RecordId }}
+    @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
 
-    return $EventsOutput
+    return $EventsFound
 }
