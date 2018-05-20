@@ -169,7 +169,74 @@ function Get-DomainControllers($Servers) {
     return $ServersTable
 }
 
-function Start-Report([hashtable] $Dates, [hashtable] $EmailParameters, [hashtable] $ReportOptions, [hashtable] $FormattingOptions, $Servers) {
+
+function Get-Servers($ReportOptions) {
+    $Servers = @()
+    if ($ReportOptions.OnlyPrimaryDC -eq $true) {
+        $ServerOptions = @{
+            Server      = (get-addomain).pdcemulator;
+            ErrorAction = "Stop"
+        }
+    } else {
+        $ServerOptions = @{
+            Filter      = "*";
+            ErrorAction = "Stop"
+        }
+    }
+    try {
+        $Servers = Get-ADDomainController @ServerOptions | Select-Object Name, HostName, Ipv4Address, IsGlobalCatalog, IsReadOnly, OperatingSystem, Site, Enabled, Supported #, EventsFound
+    } catch {
+        if ($_.Exception -match "Unable to find a default server with Active Directory Web Services running.") {
+            Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+        }
+        Write-Color @script:WriteParameters "[i] Error: ", "$($_.Exception.Message)" -Color White, Red
+    }
+    return $Servers
+}
+
+
+function Find-ServersAD ($ReportDefinitions) {
+    if ($ReportDefinitions.ReportsAD.Servers.Automatic -eq $true) {
+        if ($ReportDefinitions.ReportsAD.Servers.OnlyPDC -eq $true) {
+            $ServerOptions = @{
+                Server = (get-addomain).pdcemulator; ErrorAction = "Stop"
+            }
+        } else {
+            $ServerOptions = @{
+                Filter = "*"; ErrorAction = "Stop"
+            }
+        }
+        try {
+            $Servers = Get-ADDomainController @ServerOptions | Select-Object Name , HostName, Ipv4Address, IsGlobalCatalog, IsReadOnly, OperatingSystem, Site, Enabled, Supported #, EventsFound
+            $Servers = $Servers | Where-Object { $_.OperatingSystem -notlike "*2003*" -and $_.OperatingSystem -notlike "*2000*" }
+            $Servers = $Servers.Hostname
+            return $Servers
+        } catch {
+            if ($_.Exception -match "Unable to find a default server with Active Directory Web Services running.") {
+                Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+            }
+            Write-Color @script:WriteParameters "[i] Error: ", "$($_.Exception.Message)" -Color White, Red
+            Exit
+        }
+    } else {
+        if ($ReportDefinitions.ReportsAD.Servers.DC -eq '') {
+            Write-Color @script:WriteParameters "[i] Error: ", "Parameter ", 'ReportDefinitions.ReportsAD.Servers.DC', ' is empty. Please choose ', 'Automatic', 'or fill in this field.' -Color White, White, Yellow, White, Yellow, White
+            Exit
+        } else {
+            return $ReportDefinitions.ReportsAD.Servers.DC
+        }
+    }
+}
+
+function Start-Report() {
+    param (
+        [hashtable] $Dates,
+        [hashtable] $EmailParameters,
+        [hashtable] $FormattingParameters,
+        [hashtable] $ReportOptions,
+        [hashtable] $ReportDefinitions
+    )
+
     $time = [System.Diagnostics.Stopwatch]::StartNew() # Timer Start
     # Declare variables
     $EventLogTable = @()
@@ -186,9 +253,13 @@ function Start-Report([hashtable] $Dates, [hashtable] $EmailParameters, [hashtab
     $TableExecutionTimes = ''
 
     # Prepare email body
-    $EmailBody = Set-EmailHead  -FormattingOptions $FormattingOptions
-    $EmailBody += Set-EmailReportBrading -FormattingOptions $FormattingOptions
-    $EmailBody += Set-EmailReportDetails -FormattingOptions $FormattingOptions -Dates $Dates
+    $EmailBody = Set-EmailHead -FormattingParameters $FormattingParameters
+    $EmailBody += Set-EmailReportBrading -FormattingParameters $FormattingParameters
+    $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates
+
+
+    $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions
+    Exit
 
     # Load all events if required
     if ($ReportOptions.IncludeDomainControllers -eq $true) {
@@ -198,8 +269,9 @@ function Start-Report([hashtable] $Dates, [hashtable] $EmailParameters, [hashtab
 
         $script:TimeToGenerateReports.Reports.IncludeDomainControllers.Total = Stop-TimeLog -Time $ExecutionTime
     }
-    $Servers = $Servers | Where-Object { $_.OperatingSystem -notlike "*2003*" -and $_.OperatingSystem -notlike "*2000*" }
-    $Servers = $Servers.Hostname
+
+
+
 
     If ($ReportOptions.IncludeClearedLogs -eq $true) {
         $ExecutionTime = Start-TimeLog # Timer Start
@@ -359,114 +431,102 @@ function Start-Report([hashtable] $Dates, [hashtable] $EmailParameters, [hashtab
 
     Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
 }
+function Start-ADReporting () {
+    param (
+        [hashtable]$EmailParameters,
+        [hashtable]$FormattingParameters,
+        [hashtable]$ReportOptions,
+        [hashtable]$ReportTimes,
+        [hashtable]$ReportDefinitions
+    )
+    Set-DisplayParameters -ReportOptions $ReportOptions
 
-function Get-Servers($ReportOptions) {
-    $Servers = @()
-    if ($ReportOptions.OnlyPrimaryDC -eq $true) { $ServerOptions = @{ Server = (get-addomain).pdcemulator; ErrorAction = "Stop" }
-    } else { $ServerOptions = @{ Filter = "*"; ErrorAction = "Stop" }
-    }
-    try {
-        $Servers = Get-ADDomainController @ServerOptions | Select-Object Name, HostName, Ipv4Address, IsGlobalCatalog, IsReadOnly, OperatingSystem, Site, Enabled, Supported #, EventsFound
-    } catch {
-        if ($_.Exception -match "Unable to find a default server with Active Directory Web Services running.") {
-            Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
-        }
-        Write-Color @script:WriteParameters "[i] Error: ", "$($_.Exception.Message)" -Color White, Red
-    }
-    return $Servers
-}
-function Start-ADReporting ($EmailParameters, $ReportOptions, $FormattingOptions, $ScriptParameters) {
-
-    $Test1 = Test-Key -ConfigurationTable $ScriptParameters -ConfigurationSection "" -ConfigurationKey "ShowTime" -DisplayProgress $false
-    $Test2 = Test-Key -ConfigurationTable $ScriptParameters -ConfigurationSection "" -ConfigurationKey "LogFile" -DisplayProgress $false
-    $Test3 = Test-Key -ConfigurationTable $ScriptParameters -ConfigurationSection "" -ConfigurationKey "TimeFormat" -DisplayProgress $false
-    if ($Test1 -and $Test2 -and $Test3) { $script:WriteParameters = $ScriptParameters }
-    Test-Prerequisite $EmailParameters $ReportOptions $FormattingOptions
+    #Test-Prerequisite $EmailParameters $FormattingParameters $ReportOptions $ReportTimes $ReportDefinitions
     if ($ReportOptions.JustTestPrerequisite -ne $null -and $ReportOptions.JustTestPrerequisite -eq $true) {
         Exit
     }
-    $Servers = Get-Servers $ReportOptions
+
     # Report Per Hour
-    if ($ReportOptions.ReportPastHour -eq $true) {
+    if ($ReportTimes.PastHour -eq $true) {
         $DatesPastHour = Find-DatesPastHour
         if ($DatesPastHour -ne $null) {
-            Start-Report -Dates $DatesPastHour $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesPastHour -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
-    if ($ReportOptions.ReportCurrentHour -eq $true) {
+    if ($ReportTimes.CurrentHour -eq $true) {
         $DatesCurrentHour = Find-DatesCurrentHour
         if ($DatesCurrentHour -ne $null) {
-            Start-Report -Dates $DatesCurrentHour $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesCurrentHour -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
     # Report Per Day
-    if ($ReportOptions.ReportPastDay -eq $true) {
+    if ($ReportTimes.PastDay -eq $true) {
         $DatesDayPrevious = Find-DatesDayPrevious
         if ($DatesDayPrevious -ne $null) {
-            Start-Report -Dates $DatesDayPrevious $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesDayPrevious -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
-    if ($ReportOptions.ReportCurrentDay -eq $true) {
+    if ($ReportTimes.CurrentDay -eq $true) {
         $DatesDayToday = Find-DatesDayToday
         if ($DatesDayToday -ne $null) {
-            Start-Report -Dates $DatesDayToday $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesDayToday -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
     # Report Per Week
-    if ($ReportOptions.ReportOnDay.Use -eq $true) {
-        foreach ($Day in $ReportOptions.ReportOnDay.Days) {
+    if ($ReportTimes.OnDay.Enabled -eq $true) {
+        foreach ($Day in $ReportTimes.OnDay.Days) {
             $DatesReportOnDay = Find-DatesPastWeek $Day
             if ($DatesReportOnDay -ne $null) {
-                Start-Report -Dates $DatesReportOnDay $EmailParameters $ReportOptions $FormattingOptions $Servers
+                Start-Report -Dates $DatesReportOnDay -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
             }
         }
     }
     # Report Per Month
-    if ($ReportOptions.ReportPastMonth.Use -eq $true -or $ReportOptions.ReportPastMonth.Force -eq $true) {
-        $DatesMonthPrevious = Find-DatesMonthPast -Force $ReportOptions.ReportPastMonth.Force     # Find-DatesMonthPast runs only on 1st of the month unless -Force is used
+    if ($ReportTimes.PastMonth.Enabled -eq $true -or $ReportTimes.PastMonth.Force -eq $true) {
+        $DatesMonthPrevious = Find-DatesMonthPast -Force $ReportTimes.PastMonth.Force     # Find-DatesMonthPast runs only on 1st of the month unless -Force is used
         if ($DatesMonthPrevious -ne $null) {
-            Start-Report -Dates $DatesMonthPrevious -EmailParameters $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesMonthPrevious -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
-    if ($ReportOptions.ReportCurrentMonth -eq $true) {
+    if ($ReportTimes.CurrentMonth -eq $true) {
         $DatesMonthCurrent = Find-DatesMonthCurrent
         if ($DatesMonthCurrent -ne $null) {
-            Start-Report -Dates $DatesMonthCurrent $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesMonthCurrent -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
     # Report Per Quarter
-    if ($ReportOptions.ReportPastQuarter.Use -eq $true -or $ReportOptions.ReportPastQuarter.Force -eq $true) {
-        $DatesQuarterLast = Find-DatesQuarterLast -Force $ReportOptions.ReportPastQuarter.Force  # Find-DatesMonthPast runs only on 1st of the quarter unless -Force is used
+    if ($ReportTimes.PastQuarter.Enabled -eq $true -or $ReportTimes.PastQuarter.Force -eq $true) {
+        $DatesQuarterLast = Find-DatesQuarterLast -Force $ReportTimes.PastQuarter.Force  # Find-DatesMonthPast runs only on 1st of the quarter unless -Force is used
         if ($DatesQuarterLast -ne $null) {
-            Start-Report -Dates $DatesQuarterLast $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesQuarterLast -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
-    if ($ReportOptions.ReportCurrentQuarter -eq $true) {
+    if ($ReportTimes.CurrentQuarter -eq $true) {
         $DatesQuarterCurrent = Find-DatesQuarterCurrent
         if ($DatesQuarterCurrent -ne $null) {
-            Start-Report -Dates $DatesQuarterCurrent $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesQuarterCurrent -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
     # Report Custom
-    if ($ReportOptions.ReportCurrentDayMinusDayX.Use -eq $true) {
-        $DatesCurrentDayMinusDayX = Find-DatesCurrentDayMinusDayX $ReportOptions.ReportCurrentDayMinusDayX.Days
+    if ($ReportTimes.CurrentDayMinusDayX.Enabled -eq $true) {
+        $DatesCurrentDayMinusDayX = Find-DatesCurrentDayMinusDayX $ReportTimes.CurrentDayMinusDayX.Days
         if ($DatesCurrentDayMinusDayX -ne $null) {
-            Start-Report -Dates $DatesCurrentDayMinusDayX $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesCurrentDayMinusDayX -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
-    if ($ReportOptions.ReportCurrentDayMinuxDaysX.Use -eq $true) {
-        $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX $ReportOptions.ReportCurrentDayMinuxDaysX.Days
+    if ($ReportTimes.CurrentDayMinuxDaysX.Enabled -eq $true) {
+        $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX $ReportTimes.CurrentDayMinuxDaysX.Days
         if ($DatesCurrentDayMinusDaysX -ne $null) {
-            Start-Report -Dates $DatesCurrentDayMinusDaysX $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesCurrentDayMinusDaysX -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
-    if ($ReportOptions.ReportCustomDate.Use -eq $true) {
+    if ($ReportTimes.CustomDate.Enabled -eq $true) {
         $DatesCustom = @{
-            DateFrom = $ReportOptions.ReportCustomDate.DateFrom
-            DateTo   = $ReportOptions.ReportCustomDate.DateTo
+            DateFrom = $ReportTimes.CustomDate.DateFrom
+            DateTo   = $ReportTimes.CustomDate.DateTo
         }
         if ($DatesCustom -ne $null) {
-            Start-Report -Dates $DatesCustom $EmailParameters $ReportOptions $FormattingOptions $Servers
+            Start-Report -Dates $DatesCustom -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions
         }
     }
 
