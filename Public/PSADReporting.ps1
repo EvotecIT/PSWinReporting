@@ -10,10 +10,10 @@
     - When and who changed passwords
     - When and who locked out account and where did it happen
     .NOTES
-    Version:        0.91
+    Version:        0.99
     Author:         Przemyslaw Klys <przemyslaw.klys at evotec.pl>
     Creation Date:  23.03.2018
-    Modifcation Date: 12.05.2018
+    Modifcation Date: 22.05.2018
 
     TODO:
     - DirectoryPattern                = $true # adds to reports path Hourly \ Monthly \ Quarterly \ Custom ("C:\Support\Reports\Hourly")
@@ -95,7 +95,7 @@ function Start-ADReporting () {
     )
     Set-DisplayParameters -ReportOptions $ReportOptions
 
-    #Test-Prerequisite $EmailParameters $FormattingParameters $ReportOptions $ReportTimes $ReportDefinitions
+    Test-Prerequisite $EmailParameters $FormattingParameters $ReportOptions $ReportTimes $ReportDefinitions
     if ($ReportOptions.JustTestPrerequisite -ne $null -and $ReportOptions.JustTestPrerequisite -eq $true) {
         Exit
     }
