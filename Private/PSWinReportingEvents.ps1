@@ -41,6 +41,19 @@ Function Convert-UAC ([int]$UAC) {
     1..($PropertyFlags.Length) | Where-Object {$UAC -bAnd [math]::Pow(2, $_)} | ForEach-Object {If ($Attributes.Length -EQ 0) {$Attributes = $PropertyFlags[$_]} Else {$Attributes = $Attributes + ", " + $PropertyFlags[$_]}}
     Return $Attributes
 }
+
+Function Convert-FromGPO ([string] $OperationType) {
+    $Known = @{
+        '%%14674' = 'Value Added'
+        '%%14675' = 'Value Deleted'
+        '%%14676' = 'Unknown'
+    }
+    foreach ($id in $OperationType) {
+        if ($name = $Known[$id]) { return $name }
+    }
+    return $OperationType
+}
+
 function ConvertFrom-SID ($Sid) {
     $KnownSIDs = @{
         'S-1-0' = 'Null Authority'
