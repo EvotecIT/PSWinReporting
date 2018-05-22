@@ -18,6 +18,7 @@ function Get-EventLogSize ($Servers, $LogName = "Security") {
         Add-Member -InputObject $result -MemberType NoteProperty -Name "EventNewest" -Value $EventNewest
         $results += $result
     }
+
     return $results | Select-Object Server, LogName, LogType, EventOldest, EventNewest, "CurrentFileSize", "MaximumFileSize", LogMode, IsEnabled
 }
 
@@ -133,7 +134,7 @@ function Start-Report() {
         $ExecutionTime = Start-TimeLog # Timer St
         foreach ($LogName in $ReportDefinitions.ReportsAD.Custom.EventLogSize.Logs) {
             Write-Color @script:WriteParameters "[i] Running ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
-            $EventLogTable = Get-EventLogSize -Servers $Servers -LogName $LogName
+            $EventLogTable += Get-EventLogSize -Servers $Servers -LogName $LogName
             Write-Color @script:WriteParameters "[i] Ending ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
         }
         if ($ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy -ne "") { $EventLogTable = $EventLogTable | Sort-Object $ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy }
@@ -286,10 +287,9 @@ function Get-DomainControllers($Servers) {
         }
         Write-Color @script:WriteParameters "[i] Error: ", "$($_.Exception.Message)" -Color White, Red
     }
-    Add-Member -InputObject $DomainControllers -MemberType NoteProperty -Name "Supported" -Value ""
-    Add-Member -InputObject $DomainControllers -MemberType NoteProperty -Name "Reporting" -Value ""
     foreach ($dc in $DomainControllers) {
-
+        Add-Member -InputObject $dc -MemberType NoteProperty -Name "Supported" -Value ""
+        Add-Member -InputObject $dc -MemberType NoteProperty -Name "Reporting" -Value ""
         if ($dc.OperatingSystem -like "*2003*" -or $dc.OperatingSystem -like "*2000*") {
             #Add-Member -InputObject $server -MemberType NoteProperty -Name "Supported" -Value "No"
             $dc.Supported = "No"
@@ -302,8 +302,8 @@ function Get-DomainControllers($Servers) {
                 $dc.Reporting = $true
             }
         }
-        return $DomainControllers
     }
+    return $DomainControllers
 }
 
 function Get-Servers($ReportOptions) {
