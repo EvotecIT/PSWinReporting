@@ -290,36 +290,48 @@ function Start-Report() {
 
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer
         $UsersEventsTable = Get-UserChanges -Events $Events
         $script:TimeToGenerateReports.Reports.UserChanges.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
     }
     if ($ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "User Statues Report." -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer
         $UsersEventsStatusesTable = Get-UserStatuses -Events $Events
         $script:TimeToGenerateReports.Reports.UserStatus.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "User Statues Report." -Color White, Green, White, Green, White, Green, White
     }
     If ($ReportDefinitions.ReportsAD.EventBased.UserLockouts.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "User Lockouts Report." -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer
         $UsersLockoutsTable = Get-UserLockouts -Events $Events
         $script:TimeToGenerateReports.Reports.UserLockouts.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "User Lockouts Report." -Color White, Green, White, Green, White, Green, White
     }
     if ($ReportDefinitions.ReportsAD.EventBased.UserLogon.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "Logon Events Report." -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer
         $LogonEvents = Get-LogonEvents -Events $Events
         $script:TimeToGenerateReports.Reports.UserLogon.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "Logon Events Report." -Color White, Green, White, Green, White, Green, White
     }
     ### USER EVENTS END ###
 
     if ($ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "Group Membership Changes Report" -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer St
         $GroupsEventsTable = Get-GroupMembershipChanges -Events $Events
         $script:TimeToGenerateReports.Reports.GroupMembershipChanges.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "Group Membership Changes Report." -Color White, Green, White, Green, White, Green, White
     }
     if ($ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "Group Create/Delete Report." -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer
         $GroupCreateDeleteTable = Get-GroupCreateDelete -Events $Events
         $script:TimeToGenerateReports.Reports.GroupCreateDelete.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "Group Create/Delete Report." -Color White, Green, White, Green, White, Green, White
     }
     if ($ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -eq $true) {
         $ExecutionTime = Start-TimeLog # Timer
@@ -327,9 +339,11 @@ function Start-Report() {
         $script:TimeToGenerateReports.Reports.EventsReboots.Total = Stop-TimeLog -Time $ExecutionTime
     }
     if ($ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "Group Policy Changes Report." -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer
         $TableGroupPolicyChanges = Get-GroupPolicyChanges -Events $Events
         $script:TimeToGenerateReports.Reports.GroupPolicyChanges.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "Group Policy Changes Report." -Color White, Green, White, Green, White, Green, White
     }
     If ($ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -eq $true) {
         $ExecutionTime = Start-TimeLog # Timer Start

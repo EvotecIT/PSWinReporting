@@ -1,5 +1,4 @@
 function Get-GroupCreateDelete($Events) {
-    Write-Color @script:WriteParameters "[i] Running ", "Group Create/Delete Report." -Color White, Green, White, Green, White, Green, White
     $EventsType = 'Security'
     $EventsNeeded = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -11,11 +10,10 @@ function Get-GroupCreateDelete($Events) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-    Write-Color @script:WriteParameters "[i] Ending ", "Group Create/Delete Report." -Color White, Green, White, Green, White, Green, White
     return $EventsFound
 }
 function Get-GroupMembershipChanges($Events) {
-    Write-Color @script:WriteParameters "[i] Running ", "Group Membership Changes Report" -Color White, Green, White, Green, White, Green, White
+
     $EventsType = 'Security'
     $EventsNeeded = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -27,11 +25,11 @@ function Get-GroupMembershipChanges($Events) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-    Write-Color @script:WriteParameters "[i] Ending ", "Group Membership Changes Report." -Color White, Green, White, Green, White, Green, White
+
     return $EventsFound
 }
 function Get-UserStatuses($Events) {
-    Write-Color @script:WriteParameters "[i] Running ", "User Statues Report." -Color White, Green, White, Green, White, Green, White
+
     $EventsType = 'Security'
     $EventsNeeded = 4722, 4725, 4767, 4723, 4724, 4726
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -42,11 +40,11 @@ function Get-UserStatuses($Events) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-    Write-Color @script:WriteParameters "[i] Ending ", "User Statues Report." -Color White, Green, White, Green, White, Green, White
+
     return $EventsFound
 }
 function Get-UserLockouts($Events) {
-    Write-Color @script:WriteParameters "[i] Running ", "User Lockouts Report." -Color White, Green, White, Green, White, Green, White
+
     $EventsType = 'Security'
     $EventsNeeded = 4740
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -58,11 +56,11 @@ function Get-UserLockouts($Events) {
     @{label = 'When'; expression = { ($_.Date) }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-    Write-Color @script:WriteParameters "[i] Ending ", "User Lockouts Report." -Color White, Green, White, Green, White, Green, White
+
     return $EventsFound
 }
 function Get-UserChanges($Events) {
-    Write-Color @script:WriteParameters "[i] Running ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
+
     $EventsFoundCleaned = @()
     $EventsType = 'Security'
     $EventsNeeded = 4720, 4738
@@ -105,11 +103,10 @@ function Get-UserChanges($Events) {
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }}
     $EventsFoundCleaned = $EventsFoundCleaned | Sort-Object When
-    Write-Color @script:WriteParameters "[i] Ending ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
+
     return $EventsFoundCleaned
 }
 function Get-GroupPolicyChanges ($Events) {
-    Write-Color @script:WriteParameters "[i] Running ", "Group Policy Changes Report." -Color White, Green, White, Green, White, Green, White
     # 5136 Group Policy changes, value changes, links, unlinks.
     # 5137 Group Policy creations.
     # 5141 Group Policy deletions.
@@ -126,12 +123,10 @@ function Get-GroupPolicyChanges ($Events) {
     @{label = 'OperationType'; expression = { Convert-FromGPO -OperationType $_.OperationType }},
     DSName, DSType, ObjectDN, ObjectGUID, ObjectClass, AttributeLDAPDisplayName, AttributeSyntaxOID,
     AttributeValue, Id, Task | Sort-Object When
-
-    Write-Color @script:WriteParameters "[i] Ending ", "Group Policy Changes Report." -Color White, Green, White, Green, White, Green, White
     return $EventsFound
 }
 function Get-LogonEvents($Events) {
-    Write-Color @script:WriteParameters "[i] Running ", "Logon Events Report." -Color White, Green, White, Green, White, Green, White
+
     # 4624: An account was successfully logged on
     # 4634: An account was logged off
     # 4647: User initiated logoff
@@ -139,6 +134,6 @@ function Get-LogonEvents($Events) {
     $EventsType = 'Security'
     $EventsNeeded = 4624
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
-    Write-Color @script:WriteParameters "[i] Ending ", "Logon Events Report." -Color White, Green, White, Green, White, Green, White
+
     return $EventsFound
 }
