@@ -1,6 +1,6 @@
 # required modules
 Install-Module -Name PSEventViewer
-Install-Module -Name PSADReporting
+Install-Module -Name PSWinReporting
 Install-Module -Name PSWriteColor
 Install-Module -Name ImportExcel
 # Updates to already installed modules
