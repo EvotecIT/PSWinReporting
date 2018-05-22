@@ -1,7 +1,8 @@
 function Get-GroupCreateDelete($Events) {
     Write-Color @script:WriteParameters "[i] Running ", "Group Create/Delete Report." -Color White, Green, White, Green, White, Green, White
+    $EventsType = 'Security'
     $EventsNeeded = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
-    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
     @{label = 'Group Name'; expression = { $_.TargetUserName }},
@@ -15,8 +16,9 @@ function Get-GroupCreateDelete($Events) {
 }
 function Get-GroupMembershipChanges($Events) {
     Write-Color @script:WriteParameters "[i] Running ", "Group Membership Changes Report" -Color White, Green, White, Green, White, Green, White
+    $EventsType = 'Security'
     $EventsNeeded = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
-    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
     @{label = 'Group Name'; expression = { $_.TargetUserName }},
@@ -30,8 +32,9 @@ function Get-GroupMembershipChanges($Events) {
 }
 function Get-UserStatuses($Events) {
     Write-Color @script:WriteParameters "[i] Running ", "User Statues Report." -Color White, Green, White, Green, White, Green, White
+    $EventsType = 'Security'
     $EventsNeeded = 4722, 4725, 4767, 4723, 4724, 4726
-    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
     @{label = 'User Affected'; expression = { "$($_.TargetDomainName)\$($_.TargetUserName)" }},
@@ -44,8 +47,9 @@ function Get-UserStatuses($Events) {
 }
 function Get-UserLockouts($Events) {
     Write-Color @script:WriteParameters "[i] Running ", "User Lockouts Report." -Color White, Green, White, Green, White, Green, White
+    $EventsType = 'Security'
     $EventsNeeded = 4740
-    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
     @{label = 'Computer Lockout On'; expression = { "$($_.TargetDomainName)" }},
@@ -60,8 +64,9 @@ function Get-UserLockouts($Events) {
 function Get-UserChanges($Events) {
     Write-Color @script:WriteParameters "[i] Running ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
     $EventsFoundCleaned = @()
+    $EventsType = 'Security'
     $EventsNeeded = 4720, 4738
-    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
 
     # Cleanup Anonymous LOGON (usually related to password events)
     # https://social.technet.microsoft.com/Forums/en-US/5b2a93f7-7101-43c1-ab53-3a51b2e05693/eventid-4738-user-account-was-changed-by-anonymous?forum=winserverDS
@@ -108,8 +113,9 @@ function Get-GroupPolicyChanges ($Events) {
     # 5136 Group Policy changes, value changes, links, unlinks.
     # 5137 Group Policy creations.
     # 5141 Group Policy deletions.
+    $EventsType = 'Security'
     $EventsNeeded = 5136, 5137, 5141
-    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
 
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
@@ -121,8 +127,6 @@ function Get-GroupPolicyChanges ($Events) {
     DSName, DSType, ObjectDN, ObjectGUID, ObjectClass, AttributeLDAPDisplayName, AttributeSyntaxOID,
     AttributeValue, Id, Task | Sort-Object When
 
-
-
     Write-Color @script:WriteParameters "[i] Ending ", "Group Policy Changes Report." -Color White, Green, White, Green, White, Green, White
     return $EventsFound
 }
@@ -132,8 +136,9 @@ function Get-LogonEvents($Events) {
     # 4634: An account was logged off
     # 4647: User initiated logoff
     # 4672: Special privileges assigned to new logon                     https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4672
+    $EventsType = 'Security'
     $EventsNeeded = 4624
-    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     Write-Color @script:WriteParameters "[i] Ending ", "Logon Events Report." -Color White, Green, White, Green, White, Green, White
     return $EventsFound
 }
