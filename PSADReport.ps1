@@ -115,7 +115,7 @@ $ReportDefinitions = @{
                 IgnoreWords = ''
             }
             UserLogon              = @{
-                Enabled     = $false
+                Enabled     = $false ### not ready for prime time, huge impact on performance, do not use...
                 Events      = 4624
                 LogName     = 'Security'
                 IgnoreWords = ''
@@ -133,7 +133,7 @@ $ReportDefinitions = @{
                 IgnoreWords = ''
             }
             GroupPolicyChanges     = @{
-                Enabled     = $true
+                Enabled     = $false  ### not ready for prime time
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
                 IgnoreWords = ''
@@ -151,7 +151,7 @@ $ReportDefinitions = @{
                 IgnoreWords = ''
             }
             EventsReboots          = @{
-                Enabled     = $true
+                Enabled     = $false  ### a bit useless atm
                 Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
                 LogName     = 'System'
                 IgnoreWords = ''
