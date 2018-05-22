@@ -111,30 +111,9 @@ function Set-TimeReports ($HashTable) {
             <th colspan="1">
                 <font color="#ffffff">Total</font>
             </th>
-            <th colspan="$Count">
-                <font color="#ffffff">Servers</font>
-            </th>
         </tr>
 "@
 
-    $htmlStart += '<tr bgcolor="#00CC00">'
-    $htmlStart += '<th></th>'
-    $htmlStart += '<th></th>'
-
-    #$HashTable.GetEnumerator()
-    foreach ($reportName in $reports) {
-        if ($($HashTable[$reportName]).Count -eq $($Count + 1)) {
-            foreach ($server in $($HashTable[$reportName].GetEnumerator().Name)) {
-                if ($server -ne 'Total') {
-                    $htmlStart += '<th>' + $server + '</th>'
-                }
-            }
-            break;
-        }
-    }
-    $htmlStart += '</tr>'
-
-    #
     foreach ($reportName in $reports) {
         $htmlStart += '<tr align="left" bgcolor="#dddddd">'
 
@@ -309,8 +288,6 @@ function Start-Report() {
     $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security'
     $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System'
 
-
-
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
         $ExecutionTime = Start-TimeLog # Timer
@@ -401,7 +378,7 @@ function Start-Report() {
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -ReportTable $GroupsEventsTable -ReportTableText 'The membership of those groups below has changed'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -ReportTable $GroupCreateDeleteTable -ReportTableText 'Following group creation/deletion occured'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -ReportTable $TableGroupPolicyChanges -ReportTableText 'Following GPOs were modified'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -ReportTable $TableEventLogClearedLogs ReportTableText 'Following logs clearing (security) actions occured '
+        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -ReportTable $TableEventLogClearedLogs -ReportTableText 'Following logs clearing (security) actions occured '
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -ReportTable $TableEventLogClearedLogsOther -ReportTableText 'Following logs clearing (other) actions occured'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -ReportTable $RebootEventsTable -ReportTableText 'Following reboot related events happened'
     }
@@ -568,5 +545,3 @@ function Start-ADReporting () {
     }
 
 }
-
-#xport-ModuleMember -function 'Start-ADReporting'
