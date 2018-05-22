@@ -110,16 +110,19 @@ function Get-GroupPolicyChanges ($Events) {
     # 5141 Group Policy deletions.
     $EventsNeeded = 5136, 5137, 5141
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded
-    <#
+
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
-    @{label = 'Group Name'; expression = { $_.TargetUserName }},
-    @{label = 'Member Name'; expression = {$_.MemberName -replace '^CN=|,.*$' }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
-    @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-    #>
+    @{label = 'Record ID'; expression = { $_.RecordId }},
+    @{label = 'OperationType'; expression = { Convert-FromGPO -OperationType $_.OperationType }},
+    DSName, DSType, ObjectDN, ObjectGUID, ObjectClass, AttributeLDAPDisplayName, AttributeSyntaxOID,
+    AttributeValue, Id, Task | Sort-Object When
+
+
+
     Write-Color @script:WriteParameters "[i] Ending ", "Group Policy Changes Report." -Color White, Green, White, Green, White, Green, White
     return $EventsFound
 }
