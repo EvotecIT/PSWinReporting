@@ -120,6 +120,12 @@ $ReportDefinitions = @{
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
+            UserLogonKerberos      = @{
+                Enabled     = $true ### not ready for prime time, huge impact on performance, do not use...
+                Events      = 4768
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
             GroupMembershipChanges = @{
                 Enabled     = $true
                 Events      = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
