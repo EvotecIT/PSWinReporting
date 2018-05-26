@@ -58,6 +58,9 @@ $script:TimeToGenerateReports = [ordered]@{
         UserLogon              = @{
             Total = $null
         }
+        UserLogonKerberos      = @{
+            Total = $null
+        }
         GroupMembershipChanges = @{
             Total = $null
         }
