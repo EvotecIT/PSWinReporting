@@ -5,7 +5,6 @@ function Get-GroupCreateDelete($Events) {
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
     @{label = 'Group Name'; expression = { $_.TargetUserName }},
-    @{label = 'Member Name'; expression = {$_.MemberName -replace '^CN=|,.*$' }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
