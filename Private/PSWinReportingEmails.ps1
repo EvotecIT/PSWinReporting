@@ -1,15 +1,4 @@
 function Set-EmailHead($FormattingOptions) {
-    <#
-    $Head = "<style>" +
-    "BODY{background-color:white;font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)}" +
-    "TABLE{border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse}" +
-    "TH{border-width: 1px;padding: 3px;border-style: solid;border-color: black;background-color:`"#00297A`";font-color:white}" +
-    "TD{border-width: 1px;padding-right: 2px;padding-left: 2px;padding-top: 0px;padding-bottom: 0px;border-style: solid;border-color: black;background-color:white}" +
-    "H2{font-family:$($FormattingParameters.FontHeadingFamily);font-size:$($FormattingParameters.FontHeadingSize)}" +
-    "P{font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)}" +
-    "</style>"
-#>
-
     $head = @"
 <style>
     BODY {
