@@ -10,5 +10,7 @@ Foreach ($import in @($Public + $Private)) {
         Write-Error -Message "Failed to import function $($import.fullname): $_"
     }
 }
-#Export-ModuleMember -Function $Public.Basename
+
+#Export-ModuleMember -Function $Public.Basename -Verbose
+#Export-ModuleMember -Function * #-Verbose # 'Start-ADReporting', 'Get-KerberosLogonEvents', 'Get-GroupPolicyChanges', 'Get-EventLogClearedLogs'
 Export-ModuleMember -Function 'Start-ADReporting'

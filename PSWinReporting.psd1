@@ -12,7 +12,7 @@
     RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '0.99'
+    ModuleVersion     = '1.00'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -69,8 +69,8 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
+    #FunctionsToExport = '*'# 'Start-ADReporting', 'Get-KerberosLogonEvents', 'Get-GroupPolicyChanges', 'Get-EventLogClearedLogs'
     FunctionsToExport = 'Start-ADReporting'
-
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = @()
 
@@ -87,7 +87,7 @@
     # ModuleList = @()
 
     # List of all files packaged with this module
-    FileList          = 'PSWinReporting.psm1', 'PSWinReporting.psd1'
+    #FileList          = 'PSWinReporting.psm1', 'PSWinReporting.psd1'
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData       = @{
 
