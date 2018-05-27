@@ -189,8 +189,8 @@ function Get-EventLogClearedLogs($Events, $Type, $IgnoreWords = '') {
     #return $EventsFound
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
-    @{label = 'Backup Path'; expression = { $_.BackupPath }},
-    @{label = 'Log Type'; expression = { $_.Channel }},
+    @{label = 'Backup Path'; expression = { if ($_.BackupPath -eq $null) { 'N/A' } else { $_.BackupPath} }},
+    @{label = 'Log Type'; expression = { if ($Type -eq 'Security') { 'Security' } else {  $_.Channel } }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
