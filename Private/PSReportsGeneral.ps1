@@ -240,8 +240,11 @@ function Start-Report() {
     } else {
         Write-Color @script:WriteParameters "[i] Skipping sending email with reports...", "as per configuration!" -Color White, Green
     }
-    if ($ReportOptions.OpenAsFile -eq $true) {
-        # $EmailBody | Out-File -FilePath
+    if ($ReportOptions.OpenAsFile -eq $true -and $ReportOptions.AsHTML -eq $true) {
+        $ReportHTMLPath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension 'html'
+        Write-Color $ReportHTMLPath -Color Yellow
+        $EmailBody | Out-File -Encoding unicode -FilePath $ReportHTMLPath
+        Invoke-Item $ReportHTMLPath
     }
 
     Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
