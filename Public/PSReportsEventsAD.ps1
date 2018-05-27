@@ -186,14 +186,12 @@ function Get-EventLogClearedLogs($Events, $Type) {
     }
     #return $EventsFound
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
-    BackupPath,
-    Channel,
+    @{label = 'Backup Path'; expression = { $_.BackupPath }},
+    @{label = 'Log Type'; expression = { $_.Channel }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-
     return $EventsFound
 }
