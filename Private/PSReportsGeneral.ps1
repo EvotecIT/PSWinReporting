@@ -22,6 +22,19 @@ function Get-EventLogSize ($Servers, $LogName = "Security") {
     return $results | Select-Object Server, LogName, LogType, EventOldest, EventNewest, "CurrentFileSize", "MaximumFileSize", LogMode, IsEnabled
 }
 
+function Invoke-EventLogVerification ($Results, $Dates) {
+
+    $Logs = @()
+    foreach ($result in $Results) {
+
+        if ($result.EventOldest -gt $Dates.DateFrom) {
+            Write-Color @script:WriteParameters '[W] ', 'Warning: ', $result.LogName, ' log on ', $result.Server, " doesn't cover whole date range requested. Oldest event ", $result.EventOldest, ' while requested ', $Dates.DateFrom, '.' -Color Blue, White, Yellow, White, Yellow, White, Yellow, White, Yellow
+            $Logs += "<strong>$($result.LogName)</strong> log on <strong>$($result.Server)</strong> doesn't cover whole date range requested. Oldest event <strong>$($result.EventOldest)</strong> while requested <strong>$($Dates.DateFrom)</strong>."
+        }
+    }
+    return $Logs
+}
+
 function Start-Report() {
     param (
         [hashtable] $Dates,
@@ -47,11 +60,6 @@ function Start-Report() {
     $GroupCreateDeleteTable = @()
     $TableExecutionTimes = ''
 
-    # Prepare email body
-    $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
-    $EmailBody += Set-EmailReportBrading -FormattingParameters $FormattingParameters
-    $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates
-
     $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions
     $EventsToProcessSecurity = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'Security'
     $EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
@@ -59,6 +67,18 @@ function Start-Report() {
     $Events = @()
     $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose $ReportOptions.Debug.Verbose
     $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose $ReportOptions.Debug.Verbose
+
+    $EventLogDatesSummary = @()
+    $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
+    $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
+
+    $Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
+
+    # Prepare email body
+    $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
+    $EmailBody += Set-EmailReportBrading -FormattingParameters $FormattingParameters
+    $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
+
 
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {

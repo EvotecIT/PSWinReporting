@@ -124,7 +124,7 @@ function Set-EmailReportBrading($FormattingParameters) {
     }
     return $Report
 }
-function Set-EmailReportDetails($FormattingParameters, $Dates) {
+function Set-EmailReportDetails($FormattingParameters, $Dates, $Warnings) {
     $DateReport = get-date
     # HTML Report settings
     $Report = "<p style=`"background-color:white;font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)`">" +
@@ -132,7 +132,14 @@ function Set-EmailReportDetails($FormattingParameters, $Dates) {
     "<strong>Report Period:</strong> $($Dates.DateFrom) to $($Dates.DateTo) <br>" +
     "<strong>Account Executing Report :</strong> $env:userdomain\$($env:username.toupper()) on $($env:ComputerName.toUpper()) <br>" +
     "<strong>Time to generate:</strong> **TimeToGenerateDays** days, **TimeToGenerateHours** hours, **TimeToGenerateMinutes** minutes, **TimeToGenerateSeconds** seconds, **TimeToGenerateMilliseconds** milliseconds"
-    "</p>"
+
+    if ($($Warnings | Measure-Object).Count -gt 0) {
+        $Report += "<br><br><strong>Warnings:</strong>"
+        foreach ($warning in $Warnings) {
+            $Report += "<br> $warning"
+        }
+    }
+    $Report += "</p>"
     return $Report
 }
 function Set-EmailWordReplacements($Body, $Replace, $ReplaceWith, [switch] $RegEx) {
