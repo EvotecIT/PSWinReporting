@@ -1,4 +1,4 @@
-function Get-GroupCreateDelete($Events) {
+function Get-GroupCreateDelete($Events, $IgnoreWords = '') {
     $EventsType = 'Security'
     $EventsNeeded = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -9,9 +9,10 @@ function Get-GroupCreateDelete($Events) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }
-function Get-GroupMembershipChanges($Events) {
+function Get-GroupMembershipChanges($Events, $IgnoreWords = '') {
 
     $EventsType = 'Security'
     $EventsNeeded = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
@@ -24,10 +25,14 @@ function Get-GroupMembershipChanges($Events) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }
-function Get-UserStatuses($Events) {
+function Get-UserStatuses {
+    param (
+        $Events,
+        [hashtable] $IgnoreWords = ''
+    )
 
     $EventsType = 'Security'
     $EventsNeeded = 4722, 4725, 4767, 4723, 4724, 4726
@@ -39,11 +44,10 @@ function Get-UserStatuses($Events) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }
-function Get-UserLockouts($Events) {
-
+function Get-UserLockouts($Events, $IgnoreWords = '') {
     $EventsType = 'Security'
     $EventsNeeded = 4740
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -55,10 +59,10 @@ function Get-UserLockouts($Events) {
     @{label = 'When'; expression = { ($_.Date) }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }
-function Get-UserChanges($Events) {
+function Get-UserChanges($Events, $IgnoreWords = '') {
 
     $EventsFoundCleaned = @()
     $EventsType = 'Security'
@@ -100,19 +104,18 @@ function Get-UserChanges($Events) {
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
-    @{label = 'Record ID'; expression = { $_.RecordId }}
-    $EventsFoundCleaned = $EventsFoundCleaned | Sort-Object When
+    @{label = 'Record ID'; expression = { $_.RecordId }}  | Sort-Object When
 
+    $EventsFoundCleaned = Find-EventsIgnored -Events $EventsFoundCleaned -IgnoreWords $IgnoreWords
     return $EventsFoundCleaned
 }
-function Get-GroupPolicyChanges ($Events) {
+function Get-GroupPolicyChanges ($Events, $IgnoreWords = '') {
     # 5136 Group Policy changes, value changes, links, unlinks.
     # 5137 Group Policy creations.
     # 5141 Group Policy deletions.
     $EventsType = 'Security'
     $EventsNeeded = 5136, 5137, 5141
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
-
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
@@ -122,9 +125,10 @@ function Get-GroupPolicyChanges ($Events) {
     @{label = 'OperationType'; expression = { Convert-FromGPO -OperationType $_.OperationType }},
     DSName, DSType, ObjectDN, ObjectGUID, ObjectClass, AttributeLDAPDisplayName, AttributeSyntaxOID,
     AttributeValue, Id, Task | Sort-Object When
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }
-function Get-LogonEvents($Events) {
+function Get-LogonEvents($Events, $IgnoreWords = '') {
 
     # 4624: An account was successfully logged on
     # 4634: An account was logged off
@@ -133,11 +137,11 @@ function Get-LogonEvents($Events) {
     $EventsType = 'Security'
     $EventsNeeded = 4624
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
-
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }
 
-function Get-LogonEventsKerberos($Events) {
+function Get-LogonEventsKerberos($Events, $IgnoreWords = '') {
     $EventsType = 'Security'
     $EventsNeeded = 4768
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -156,13 +160,10 @@ function Get-LogonEventsKerberos($Events) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
-
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }
-function Get-RebootEvents($Events) {
-
-    Write-Color @script:WriteParameters "[i] Running ", "Reboot Events Report (Troubleshooting Only)." -Color White, Green, White, Green, White, Green, White
-
+function Get-RebootEvents($Events, $IgnoreWords = '') {
     # -LogName "System" -Provider "User32"
     # -LogName "System" -Provider "Microsoft-Windows-WER-SystemErrorReporting" -EventID 1001, 1018
     # -LogName "System" -Provider "Microsoft-Windows-Kernel-General" -EventID 1, 12, 13
@@ -172,11 +173,12 @@ function Get-RebootEvents($Events) {
 
     $EventsNeeded = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013 | Sort-Object -Unique
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType 'System'
-    Write-Color @script:WriteParameters "[i] Ending ", "Reboot Events Report (Troubleshooting Only)." -Color White, Green, White, Green, White, Green, White
-    return $EventsFound | Select-Object ID, Computer, TimeCreated, Message
+    $EventsFound = $EventsFound | Select-Object ID, Computer, TimeCreated, Message
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
+    return $EventsFound
 }
 
-function Get-EventLogClearedLogs($Events, $Type) {
+function Get-EventLogClearedLogs($Events, $Type, $IgnoreWords = '') {
     if ($Type -eq 'Security') {
         $EventsNeeded = 1102
         $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType 'Security'
@@ -193,5 +195,6 @@ function Get-EventLogClearedLogs($Events, $Type) {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
+    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }

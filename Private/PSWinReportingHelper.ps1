@@ -53,6 +53,27 @@ function Find-EventsNeeded ($Events, $EventsNeeded, $EventsType = 'Security') {
     }
     return $EventsFound
 }
+function Find-EventsIgnored($Events, $IgnoreWords = '') {
+    $EventsToReturn = @()
+    foreach ($Event in $Events) {
+        $Found = $false
+        foreach ($Ignore in $IgnoreWords.GetEnumerator()) {
+            if ($Ignore.Value -ne '') {
+                foreach ($Value in $Ignore.Value) {
+                    $ColumnName = $Ignore.Name
+                    if ($Event.$ColumnName -like $Value) {
+                        $Found = $true
+                    }
+                }
+            }
+        }
+        if ($Found -eq $false) {
+            $EventsToReturn += $Event
+        }
+    }
+    return $EventsToReturn
+}
+
 function Convert-Size {
     # Original - https://techibee.com/powershell/convert-from-any-to-any-bytes-kb-mb-gb-tb-using-powershell/2376
     #
