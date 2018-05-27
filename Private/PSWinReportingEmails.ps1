@@ -1,4 +1,5 @@
-function Set-EmailHead($FormattingParameters) {
+function Set-EmailHead($FormattingOptions) {
+    <#
     $Head = "<style>" +
     "BODY{background-color:white;font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)}" +
     "TABLE{border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse}" +
@@ -7,12 +8,107 @@ function Set-EmailHead($FormattingParameters) {
     "H2{font-family:$($FormattingParameters.FontHeadingFamily);font-size:$($FormattingParameters.FontHeadingSize)}" +
     "P{font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)}" +
     "</style>"
+#>
+
+    $head = @"
+<style>
+    BODY {
+        background-color: white;
+        font-family: $($FormattingOptions.FontFamily);
+        font-size: $($FormattingOptions.FontSize);
+    }
+
+    TABLE {
+        border-width: 1px;
+        border-style: solid;
+        border-color: black;
+        border-collapse: collapse;
+        font-family: $($FormattingOptions.FontTableHeadingFamily);
+        font-size: $($FormattingOptions.FontTableHeadingSize);
+    }
+
+    TH {
+        border-width: 1px;
+        padding: 3px;
+        border-style: solid;
+        border-color: black;
+        background-color: #00297A;
+        color: white;
+        font-family: $($FormattingOptions.FontTableHeadingFamily);
+        font-size: $($FormattingOptions.FontTableHeadingSize);
+    }
+
+    TD {
+        border-width: 1px;
+        padding-right: 2px;
+        padding-left: 2px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        border-style: solid;
+        border-color: black;
+        background-color: white;
+        font-family: $($FormattingOptions.FontTableDataFamily);
+        font-size: $($FormattingOptions.FontTableDataSize);
+    }
+
+    H2 {
+        font-family: $($FormattingOptions.FontHeadingFamily);
+        font-size: $($FormattingOptions.FontHeadingSize);
+    }
+
+    P {
+        font-family: $($FormattingOptions.FontFamily);
+        font-size: $($FormattingOptions.FontSize);
+    }
+</style>
+"@
     return $Head
+}
+
+function Set-EmailFormatting ($Template, $FormattingParameters, $ConfigurationParameters) {
+    $Body = $Template
+    Write-Color -Text "Done" -Color "Green"
+    foreach ($style in $FormattingParameters.Styles.GetEnumerator()) {
+        foreach ($value in $style.Value) {
+            if ($value -eq "") { continue }
+            Write-Color @WriteParameters -Text "[i] Preparing template ", "adding", " HTML ", "$($style.Name)", " tag for ", "$value", ' tags...' -Color White, Yellow, White, Yellow, White, Yellow -NoNewLine
+            $Body = $Body.Replace($value, "<$($style.Name)>$value</$($style.Name)>")
+            Write-Color -Text "Done" -Color "Green"
+        }
+    }
+
+    foreach ($color in $FormattingParameters.Colors.GetEnumerator()) {
+        foreach ($value in $color.Value) {
+            if ($value -eq "") { continue }
+            Write-Color @WriteParameters -Text "[i] Preparing template ", "adding", " HTML ", "$($color.Name)", " tag for ", "$value", ' tags...' -Color White, Yellow, White, $($color.Name), White, Yellow -NoNewLine
+            $Body = $Body.Replace($value, "<span style=color:$($color.Name)>$value</span>")
+            Write-Color -Text "Done" -Color "Green"
+        }
+    }
+    foreach ($links in $FormattingParameters.Links.GetEnumerator()) {
+        foreach ($link in $links.Value) {
+            #write-host $link.Text
+            #write-host $link.Link
+            if ($link.Link -like "*@*") {
+                Write-Color @WriteParameters -Text "[i] Preparing template ", "adding", " EMAIL ", "Links for", " $($links.Key)..." -Color White, Yellow, White, White, Yellow, White -NoNewLine
+                $Body = $Body -replace "<<$($links.Key)>>", "<span style=color:$($link.Color)><a href='mailto:$($link.Link)?subject=$($Link.Subject)'>$($Link.Text)</a></span>"
+            } else {
+                Write-Color @WriteParameters -Text "[i] Preparing template ", "adding", " HTML ", "Links for", " $($links.Key)..." -Color White, Yellow, White, White, Yellow, White -NoNewLine
+                $Body = $Body -replace "<<$($links.Key)>>", "<span style=color:$($link.Color)><a href='$($link.Link)'>$($Link.Text)</a></span>"
+            }
+            Write-Color -Text "Done" -Color "Green"
+        }
+
+    }
+
+    if ($ConfigurationParameters.Debug.DisplayTemplateHTML -eq $true) { Get-HTML($Body) }
+    return $Body
 }
 function Set-EmailBody($TableData, $TableWelcomeMessage) {
     $body = "<p><i>$TableWelcomeMessage</i>"
     if ($($TableData | Measure-Object).Count -gt 0) {
         $body += $TableData | ConvertTo-Html -Fragment | Out-String
+        <#
         $body = $body -replace " Added", "<font color=`"green`"><b> Added</b></font>"
         $body = $body -replace " Removed", "<font color=`"red`"><b> Removed</b></font>"
         $body = $body -replace " Deleted", "<font color=`"red`"><b> Deleted</b></font>"
@@ -24,6 +120,7 @@ function Set-EmailBody($TableData, $TableWelcomeMessage) {
         $body = $body -replace " Lockouts", "<font color=`"red`"><b> Lockouts</b></font>"
         $body = $body -replace " Unlocked", "<font color=`"green`"><b> Unlocked</b></font>"
         $body = $body -replace " Reset", "<font color=`"blue`"><b> Reset</b></font>"
+        #>
         $body += "</p>"
     } else {
         $body += "<br><i>No changes happend during that period.</i></p>"

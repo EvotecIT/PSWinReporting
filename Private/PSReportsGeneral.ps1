@@ -48,7 +48,7 @@ function Start-Report() {
     $TableExecutionTimes = ''
 
     # Prepare email body
-    $EmailBody = Set-EmailHead -FormattingParameters $FormattingParameters
+    $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
     $EmailBody += Set-EmailReportBrading -FormattingParameters $FormattingParameters
     $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates
 
@@ -222,6 +222,7 @@ function Start-Report() {
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
+    $EmailBody = Set-EmailFormatting -Template $EmailBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions
     $Time.Stop()
 
     #$script:TimeToGenerateReports | ConvertTo-Json
@@ -242,7 +243,7 @@ function Start-Report() {
     }
     if ($ReportOptions.OpenAsFile -eq $true -and $ReportOptions.AsHTML -eq $true) {
         $ReportHTMLPath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension 'html'
-        Write-Color $ReportHTMLPath -Color Yellow
+        Write-Color @script:WriteParameters '[i] Saving report to file ', $ReportHTMLPath, ' and opening it up...' -Color White, Yellow, White
         $EmailBody | Out-File -Encoding unicode -FilePath $ReportHTMLPath
         Invoke-Item $ReportHTMLPath
     }
