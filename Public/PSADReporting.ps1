@@ -10,29 +10,16 @@
     - When and who changed passwords
     - When and who locked out account and where did it happen
     .NOTES
-    Version:        0.99
+    Version:        1.00
     Author:         Przemyslaw Klys <przemyslaw.klys at evotec.pl>
     Creation Date:  23.03.2018
-    Modifcation Date: 22.05.2018
+    Modifcation Date: 27.05.2018
 
     TODO:
     - DirectoryPattern                = $true # adds to reports path Hourly \ Monthly \ Quarterly \ Custom ("C:\Support\Reports\Hourly")
     - Fixes for reports
 
     Newest version of the script is always available at: https://evotec.xyz/hub/scripts/get-eventslibrary-ps1/
-
-    Additonal notes for self for using it later
-    Users https://www.ultimatewindowssecurity.com/securitylog/book/page.aspx?spid=chapter8#UAM
-    4720: A user account was created                                    https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4720
-    4722: A user account was enabled                                    https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4722
-    4725: A user account was disabled                                   https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4725
-    4726: A user account was deleted                                    https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4726
-    4738: A user account was changed                                    https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4738
-    4740: A user account was locked out.                                https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4740
-    4767: A user account was unlocked.                                  https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4767
-    4781: The name of an account was changed                            https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4781
-    4723: An attempt was made to change an account's password           https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4723
-    4724: An attempt was made to reset an accounts password             https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4724
 
     .EXAMPLE
     Examples of usage can be found at https://evotec.xyz/monitoring-active-directory-changes-on-users-and-groups-with-powershell
