@@ -14,16 +14,38 @@ $EmailParameters = @{
     EmailPriority        = "Low" # Normal, High
 }
 $FormattingParameters = @{
-    CompanyBranding   = @{
-        Logo   = "https://evotec.xyz/wp-content/uploads/2015/05/Logo-evotec-012.png"
-        Width  = "200"
-        Height = ""
-        Link   = "https://evotec.xyz"
+    CompanyBranding        = @{
+        Logo   = 'https://evotec.xyz/wp-content/uploads/2015/05/Logo-evotec-012.png'
+        Width  = '200'
+        Height = ''
+        Link   = 'https://evotec.xyz'
     }
-    FontFamily        = "Calibri Light"
-    FontSize          = "9pt"
-    FontHeadingFamily = "Calibri Light"
-    FontHeadingSize   = "12pt"
+    FontFamily             = 'Calibri Light'
+    FontSize               = '9pt'
+    FontHeadingFamily      = 'Calibri Light'
+    FontHeadingSize        = '12pt'
+
+    FontTableHeadingFamily = 'Calibri Light'
+    FontTableHeadingSize   = '9pt'
+
+    FontTableDataFamily    = 'Calibri Light'
+    FontTableDataSize      = '9pt'
+
+    Colors                 = @{
+        # case sensitive
+        Red   = 'removed', 'deleted', 'locked out', 'lockouts', 'disabled', 'Domain Admins', 'was cleared'
+        Blue  = 'changed', 'changes', 'change', 'reset'
+        Green = 'added', 'enabled', 'unlocked', 'created'
+    }
+    Styles                 = @{
+        # case sensitive
+        B = 'status', 'Domain Admins', 'Enterprise Admins', 'Schema Admins', 'was cleared', 'lockouts' # BOLD
+        I = '' # Italian
+        U = 'status'# Underline
+    }
+    Links                  = @{
+
+    }
 }
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
@@ -31,30 +53,33 @@ $ReportOptions = @{
     AsExcel               = $true # attaches Excel to email with all events, required ImportExcel module
     AsCSV                 = $false # attaches CSV to email with all events,
     AsHTML                = $true # puts exported data into email directly with all events
-    SendMail              = $true
-    OpenAsFile            = $true
+    SendMail              = $false
+    OpenAsFile            = $true # requires AsHTML set to $true
     KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
-    KeepReportsPath       = "C:\Support\Reports\ExportedEvents" # if empty, temp path is used
-    FilePattern           = "Evotec-ADMonitoredEvents-<currentdate>.xlsx"
-    FilePatternDateFormat = "yyyy-MM-dd-HH_mm_ss"
+    KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
+    FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
+    FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
 
     DisplayConsole        = @{
         ShowTime   = $true
-        LogFile    = ""
-        TimeFormat = "yyyy-MM-dd HH:mm:ss"
+        LogFile    = ''
+        TimeFormat = 'yyyy-MM-dd HH:mm:ss'
+    }
+    Debug                 = @{
+        DisplayTemplateHTML = $false
+        Verbose             = $false
     }
 }
-
 $ReportTimes = @{
     # Report Per Hour
     PastHour             = $false # if it's 23:22 it will report 22:00 till 23:00
     CurrentHour          = $false # if it's 23:22 it will report 23:00 till 00:00
     # Report Per Day
     PastDay              = $false # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
-    CurrentDay           = $true # if it's 1.04.2018 05:22 it will report 1.04.2018 00:00:00 till 01.04.2018 00:00:00
+    CurrentDay           = $false # if it's 1.04.2018 05:22 it will report 1.04.2018 00:00:00 till 01.04.2018 00:00:00
     # Report Per Week
     OnDay                = @{
-        Enabled = $true
+        Enabled = $false
         Days    = 'Monday'#, 'Tuesday'
     }
     # Report Per Month
@@ -62,7 +87,7 @@ $ReportTimes = @{
         Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
         Force   = $false  # if true - runs always ...
     }
-    CurrentMonth         = $false
+    CurrentMonth         = $true
 
     # Report Per Quarter
     PastQuarter          = @{
@@ -85,9 +110,8 @@ $ReportTimes = @{
         DateTo   = get-date -Year 2018 -Month 03 -Day 23
     }
 }
-
 $ReportDefinitions = @{
-    TimeToGenerate = $true
+    TimeToGenerate = $false
 
     ReportsAD      = @{
         Servers    = @{
@@ -106,7 +130,15 @@ $ReportDefinitions = @{
                 Enabled     = $true
                 Events      = 4722, 4725, 4767, 4723, 4724, 4726
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{
+                    'Domain Controller' = ''
+                    'Action'            = ''
+                    'User Affected'     = 'Win-*', '*AD1$*'
+                    'Who'               = ''
+                    'When'              = ''
+                    'Event ID'          = ''
+                    'Record ID'         = ''
+                }
             }
             UserLockouts           = @{
                 Enabled     = $true
@@ -115,13 +147,13 @@ $ReportDefinitions = @{
                 IgnoreWords = ''
             }
             UserLogon              = @{
-                Enabled     = $false ### not ready for prime time, huge impact on performance, do not use...
+                Enabled     = $false
                 Events      = 4624
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
             UserLogonKerberos      = @{
-                Enabled     = $true ### not ready for prime time, huge impact on performance, do not use...
+                Enabled     = $false
                 Events      = 4768
                 LogName     = 'Security'
                 IgnoreWords = ''
@@ -130,16 +162,20 @@ $ReportDefinitions = @{
                 Enabled     = $true
                 Events      = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{
+                    'Who' = '*ANONYMOUS*'
+                }
             }
             GroupCreateDelete      = @{
                 Enabled     = $true
                 Events      = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{
+                    'Who' = '*ANONYMOUS*'
+                }
             }
             GroupPolicyChanges     = @{
-                Enabled     = $false  ### not ready for prime time
+                Enabled     = $false
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
                 IgnoreWords = ''
@@ -153,11 +189,11 @@ $ReportDefinitions = @{
             LogsClearedOther       = @{
                 Enabled     = $true
                 Events      = 104
-                LogName     = 'System' # Source: EventLog, Task: 'Log clear'
+                LogName     = 'System'
                 IgnoreWords = ''
             }
             EventsReboots          = @{
-                Enabled     = $false  ### a bit useless atm
+                Enabled     = $false
                 Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
                 LogName     = 'System'
                 IgnoreWords = ''
