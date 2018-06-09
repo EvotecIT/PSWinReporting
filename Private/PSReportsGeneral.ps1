@@ -60,25 +60,32 @@ function Start-Report() {
     $GroupCreateDeleteTable = @()
     $TableExecutionTimes = ''
 
+    Write-Color @script:WriteParameters '[i] Establishing servers list to ', 'process...' -Color White, Yellow
     $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions
+
+    Write-Color @script:WriteParameters '[i] Preparing ', 'Security Events', ' list to be processed on servers.' -Color White, Yellow, White
     $EventsToProcessSecurity = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'Security'
+    Write-Color @script:WriteParameters '[i] Preparing ', 'System Events', ' list to be processed on servers.' -Color White, Yellow, White
     $EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
 
     $Events = @()
+    Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on defined servers.' -Color White, Yellow, White
     $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose $ReportOptions.Debug.Verbose
+    Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers.' -Color White, Yellow, White
     $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose $ReportOptions.Debug.Verbose
 
+    Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on defined servers for warnings.' -Color White, Yellow, White
     $EventLogDatesSummary = @()
     $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
     $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
 
+    Write-Color @script:WriteParameters '[i] Processing ', 'Warnings', ' to make sure things are great.' -Color White, Yellow, White
     $Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
 
     # Prepare email body
     $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
     $EmailBody += Set-EmailReportBrading -FormattingParameters $FormattingParameters
     $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
-
 
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
