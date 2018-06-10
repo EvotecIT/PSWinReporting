@@ -7,12 +7,20 @@ This `PowerShell Module`, which started as an event library (`Get-EventsLibrary.
 
 ###### Project Features
 
+Following features are done:
+
 - [x] Group create, delete, modify (Who / When / What)
 - [x] Group membership changes (Who / When / What)
 - [x] User changes (Who / When / What)
 - [x] User create, delete (Who / When)
 - [x] User password changes (Who / When)
 - [x] User lockouts (Who / When / Where)
+
+Run script/config:
+
+![image](https://evotec.xyz/wp-content/uploads/2018/06/2018-06-10_11-20-08.gif.pagespeed.ce.xrLSOGTIkk.gif)
+
+And get a nice report
 
 ![image](https://evotec.xyz/wp-content/uploads/2018/06/PSWinReporting1.0-Example1.png)
 
