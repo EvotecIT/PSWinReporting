@@ -12,7 +12,7 @@
     RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.001'
+    ModuleVersion     = '1.002'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -30,7 +30,7 @@
     Copyright         = 'Evotec (c) 2018. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description       = 'Basic reporting for Events'
+    Description       = 'This PowerShell Module, which started as an event library (Get-EventsLibrary.ps1), has now grown up and became full fledged PowerShell Module. This module has multiple functionalities but one of the signature features of this module is ability to parse Security (mostly) logs on Domain Controllers.'
 
     # Minimum version of the Windows PowerShell engine required by this module
     # PowerShellVersion = ''
@@ -51,7 +51,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    # RequiredModules = @()
+    RequiredModules   = @('PSEventViewer', 'PSWriteColor', 'ImportExcel')
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
