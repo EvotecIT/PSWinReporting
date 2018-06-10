@@ -26,7 +26,7 @@ This `PowerShell Module`, which started as an event library (`Get-EventsLibrary.
 ###### Links
 
 Documentation for PSWinReporting (overview - latest post):
-> https://evotec.xyz/hub/scripts/pseventviewer-powershell-module/
+> https://evotec.xyz/pswinreporting-1-0-is-out/
 
 Documentation for PSWinReporting (module description, installation, how to):
 > https://evotec.xyz/hub/scripts/pswinreporting-powershell-module/
