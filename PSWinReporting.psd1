@@ -12,7 +12,7 @@
     RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.002'
+    ModuleVersion     = '1.003'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
