@@ -3,7 +3,7 @@ function New-ArrayList {
     param(
 
     )
-    $List = New-Object System.Collections.ArrayList
+    [System.Collections.ArrayList] $List = New-Object System.Collections.ArrayList
     <#
     Mathias Rørbo Jessen:
         The pipeline will attempt to unravel the list on assignment,
@@ -17,11 +17,13 @@ function New-ArrayList {
 function Add-ToArray {
     [CmdletBinding()]
     param(
-        $List,
-        [ValidateNotNullOrEmpty()][Object] $Element
+        [System.Collections.ArrayList] $List,
+        [ValidateNotNullOrEmpty()][Object[]] $Element
     )
-    Write-Verbose $Element
-    $List.Add($Element) > $null
+    foreach ($E in $Element) {
+        Write-Verbose $E
+        $List.Add($E) > $null
+    }
 }
 function Remove-FromArray {
     param(

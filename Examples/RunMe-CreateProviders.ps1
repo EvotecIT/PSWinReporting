@@ -95,6 +95,7 @@ $DomainControllers = (Get-ADDomainController -Filter * | Select HostName).HostNa
 
 $xmlTemplate = "$PSScriptRoot\..\Forwarders\Template.xml"
 
+
 if (Test-Path $xmlTemplate) {
     $Array = New-ArrayList
     $SplitArrayID = Split-Array -inArray $Events -size 22  # Support for more ID's then 22 (limitation of Get-WinEvent)
@@ -110,13 +111,18 @@ if (Test-Path $xmlTemplate) {
 
         Add-ServersToXML -FilePath $SubscriptionTemplate -Servers $DomainControllers
 
-        Set-XML -FilePath $SubscriptionTemplate -Node 'SubscriptionId' -Value 'PSWinReporting Subscription Events - 1'
+        Set-XML -FilePath $SubscriptionTemplate -Node 'SubscriptionId' -Value "PSWinReporting Subscription Events - $i"
         Set-XML -FilePath $SubscriptionTemplate -Node 'ContentFormat' -Value 'Events'
         Set-XML -FilePath $SubscriptionTemplate -Node 'ConfigurationMode' -Value 'Custom'
         $Events
         Set-XML -FilePath $SubscriptionTemplate -Node 'Query' -Value $Events
     }
 }
+
+
+Start-MyProgram -Program $ProgramWecutil -cmdArgList 'cs', "$ENV:TEMP\MyTemplate1.xml"
+Start-MyProgram -Program $ProgramWecutil -cmdArgList 'cs', "$ENV:TEMP\MyTemplate2.xml"
+Start-MyProgram -Program $ProgramWecutil -cmdArgList 'cs', "$ENV:TEMP\MyTemplate3.xml"
 
 #>
 

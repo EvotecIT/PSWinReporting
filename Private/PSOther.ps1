@@ -14,20 +14,28 @@ function New-EventQuery {
         [string] $Type
     )
 
+    <#
+<![CDATA[
+<QueryList>
+<Query Id="0" Path="Security">
+<Select Path="Security">*[System[(EventID=122 or EventID=212 or EventID=323)]]</Select>
+</Query>
+</QueryList>
+		]]>
+#>
+
+
     $values = New-ArrayList
-    Add-ToArray -List $Values -Element '<![CDATA['
-    Add-ToArray -List $Values -Element "<Select Path ="
-    Add-ToArray -List $Values -Element "`"$Type`""
-    Add-ToArray -List $Values -Element ">*"
-    Add-ToArray -List $Values -Element '[System[('
+    Add-ToArray -List $Values -Element '<![CDATA[ <QueryList><Query Id="0" Path="Security">'
+    Add-ToArray -List $Values -Element "<Select Path =", "`"$Type`"", ">*[System[("
     foreach ($E in $Events) {
         Add-ToArray -List $Values -Element "EventID=$E"
         Add-ToArray -List $Values -Element "or"
     }
     Remove-FromArray -List $values -LastElement
-    Add-ToArray -List $Values -Element ')]]</Select>]]>'
+    Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>]]>'
 
-    return ([string] $Values).Replace(' ', '').Replace('or', ' or ')
+    return ([string] $Values) #.Replace(' ', '').Replace('or', ' or ').Replace('SelectPath', 'Select Path')
 }
 function Start-MyProgram {
     param (
@@ -66,7 +74,7 @@ function Set-ServersPermissions {
             "sl",
             "security"
             "/r:$DC"
-            "/ca:O:BAG:SYD:(A;;0xf0005;;;SY)(A;;0x5;;;BA)(A;;0x1;;;S-1-5-32-573)(A;;0x1;;;S-1-5-20)"
+            "/ca:O:BAG:SYD:(A; ; 0xf0005; ; ; SY)(A; ; 0x5; ; ; BA)(A; ; 0x1; ; ; S-1-5-32-573)(A; ; 0x1; ; ; S-1-5-20)"
         )
 
         Start-MyProgram -Program $ProgramWevtutil -cmdArgList $cmdArgListSet
