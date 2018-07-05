@@ -411,7 +411,7 @@ function Find-ServersAD ($ReportDefinitions) {
     }
 }
 
-function Find-AllEvents($ReportDefinitions, $LogNameSearch) {
+function Find-AllEvents($ReportDefinitions, $LogNameSearch, [switch] $All) {
     $EventsToProcess = @()
     foreach ($report in $ReportDefinitions.ReportsAD.EventBased.GetEnumerator()) {
         $ReportName = $report.Name
@@ -420,7 +420,7 @@ function Find-AllEvents($ReportDefinitions, $LogNameSearch) {
         $Events = $ReportDefinitions.ReportsAD.EventBased.$ReportName.Events
         #$IgnoreWords = $ReportDefinitions.ReportsAD.EventBased.$ReportName.IgnoreWords
 
-        if ($Enabled -eq $true) {
+        if ($Enabled -eq $true -or $All -eq $true) {
             if ($LogNameSearch -eq $LogName) {
                 $EventsToProcess += $Events
             }
