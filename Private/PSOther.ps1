@@ -90,30 +90,25 @@ function Fix-MissingDescription {
 
 function Add-ServersToXML {
     param (
-        $FilePath,
-        $Servers
+        [string] $FilePath,
+        [string[]] $Servers
     )
-    $doc = New-Object System.Xml.XmlDocument
-    $doc.Load($filePath)
+    #$doc = New-Object System.Xml.XmlDocument
+    #$doc.Load($filePath)
+    [xml]$xmlDocument = Get-Content -Path $FilePath -Encoding UTF8
 
     foreach ($Server in $Servers) {
-        $node = $doc.CreateElement('EventSource', $doc.Subscription.NamespaceURI)
+        $node = $xmlDocument.CreateElement('EventSource', $xmlDocument.Subscription.NamespaceURI)
         $node.SetAttribute('Enabled', 'true')
 
-        $nodeServer = $doc.CreateElement('Address', $doc.Subscription.NamespaceURI)
+        $nodeServer = $xmlDocument.CreateElement('Address', $xmlDocument.Subscription.NamespaceURI)
         $nodeServer.set_InnerXML($Server)
 
-        $doc.Subscription.Eventsources.AppendChild($node)
-        $doc.Subscription.Eventsources.EventSource.AppendChild($nodeServer)
+        $xmlDocument.Subscription.Eventsources.AppendChild($node) > $null
+        $xmlDocument.Subscription.Eventsources.EventSource.AppendChild($nodeServer) > $null
     }
 
-    $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
-    $sw = New-Object System.IO.StreamWriter($filePath, $false, $utf8WithoutBom)
-
-    $doc.Save( $sw )
-    $sw.Close()
-
-    $doc.Save($FilePath)
+    Save-XML -FilePath $FilePath -xml $xmlDocument
 }
 
 function Set-XML {
@@ -123,8 +118,24 @@ function Set-XML {
         [string] $Value
     )
 
-    $doc = New-Object System.Xml.XmlDocument
-    $doc.Load($filePath)
-    $doc.Subscription.$node = $value
-    $doc.Save($FilePath)
+    #$doc = New-Object System.Xml.XmlDocument
+    [xml]$xmlDocument = Get-Content -Path $FilePath -Encoding UTF8
+    #$doc.Load($filePath)
+
+    $xmlDocument.Subscription.$node = $value
+    #$xmlDocument.Subscription.$Node
+    #$doc.Save($FilePath)
+    #set-content -Path $FilePath -Force -Encoding UTF8 -Value $doc
+    Save-XML -FilePath $FilePath -xml $xmlDocument
+}
+
+function Save-XML {
+    param (
+        [string] $FilePath,
+        [System.Xml.XmlNode] $xml
+    )
+    $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+    $writer = New-Object System.IO.StreamWriter($FilePath, $false, $utf8WithoutBom)
+    $xml.Save( $writer )
+    $writer.Close()
 }
