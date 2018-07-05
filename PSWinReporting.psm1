@@ -13,4 +13,4 @@ Foreach ($import in @($Public + $Private)) {
 
 #Export-ModuleMember -Function $Public.Basename -Verbose
 #Export-ModuleMember -Function * #-Verbose # 'Start-ADReporting', 'Get-KerberosLogonEvents', 'Get-GroupPolicyChanges', 'Get-EventLogClearedLogs'
-Export-ModuleMember -Function 'Start-ADReporting'
+Export-ModuleMember -Function '*'
