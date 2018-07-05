@@ -175,7 +175,7 @@ $ReportDefinitions = @{
                 }
             }
             GroupPolicyChanges     = @{
-                Enabled     = $false
+                Enabled     = $true
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
                 IgnoreWords = ''
