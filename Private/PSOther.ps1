@@ -26,14 +26,16 @@ function New-EventQuery {
 
 
     $values = New-ArrayList
-    Add-ToArray -List $Values -Element '<![CDATA[ <QueryList><Query Id="0" Path="Security">'
+    #  Add-ToArray -List $Values -Element '<![CDATA[ <QueryList><Query Id="0" Path="Security">'
+    Add-ToArray -List $Values -Element '<QueryList><Query Id="0" Path="Security">'
     Add-ToArray -List $Values -Element "<Select Path =", "`"$Type`"", ">*[System[("
     foreach ($E in $Events) {
         Add-ToArray -List $Values -Element "EventID=$E"
         Add-ToArray -List $Values -Element "or"
     }
     Remove-FromArray -List $values -LastElement
-    Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>]]>'
+    #Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>]]>'
+    Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>'
 
     return ([string] $Values) #.Replace(' ', '').Replace('or', ' or ').Replace('SelectPath', 'Select Path')
 }
