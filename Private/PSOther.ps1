@@ -1,5 +1,5 @@
-$ProgramWecutil = "wecutil.exe"
-$ProgramWevtutil = 'wevtutil.exe'
+$Script:ProgramWecutil = "wecutil.exe"
+$Script:ProgramWevtutil = 'wevtutil.exe'
 
 function Get-EventsData {
     param (
@@ -13,18 +13,15 @@ function New-EventQuery {
         [string[]]$Events,
         [string] $Type
     )
-
     <#
-<![CDATA[
-<QueryList>
-<Query Id="0" Path="Security">
-<Select Path="Security">*[System[(EventID=122 or EventID=212 or EventID=323)]]</Select>
-</Query>
-</QueryList>
-		]]>
-#>
-
-
+        <![CDATA[
+        <QueryList>
+        <Query Id="0" Path="Security">
+        <Select Path="Security">*[System[(EventID=122 or EventID=212 or EventID=323)]]</Select>
+        </Query>
+        </QueryList>
+                ]]>
+    #>
     $values = New-ArrayList
     #  Add-ToArray -List $Values -Element '<![CDATA[ <QueryList><Query Id="0" Path="Security">'
     Add-ToArray -List $Values -Element '<QueryList><Query Id="0" Path="Security">'
@@ -62,28 +59,46 @@ function Find-MyProgramData {
 function Set-ServersPermissions {
     param (
         $ProgramWevtutil,
-        $Servers
+        $Servers,
+        [string]$LogName = 'security'
     )
 
 
     foreach ($DC in $Servers) {
         $cmdArgListGet = @(
             "gl"
-            "security"
+            $LogName
             "/r:$DC"
         )
         $cmdArgListSet = @(
             "sl",
-            "security"
+            $LogName
             "/r:$DC"
             "/ca:O:BAG:SYD:(A; ; 0xf0005; ; ; SY)(A; ; 0x5; ; ; BA)(A; ; 0x1; ; ; S-1-5-32-573)(A; ; 0x1; ; ; S-1-5-20)"
         )
 
-        Start-MyProgram -Program $ProgramWevtutil -cmdArgList $cmdArgListSet
-        Start-MyProgram -Program $ProgramWevtutil -cmdArgList $cmdArgListGet
+        Start-MyProgram -Program $Script:ProgramWevtutil -cmdArgList $cmdArgListSet
+        Start-MyProgram -Program $Script:ProgramWevtutil -cmdArgList $cmdArgListGet
     }
 }
-function Fix-MissingDescription {
+function Get-ServersPermissions {
+    param (
+        $ProgramWevtutil,
+        $Servers,
+        [string]$LogName = 'security'
+    )
+
+
+    foreach ($DC in $Servers) {
+        $cmdArgListGet = @(
+            "gl"
+            $LogName
+            "/r:$DC"
+        )
+        Start-MyProgram -Program $Script:ProgramWevtutil -cmdArgList $cmdArgListGet
+    }
+}
+function Set-MissingDescription {
     param()
     $AllSubscriptions = Start-MyProgram -Program $ProgramWecutil -cmdArgList 'es'
 

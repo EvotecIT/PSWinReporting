@@ -54,6 +54,7 @@ function Find-EventsNeeded ($Events, $EventsNeeded, $EventsType = 'Security') {
     return $EventsFound
 }
 function Find-EventsIgnored($Events, $IgnoreWords = '') {
+    if ($IgnoreWords -eq $null) { return $Events }
     $EventsToReturn = @()
     foreach ($Event in $Events) {
         $Found = $false
