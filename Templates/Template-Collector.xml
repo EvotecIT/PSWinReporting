@@ -9,13 +9,14 @@
     <ConfigurationMode>Custom</ConfigurationMode>
     <Delivery Mode="Pull">
         <Batching>
-            <MaxLatencyTime>900000</MaxLatencyTime>
+            <MaxItems>1</MaxItems>
+            <MaxLatencyTime>1000</MaxLatencyTime>
         </Batching>
         <PushSettings>
-            <Heartbeat Interval="900000" />
+            <Heartbeat Interval="40000" />
         </PushSettings>
     </Delivery>
-    <Query>sdfdfdf</Query>
+    <Query>This query will be filled automatically</Query>
     <ReadExistingEvents>false</ReadExistingEvents>
     <TransportName>HTTP</TransportName>
     <TransportPort>5985</TransportPort>
