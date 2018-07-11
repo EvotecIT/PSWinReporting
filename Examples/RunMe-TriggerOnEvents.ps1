@@ -10,5 +10,7 @@ Import-Module PSEventViewer -Force
 Import-Module PSWinReporting -Force
 Import-Module PSWriteColor -Force
 
+Write-Color 'Executed Trigger for ID: ', $eventid, ' and RecordID: ', $eventRecordID -LogFile 'C:\Log.txt'
+
 $TeamsID = ''
 Start-TeamsReport -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -TeamsID $TeamsID
