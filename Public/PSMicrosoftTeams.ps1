@@ -22,7 +22,7 @@ function Start-TeamsReport {
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
 
-    $Events = Get-Events -Server 'EVO1' -LogName 'ForwardedEvents' -EventID $eventid | Where {$_.RecordID -eq $eventRecordID }
+    $Events = Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog -EventID $eventid | Where {$_.RecordID -eq $eventRecordID }
 
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
