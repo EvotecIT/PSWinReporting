@@ -35,8 +35,13 @@ $ReportOptions = @{
 }
 $ReportDefinitions = @{
     TimeToGenerate = $false
+    TeamsID        = ''
 
     ReportsAD      = @{
+        Servers    = @{
+            ForwardServer   = 'EVO1'
+            ForwardEventLog = 'ForwardedEvents'
+        }
         EventBased = @{
             UserChanges            = @{
                 Enabled     = $true
@@ -120,5 +125,4 @@ $ReportDefinitions = @{
     }
 }
 
-$TeamsID = ''
-Start-TeamsReport -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -TeamsID $TeamsID
+Start-TeamsReport -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel

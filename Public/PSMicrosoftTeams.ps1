@@ -4,10 +4,9 @@ function Start-TeamsReport {
         $ReportDefinitions,
         $EventID,
         $EventRecordID,
-        $EventChannel,
-        [string] $TeamsID
+        $EventChannel
     )
-
+    [string] $TeamsID = $ReportDefinitions.TeamsID
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
 
     # Declare variables
