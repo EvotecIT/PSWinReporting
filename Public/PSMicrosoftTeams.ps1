@@ -1,5 +1,6 @@
 function Start-TeamsReport {
     param(
+        $ReportOptions,
         $ReportDefinitions,
         $EventID,
         $EventRecordID,
