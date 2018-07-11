@@ -8,6 +8,8 @@ function Remove-TaskScheduledForwarder {
 
 function Add-TaskScheduledForwarder {
     param(
+        $TaskPath = '\Event Viewer Tasks\',
+        $TaskName = 'ForwardedEvents',
         $Author = 'Evotec',
         $URI = '\Event Viewer Tasks\ForwardedEvents',
         $Command = 'powershell.exe',
@@ -22,11 +24,14 @@ function Add-TaskScheduledForwarder {
         Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'RegistrationInfo' -Node 'Author' -Value $Author
         Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'Actions', 'Exec' -Node 'Command' -Value $Command
         Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'Actions', 'Exec' -Node 'Arguments' -Value ([string] $Argument)
-        Invoke-Item $ScheduledTaskXML
-    }
-    return $ListTemplates
-}
+        #  Invoke-Item $ScheduledTaskXML
 
+        $xml = (get-content $ScheduledTaskXML | out-string)
+        #  $xml
+
+        Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -xml $xml
+    }
+}
 <#
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2"

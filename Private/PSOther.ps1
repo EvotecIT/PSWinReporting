@@ -149,7 +149,8 @@ function Set-XML {
         $XmlElement = $XmlElement.$Path
     }
     $XmlElement.$Node = $Value
-    Save-XML -FilePath $FilePath -xml $xmlDocument
+    $xmlDocument.Save($FilePath)
+    # Save-XML -FilePath $FilePath -xml $xmlDocument
 }
 
 function Save-XML {
