@@ -35,7 +35,7 @@ function Invoke-EventLogVerification ($Results, $Dates) {
     return $Logs
 }
 
-function Start-Report() {
+function Start-Report {
     param (
         [hashtable] $Dates,
         [hashtable] $EmailParameters,
@@ -69,13 +69,22 @@ function Start-Report() {
     $EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
 
     $Events = @()
-    Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on defined servers.' -Color White, Yellow, White
-    $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose $ReportOptions.Debug.Verbose
-    Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers.' -Color White, Yellow, White
-    $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose $ReportOptions.Debug.Verbose
-
+    if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
+        Write-Color @script:WriteParameters '[i] Processing ', 'Forwarded Events', ' on defined servers: ', $ReportDefinitions.ReportsAD.Servers.ForwardServer -Color White, Yellow, White
+        #$Events += Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog
+        $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
+        $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
+    } else {
+        Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on defined servers: ', ([string] $Servers) -Color White, Yellow, White
+        $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose $ReportOptions.Debug.Verbose
+        Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers: ', ([string] $Servers) -Color White, Yellow, White
+        $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose $ReportOptions.Debug.Verbose
+    }
     Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on defined servers for warnings.' -Color White, Yellow, White
     $EventLogDatesSummary = @()
+    if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
+        $EventLogDatesSummary += Get-EventLogSize -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
+    }
     $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
     $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
 
@@ -378,7 +387,21 @@ function Get-Servers($ReportOptions) {
 }
 
 
-function Find-ServersAD ($ReportDefinitions) {
+function Find-ServersAD {
+    param (
+        $ReportDefinitions
+    )
+    <#
+        Servers    = @{
+            UseForwarders   = $false # if $true skips Automatic/OnlyPDC/DC otherwise below applies
+            ForwardServer   = 'EVO1'
+            ForwardEventLog = 'ForwardedEvents'
+
+            Automatic       = $true
+            OnlyPDC         = $false
+            DC              = ''
+        }
+    #>
     if ($ReportDefinitions.ReportsAD.Servers.Automatic -eq $true) {
         if ($ReportDefinitions.ReportsAD.Servers.OnlyPDC -eq $true) {
             $ServerOptions = @{
@@ -402,7 +425,7 @@ function Find-ServersAD ($ReportDefinitions) {
             Exit
         }
     } else {
-        if ($ReportDefinitions.ReportsAD.Servers.DC -eq '') {
+        if ($ReportDefinitions.ReportsAD.Servers.DC -eq '' -and $ReportDefinitions.ReportsAD.Servers.UseForwarders -eq $false) {
             Write-Color @script:WriteParameters "[i] Error: ", "Parameter ", 'ReportDefinitions.ReportsAD.Servers.DC', ' is empty. Please choose ', 'Automatic', ' or fill in this field.' -Color White, White, Yellow, White, Yellow, White
             Exit
         } else {
@@ -429,10 +452,17 @@ function Find-AllEvents($ReportDefinitions, $LogNameSearch, [switch] $All) {
     return $EventsToProcess
 }
 
-function Get-AllRequiredEvents ($Servers, $Dates, $Events, $LogName, $Verbose = $false) {
+function Get-AllRequiredEvents {
+    param(
+        $Servers,
+        $Dates,
+        $Events,
+        $LogName,
+        $Verbose = $false
+    )
     $Count = Get-Count $Events
     if ($Count -ne 0) {
-        Get-Events -Server $Servers -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo -EventID $Events -LogName $LogName -Verbose:$Verbose
+        return  Get-Events -Server $Servers -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo -EventID $Events -LogName $LogName -Verbose:$Verbose
         #Get-Events -Server $Servers -EventID $Events -LogName $LogName -Verbose
     }
 }
