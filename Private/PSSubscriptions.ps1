@@ -25,11 +25,11 @@ function New-SubscriptionTemplates {
 
             Add-ServersToXML -FilePath $SubscriptionTemplate -Servers $Servers
 
-            Set-XML -FilePath $SubscriptionTemplate -Node 'SubscriptionId' -Value "PSWinReporting Subscription Events - $i"
-            Set-XML -FilePath $SubscriptionTemplate -Node 'ContentFormat' -Value 'Events'
-            Set-XML -FilePath $SubscriptionTemplate -Node 'ConfigurationMode' -Value 'Custom'
+            Set-XML -FilePath $SubscriptionTemplate -Path 'Subscription' -Node 'SubscriptionId' -Value "PSWinReporting Subscription Events - $i"
+            Set-XML -FilePath $SubscriptionTemplate -Path 'Subscription' -Node 'ContentFormat' -Value 'Events'
+            Set-XML -FilePath $SubscriptionTemplate -Path 'Subscription' -Node 'ConfigurationMode' -Value 'Custom'
             #$Events
-            Set-XML -FilePath $SubscriptionTemplate -Node 'Query' -Value $Events
+            Set-XML -FilePath $SubscriptionTemplate -Path 'Subscription' -Node 'Query' -Value $Events
             Add-ToArray -List $ListTemplates -Element $SubscriptionTemplate
         }
 
