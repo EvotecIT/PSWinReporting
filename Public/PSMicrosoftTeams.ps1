@@ -6,8 +6,10 @@ function Start-TeamsReport {
         $EventRecordID,
         $EventChannel
     )
+    Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $true
+
     $TeamsID = $ReportDefinitions.TeamsID
-    Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..."
+    Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..." -Color White, Yellow
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
 
     # Declare variables

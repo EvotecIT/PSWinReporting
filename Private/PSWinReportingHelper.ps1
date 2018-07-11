@@ -31,14 +31,14 @@ function Test-Key ($ConfigurationTable, $ConfigurationSection = "", $Configurati
         return $false
     }
 }
-function Set-DisplayParameters($ReportOptions) {
-    $Test0 = Test-Key -ConfigurationTable $ReportOptions -ConfigurationKey 'DisplayConsole' -DisplayProgress $false
+function Set-DisplayParameters($ReportOptions, $DisplayProgress = $false) {
+    $Test0 = Test-Key -ConfigurationTable $ReportOptions -ConfigurationKey 'DisplayConsole' -DisplayProgress $DisplayProgress
     if ($Test0 -eq $true) {
-        $Test1 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "DisplayConsole.ShowTime" -DisplayProgress $false
-        $Test2 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "DisplayConsole.LogFile" -DisplayProgress $false
-        $Test3 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "DisplayConsole.TimeFormat" -DisplayProgress $false
+        $Test1 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "ShowTime" -DisplayProgress $DisplayProgress
+        $Test2 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "LogFile" -DisplayProgress $DisplayProgress
+        $Test3 = Test-Key -ConfigurationTable $ReportOptions.DisplayConsole -ConfigurationSection '' -ConfigurationKey "TimeFormat" -DisplayProgress $DisplayProgress
 
-        if ($Test1 -and $Test2 -and $Test3) { $script:WriteParameters = $ScriptParameters }
+        if ($Test1 -and $Test2 -and $Test3) { $script:WriteParameters = $ReportOptions.DisplayConsole }
     }
 }
 
