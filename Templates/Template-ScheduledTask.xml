@@ -20,9 +20,8 @@
   </Triggers>
   <Principals>
     <Principal id="Author">
-      <UserId>S-1-5-21-853615985-2870445339-3163598659-1105</UserId>
-      <LogonType>InteractiveToken</LogonType>
-      <RunLevel>LeastPrivilege</RunLevel>
+      <UserId>S-1-5-18</UserId>
+      <RunLevel>HighestAvailable</RunLevel>
     </Principal>
   </Principals>
   <Settings>
