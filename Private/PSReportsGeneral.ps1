@@ -83,11 +83,14 @@ function Start-Report {
     Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on defined servers for warnings.' -Color White, Yellow, White
     $EventLogDatesSummary = @()
     if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
+        Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on ', ([string] $ReportDefinitions.ReportsAD.Servers.ForwardServer), ' for warnings.' -Color White, Yellow, White
         $EventLogDatesSummary += Get-EventLogSize -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
     }
-    $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
-    $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
-
+    if ($Servers -ne '') {
+        Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on ', ([string] $Servers), ' for warnings.' -Color White, Yellow, White
+        $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
+        $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
+    }
     Write-Color @script:WriteParameters '[i] Processing ', 'Warnings', ' to make sure things are great.' -Color White, Yellow, White
     $Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
 
@@ -178,10 +181,18 @@ function Start-Report {
     }
     If ($ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -eq $true) {
         $ExecutionTime = Start-TimeLog # Timer St
-        foreach ($LogName in $ReportDefinitions.ReportsAD.Custom.EventLogSize.Logs) {
-            Write-Color @script:WriteParameters "[i] Running ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
-            $EventLogTable += Get-EventLogSize -Servers $Servers -LogName $LogName
-            Write-Color @script:WriteParameters "[i] Ending ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
+        if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
+            foreach ($LogName in $ReportDefinitions.ReportsAD.Servers.ForwardEventLog) {
+                Write-Color @script:WriteParameters "[i] Running ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
+                $EventLogTable += Get-EventLogSize -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer  -LogName $LogName
+                Write-Color @script:WriteParameters "[i] Ending ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
+            }
+        } else {
+            foreach ($LogName in $ReportDefinitions.ReportsAD.Custom.EventLogSize.Logs) {
+                Write-Color @script:WriteParameters "[i] Running ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
+                $EventLogTable += Get-EventLogSize -Servers $Servers -LogName $LogName
+                Write-Color @script:WriteParameters "[i] Ending ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
+            }
         }
         if ($ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy -ne "") { $EventLogTable = $EventLogTable | Sort-Object $ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy }
         $script:TimeToGenerateReports.Reports.EventLogSize.Total = Stop-TimeLog -Time $ExecutionTime
@@ -189,7 +200,11 @@ function Start-Report {
 
     if ($ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -eq $true) {
         $ExecutionTime = Start-TimeLog # Timer Start
-        $ServersTable = Get-DomainControllers -Servers $Servers
+        if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
+
+        } else {
+            $ServersTable = Get-DomainControllers -Servers $Servers
+        }
         $script:TimeToGenerateReports.Reports.ServersData.Total = Stop-TimeLog -Time $ExecutionTime
     }
 
