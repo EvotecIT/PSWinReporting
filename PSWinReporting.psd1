@@ -12,7 +12,7 @@
     RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.005'
+    ModuleVersion     = '1.7.0.3'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -51,7 +51,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules   = @('PSEventViewer', 'PSWriteColor', 'ImportExcel')
+    RequiredModules   = @('PSEventViewer', 'PSWriteColor', 'ImportExcel', 'PSTeams')
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
