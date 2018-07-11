@@ -139,18 +139,16 @@ function Add-ServersToXML {
 function Set-XML {
     param (
         [string] $FilePath,
+        [string[]]$Paths,
         [string] $Node,
         [string] $Value
     )
-
-    #$doc = New-Object System.Xml.XmlDocument
     [xml]$xmlDocument = Get-Content -Path $FilePath -Encoding UTF8
-    #$doc.Load($filePath)
-
-    $xmlDocument.Subscription.$node = $value
-    #$xmlDocument.Subscription.$Node
-    #$doc.Save($FilePath)
-    #set-content -Path $FilePath -Force -Encoding UTF8 -Value $doc
+    $XmlElement = $xmlDocument
+    foreach ($Path in $Paths) {
+        $XmlElement = $XmlElement.$Path
+    }
+    $XmlElement.$Node = $Value
     Save-XML -FilePath $FilePath -xml $xmlDocument
 }
 
