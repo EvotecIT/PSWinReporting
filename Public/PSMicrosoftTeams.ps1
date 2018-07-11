@@ -6,7 +6,8 @@ function Start-TeamsReport {
         $EventRecordID,
         $EventChannel
     )
-    [string] $TeamsID = $ReportDefinitions.TeamsID
+    $TeamsID = $ReportDefinitions.TeamsID
+    Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..."
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
 
     # Declare variables
@@ -20,8 +21,9 @@ function Start-TeamsReport {
     $RebootEventsTable = @()
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
+    $TableEventLogClearedLogsOther = @()
 
-    $Events = Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog -EventID $eventid | Where {$_.RecordID -eq $eventRecordID }
+    $Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid | Where {$_.RecordID -eq $eventRecordID }
 
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
@@ -104,16 +106,17 @@ function Start-TeamsReport {
         $script:TimeToGenerateReports.Reports.LogsClearedOther.Total = Stop-TimeLog -Time $ExecutionTime
     }
 
-    Send-ToTeams $UsersEventsTable -TeamsID $TeamsID
-    Send-ToTeams $UsersLockoutsTable -TeamsID $TeamsID
-    Send-ToTeams $UsersEventsStatusesTable -TeamsID $TeamsID
-    Send-ToTeams $TableGroupPolicyChanges -TeamsID $TeamsID
-    Send-ToTeams $TableEventLogClearedLogs -TeamsID $
-    Send-ToTeams $GroupsEventsTable -TeamsID $TeamsID
-    Send-ToTeams $GroupCreateDeleteTable -TeamsID $TeamsID
-    Send-ToTeams $LogonEvents -TeamsID $TeamsID
-    Send-ToTeams $LogonEventsKerberos -TeamsID $TeamsID
-    Send-ToTeams $RebootEventsTable -TeamsID $TeamsID
+    Send-ToTeams -Events $UsersEventsTable -TeamsID $TeamsID
+    Send-ToTeams -Events $UsersLockoutsTable -TeamsID $TeamsID
+    Send-ToTeams -Events $UsersEventsStatusesTable -TeamsID $TeamsID
+    Send-ToTeams -Events $TableGroupPolicyChanges -TeamsID $TeamsID
+    Send-ToTeams -Events $TableEventLogClearedLogs -TeamsID $TeamsID
+    Send-ToTeams -Events $TableEventLogClearedLogsOther -TeamsID $TeamsID
+    Send-ToTeams -Events $GroupsEventsTable -TeamsID $TeamsID
+    Send-ToTeams -Events $GroupCreateDeleteTable -TeamsID $TeamsID
+    Send-ToTeams -Events $LogonEvents -TeamsID $TeamsID
+    Send-ToTeams -Events $LogonEventsKerberos -TeamsID $TeamsID
+    Send-ToTeams -Events $RebootEventsTable -TeamsID $TeamsID
 }
 
 function Send-ToTeams {
@@ -121,7 +124,7 @@ function Send-ToTeams {
         [System.Object] $Events,
         [string] $TeamsID
     )
-    Import-Module PSTeams -Force
+    Import-Module PSTeams
     if ($Events -ne $null) {
         foreach ($Event in $Events) {
             $MessageTitle = 'Active Directory Changes'
@@ -144,6 +147,7 @@ function Send-ToTeams {
             } else {
                 [MessageType] $MessageType = [MessageType]::Alert
             }
+            Write-Color @script:WriteParameters -Text "[i] Sending to teams: ", $Action -Color White, Green, White, Green, White, Green, White
             $data = Send-TeamChannelMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $false
         }
     }
