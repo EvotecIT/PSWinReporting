@@ -126,12 +126,12 @@ function Send-ToTeams {
         [System.Object] $Events,
         [string] $TeamsID
     )
-    Import-Module PSTeams
+    Import-Module PSTeams -Force
     if ($Events -ne $null) {
         foreach ($Event in $Events) {
             $MessageTitle = 'Active Directory Changes'
             $MessageBody = 'Body'
-            $ActivityTitle = $Event.Action
+            $ActivityTitle = $($Event.Action).Trim()
             # $ActivitySubtitle = 'Subtitle'
             $Details = @()
             foreach ($Property in $event.PSObject.Properties) {
@@ -141,16 +141,18 @@ function Send-ToTeams {
                     $Details += @{ name = $Property.Name; value = $Property.Value }
                 }
             }
-            $Action = $Event.Action
+            [string] $Action = $($Event.Action).Trim()
             if ($Action -like '*added*') {
-                [MessageType] $MessageType = [MessageType]::Add
+                $MessageType = 'Add'
             } elseif ($Action -like '*remove*') {
-                [MessageType] $MessageType = [MessageType]::Minus
+                $MessageType = 'Minus'
             } else {
-                [MessageType] $MessageType = [MessageType]::Alert
+                $MessageType = 'Alert'
             }
-            Write-Color @script:WriteParameters -Text "[i] Sending to teams: ", $Action -Color White, Green, White, Green, White, Green, White
-            $data = Send-TeamChannelMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $false
+            Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageTitle: ", "$MessageTitle", " Action: ", "$Action" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
+            Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "$MessageBody" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
+            $Data = Send-TeamChannelMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $false
+            Write-Color @script:WriteParameters -Text $Data
         }
     }
 }

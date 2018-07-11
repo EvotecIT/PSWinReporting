@@ -31,7 +31,7 @@ function Get-GroupMembershipChanges($Events, $IgnoreWords = '') {
 function Get-UserStatuses {
     param (
         $Events,
-        [hashtable] $IgnoreWords = ''
+        $IgnoreWords = ''
     )
 
     $EventsType = 'Security'
