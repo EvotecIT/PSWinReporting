@@ -1,4 +1,5 @@
 function Start-TeamsReport {
+    [CmdletBinding()]
     param(
         $ReportOptions,
         $ReportDefinitions,
@@ -12,7 +13,6 @@ function Start-TeamsReport {
     Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..." -Color White, Yellow
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
 
-    # Declare variables
     $GroupsEventsTable = @()
     $GroupCreateDeleteTable = @()
     $UsersEventsTable = @()
@@ -24,9 +24,7 @@ function Start-TeamsReport {
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
     $TableEventLogClearedLogsOther = @()
-
     $Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid | Where {$_.RecordID -eq $eventRecordID }
-
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
         Write-Color @script:WriteParameters "[i] Running ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
@@ -122,11 +120,12 @@ function Start-TeamsReport {
 }
 
 function Send-ToTeams {
+    [CmdletBinding()]
     param(
         [System.Object] $Events,
         [string] $TeamsID
     )
-    Import-Module PSTeams -Force
+    #Import-Module PSTeams -Force
     if ($Events -ne $null) {
         foreach ($Event in $Events) {
             $MessageTitle = 'Active Directory Changes'
@@ -149,11 +148,11 @@ function Send-ToTeams {
             } else {
                 $MessageType = 'Alert'
             }
+            $MessageType = 'None'
             Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageTitle: ", "$MessageTitle", " Action: ", "$Action" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
             Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "$MessageBody" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
-
-            $Data = Send-TeamChannelMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $ReportOptions.Debug.Verbose
-            Write-Color @script:WriteParameters -Text $Data
+            $Data = Send-TeamsMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $true
+            #Write-Color @script:WriteParameters -Text $Data
         }
     }
 }
