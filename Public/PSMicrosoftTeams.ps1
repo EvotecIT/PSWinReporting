@@ -6,7 +6,7 @@ function Start-TeamsReport {
         $EventRecordID,
         $EventChannel
     )
-    Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $true
+    Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
 
     $TeamsID = $ReportDefinitions.TeamsID
     Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..." -Color White, Yellow
@@ -151,7 +151,8 @@ function Send-ToTeams {
             }
             Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageTitle: ", "$MessageTitle", " Action: ", "$Action" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
             Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "$MessageBody" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
-            $Data = Send-TeamChannelMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $false
+
+            $Data = Send-TeamChannelMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $ReportOptions.Debug.Verbose
             Write-Color @script:WriteParameters -Text $Data
         }
     }
