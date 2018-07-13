@@ -5,10 +5,17 @@ param(
     $eventChannel,
     $eventSeverity
 )
-Import-Module PSTeams -Force
-Import-Module PSEventViewer -Force
-Import-Module PSWinReporting -Force
-Import-Module PSWriteColor -Force
+<#
+Update-Module PSTeams -Force
+Update-Module PSEventViewer -Force
+Update-Module PSWinReporting -Force
+Update-Module PSWriteColor -Force
+Update-Module ImportExcel -Force
+#>
+Import-Module PSTeams -Force -Verbose
+Import-Module PSEventViewer -Verbose
+Import-Module PSWinReporting -Force -Verbose
+Import-Module PSWriteColor -Verbose
 
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
@@ -24,13 +31,13 @@ $ReportOptions = @{
     FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
 
     DisplayConsole        = @{
-        ShowTime   = $true
+        ShowTime   = $false
         LogFile    = ''
         TimeFormat = 'yyyy-MM-dd HH:mm:ss'
     }
     Debug                 = @{
         DisplayTemplateHTML = $false
-        Verbose             = $false
+        Verbose             = $true
     }
 }
 $ReportDefinitions = @{
@@ -39,7 +46,7 @@ $ReportDefinitions = @{
 
     ReportsAD      = @{
         Servers    = @{
-            ForwardServer   = 'EVO1'
+            ForwardServer   = $env:COMPUTERNAME
             ForwardEventLog = 'ForwardedEvents'
         }
         EventBased = @{
@@ -125,4 +132,4 @@ $ReportDefinitions = @{
     }
 }
 
-Start-TeamsReport -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel
+Start-TeamsReport -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -Verbose
