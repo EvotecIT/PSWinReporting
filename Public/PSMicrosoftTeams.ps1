@@ -12,7 +12,7 @@ function Start-TeamsReport {
     $TeamsID = $ReportDefinitions.TeamsID
     Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..." -Color White, Yellow
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
-
+    Write-Color @script:WriteParameters -Text "Start-TeamsReport (PSWinReporting) - This is a PSSCRIPTROOT path ", " $PSScriptRoot"
     $GroupsEventsTable = @()
     $GroupCreateDeleteTable = @()
     $UsersEventsTable = @()
@@ -125,34 +125,49 @@ function Send-ToTeams {
         [System.Object] $Events,
         [string] $TeamsID
     )
-    #Import-Module PSTeams -Force
     if ($Events -ne $null) {
         foreach ($Event in $Events) {
+
             $MessageTitle = 'Active Directory Changes'
-            $MessageBody = 'Body'
-            $ActivityTitle = $($Event.Action).Trim()
-            # $ActivitySubtitle = 'Subtitle'
-            $Details = @()
+            [string] $ActivityTitle = $($Event.Action).Trim()
+            if ($ActivityTitle -like '*added*') {
+                $Color = [System.Drawing.Color]::Green
+                $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
+            } elseif ($ActivityTitle -like '*remove*') {
+                $Color = [System.Drawing.Color]::Red
+                $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
+            } else {
+                $Color = [System.Drawing.Color]::Yellow
+                $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
+            }
+
+            $Facts = @()
             foreach ($Property in $event.PSObject.Properties) {
-                if ($Property.Name -eq 'When') {
-                    $Details += @{ name = $Property.Name; value = $Property.Value.DateTime }
-                } else {
-                    $Details += @{ name = $Property.Name; value = $Property.Value }
+                if ($Property.Value -ne $null -and $Property.Value -ne '') {
+                    if ($Property.Name -eq 'When') {
+                        $Facts += New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
+                    } else {
+                        $Facts += New-TeamsFact -Name $Property.Name -Value $Property.Value
+                    }
                 }
             }
-            [string] $Action = $($Event.Action).Trim()
-            if ($Action -like '*added*') {
-                $MessageType = 'Add'
-            } elseif ($Action -like '*remove*') {
-                $MessageType = 'Minus'
-            } else {
-                $MessageType = 'Alert'
-            }
-            $MessageType = 'None'
+
+            $Section1 = New-TeamsSection `
+                -ActivityTitle $ActivityTitle `
+                -ActivityImageLink $ActivityImageLink `
+                -ActivityDetails $Facts
+
             Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageTitle: ", "$MessageTitle", " Action: ", "$Action" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
-            Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "$MessageBody" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
-            $Data = Send-TeamsMessage -messageSummary $MessageBody -MessageType $MessageType -MessageTitle $MessageTitle -URI $TeamsID -ActivityTitle $ActivityTitle -Details $Details -Supress $true
-            #Write-Color @script:WriteParameters -Text $Data
+            Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
+
+            $Data = Send-TeamsMessage `
+                -URI $TeamsID `
+                -MessageTitle $MessageTitle `
+                -Color $Color `
+                -Sections $Section1 `
+                -Supress $false `
+                -Verbose
+            Write-Color @script:WriteParameters -Text $Data
         }
     }
 }
