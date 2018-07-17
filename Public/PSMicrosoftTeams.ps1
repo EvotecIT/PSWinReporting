@@ -12,7 +12,7 @@ function Start-TeamsReport {
     $TeamsID = $ReportDefinitions.TeamsID
     Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..." -Color White, Yellow
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
-    Write-Color @script:WriteParameters -Text "Start-TeamsReport (PSWinReporting) - This is a PSSCRIPTROOT path ", " $PSScriptRoot"
+    #Write-Color @script:WriteParameters -Text "Start-TeamsReport (PSWinReporting) - This is a PSSCRIPTROOT path ", " $PSScriptRoot"
     $GroupsEventsTable = @()
     $GroupCreateDeleteTable = @()
     $UsersEventsTable = @()
@@ -157,8 +157,8 @@ function Send-ToTeams {
                 -ActivityImageLink $ActivityImageLink `
                 -ActivityDetails $Facts
 
-            Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageTitle: ", "$MessageTitle", " Action: ", "$Action" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
-            Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
+            #Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageTitle: ", "$MessageTitle", " Action: ", "$Action" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
+            #Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
 
             $Data = Send-TeamsMessage `
                 -URI $TeamsID `
