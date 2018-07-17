@@ -1,4 +1,4 @@
-function Start-TeamsReport {
+function Start-Notifications {
     [CmdletBinding()]
     param(
         $ReportOptions,

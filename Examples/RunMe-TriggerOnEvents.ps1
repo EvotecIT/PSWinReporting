@@ -6,16 +6,18 @@ param(
     $eventSeverity
 )
 <#
-Update-Module PSTeams -Force
-Update-Module PSEventViewer -Force
-Update-Module PSWinReporting -Force
-Update-Module PSWriteColor -Force
-Update-Module ImportExcel -Force
+Update-Module PSTeams
+Update-Module PSEventViewer
+Update-Module PSWinReporting
+Update-Module PSWriteColor
+Update-Module ImportExcel
+Update-Module PSSlack
 #>
-Import-Module PSTeams -Force -Verbose
-Import-Module PSEventViewer -Verbose
-Import-Module PSWinReporting -Force -Verbose
-Import-Module PSWriteColor -Verbose
+Import-Module PSTeams
+Import-Module PSEventViewer
+Import-Module PSWinReporting
+Import-Module PSWriteColor
+Import-Module PSSlack
 
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
@@ -37,7 +39,19 @@ $ReportOptions = @{
     }
     Debug                 = @{
         DisplayTemplateHTML = $false
-        Verbose             = $true
+        Verbose             = $false
+    }
+    Notifications         = @{
+        MicrosoftTeams = @{
+            Use     = $false
+            TeamsID = ''
+
+        }
+        Slack          = @{
+            Use     = $false
+            Channel = '#general'
+            Uri     = ""
+        }
     }
 }
 $ReportDefinitions = @{
@@ -132,4 +146,4 @@ $ReportDefinitions = @{
     }
 }
 
-Start-TeamsReport -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -Verbose
+Start-Notifications -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -Verbose

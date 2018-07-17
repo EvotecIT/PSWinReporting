@@ -12,7 +12,7 @@
     RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.7.0.10'
+    ModuleVersion     = '1.7.0.13'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -51,7 +51,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules   = @('PSEventViewer', 'PSWriteColor', 'ImportExcel', 'PSTeams')
+    RequiredModules   = @('PSEventViewer', 'PSWriteColor', 'ImportExcel')
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
@@ -69,8 +69,8 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    #FunctionsToExport = '*'# 'Start-ADReporting', 'Get-KerberosLogonEvents', 'Get-GroupPolicyChanges', 'Get-EventLogClearedLogs'
-    FunctionsToExport = '*'
+    FunctionsToExport = 'Start-ADReporting', 'Start-Notifications'
+    #FunctionsToExport = '*'
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = @()
 
@@ -113,7 +113,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    HelpInfoURI       = 'https://github.com/EvotecIT/PSWinReporting'
+    #HelpInfoURI       = 'https://github.com/EvotecIT/PSWinReporting'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
