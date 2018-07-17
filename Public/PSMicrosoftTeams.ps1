@@ -9,9 +9,15 @@ function Start-TeamsReport {
     )
     Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
 
-    $TeamsID = $ReportDefinitions.TeamsID
-    Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($TeamsID.Substring(0, 50))..." -Color White, Yellow
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
+
+    Write-Color @script:WriteParameters -Text '[i] Using Microsoft Teams: ', $ReportOptions.Notifications.MicrosoftTeams.Use -Color White, Yellow
+    Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($($ReportOptions.Notifications.MicrosoftTeams.TeamsID).Substring(0, 50))..." -Color White, Yellow
+
+    Write-Color @script:WriteParameters -Text '[i] Using Slack: ', $ReportOptions.Notifications.Slack.Use -Color White, Yellow
+    Write-Color @script:WriteParameters -Text '[i] Slack Channel: ', "$($($ReportOptions.Notifications.Slack.Channel))..." -Color White, Yellow
+    Write-Color @script:WriteParameters -Text '[i] Slack URI: ', "$($($ReportOptions.Notifications.Slack.URI).Substring(0, 25))..." -Color White, Yellow
+
     #Write-Color @script:WriteParameters -Text "Start-TeamsReport (PSWinReporting) - This is a PSSCRIPTROOT path ", " $PSScriptRoot"
     $GroupsEventsTable = @()
     $GroupCreateDeleteTable = @()
@@ -106,25 +112,28 @@ function Start-TeamsReport {
         $script:TimeToGenerateReports.Reports.LogsClearedOther.Total = Stop-TimeLog -Time $ExecutionTime
     }
 
-    Send-ToTeams -Events $UsersEventsTable -TeamsID $TeamsID
-    Send-ToTeams -Events $UsersLockoutsTable -TeamsID $TeamsID
-    Send-ToTeams -Events $UsersEventsStatusesTable -TeamsID $TeamsID
-    Send-ToTeams -Events $TableGroupPolicyChanges -TeamsID $TeamsID
-    Send-ToTeams -Events $TableEventLogClearedLogs -TeamsID $TeamsID
-    Send-ToTeams -Events $TableEventLogClearedLogsOther -TeamsID $TeamsID
-    Send-ToTeams -Events $GroupsEventsTable -TeamsID $TeamsID
-    Send-ToTeams -Events $GroupCreateDeleteTable -TeamsID $TeamsID
-    Send-ToTeams -Events $LogonEvents -TeamsID $TeamsID
-    Send-ToTeams -Events $LogonEventsKerberos -TeamsID $TeamsID
-    Send-ToTeams -Events $RebootEventsTable -TeamsID $TeamsID
+    Send-Notificaton -Events $UsersEventsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $UsersLockoutsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $UsersEventsStatusesTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $TableGroupPolicyChanges -ReportOptions $ReportOptions
+    Send-Notificaton -Events $TableEventLogClearedLogs -ReportOptions $ReportOptions
+    Send-Notificaton -Events $TableEventLogClearedLogsOther -ReportOptions $ReportOptions
+    Send-Notificaton -Events $GroupsEventsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $GroupCreateDeleteTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $LogonEvents -ReportOptions $ReportOptions
+    Send-Notificaton -Events $LogonEventsKerberos -ReportOptions $ReportOptions
+    Send-Notificaton -Events $RebootEventsTable -ReportOptions $ReportOptions
+
 }
 
-function Send-ToTeams {
+function Send-Notificaton {
     [CmdletBinding()]
     param(
         [System.Object] $Events,
-        [string] $TeamsID
+        [hashtable] $ReportOptions
     )
+
+
     if ($Events -ne $null) {
         foreach ($Event in $Events) {
 
@@ -141,33 +150,48 @@ function Send-ToTeams {
                 $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
             }
 
-            $Facts = @()
+            $FactsSlack = @()
+            $FactsTeams = @()
             foreach ($Property in $event.PSObject.Properties) {
                 if ($Property.Value -ne $null -and $Property.Value -ne '') {
                     if ($Property.Name -eq 'When') {
-                        $Facts += New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
+                        $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
+                        $FactsSlack += @{ title = $Property.Name; value = $Property.Value.DateTime; short = $true }
                     } else {
-                        $Facts += New-TeamsFact -Name $Property.Name -Value $Property.Value
+                        $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value
+                        $FactsSlack += @{ title = $Property.Name; value = $Property.Value; short = $true }
                     }
                 }
             }
 
-            $Section1 = New-TeamsSection `
-                -ActivityTitle $ActivityTitle `
-                -ActivityImageLink $ActivityImageLink `
-                -ActivityDetails $Facts
+            if ($ReportOptions.Notifications.Slack.Use) {
 
-            #Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageTitle: ", "$MessageTitle", " Action: ", "$Action" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
-            #Write-Color @script:WriteParameters -Text "[i] Sending to teams MessageType: ", "$MessageType", " MessageBody: ", "" -Color White, Green, White, Green, White, Green, White, Yellow, White, Yellow
+                $Data = New-SlackMessageAttachment -Color $Color `
+                    -Title "$MessageTitle - $ActivityTitle"  `
+                    -Fields $FactsSlack `
+                    -Fallback 'Your client is bad' |
+                    New-SlackMessage -Channel $ReportOptions.Notifications.Slack.Channel `
+                    -IconEmoji :bomb: |
+                    Send-SlackMessage -Uri $ReportOptions.Notifications.Slack.URI
 
-            $Data = Send-TeamsMessage `
-                -URI $TeamsID `
-                -MessageTitle $MessageTitle `
-                -Color $Color `
-                -Sections $Section1 `
-                -Supress $false `
-                -Verbose
-            Write-Color @script:WriteParameters -Text $Data
+                Write-Color @script:WriteParameters -Text "[i] Slack output: ", $Data -Color White, Yellow
+            }
+            if ($ReportOptions.Notifications.MicrosoftTeams.Use) {
+
+                $Section1 = New-TeamsSection `
+                    -ActivityTitle $ActivityTitle `
+                    -ActivityImageLink $ActivityImageLink `
+                    -ActivityDetails $FactsTeams
+
+                $Data = Send-TeamsMessage `
+                    -URI $ReportOptions.Notifications.MicrosoftTeams.TeamsID `
+                    -MessageTitle $MessageTitle `
+                    -Color $Color `
+                    -Sections $Section1 `
+                    -Supress $false #`
+                # -Verbose
+                Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
+            }
         }
     }
 }
