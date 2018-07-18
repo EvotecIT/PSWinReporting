@@ -1,7 +1,3 @@
-<!--
-Building nice readme - https://help.github.com/articles/basic-writing-and-formatting-syntax/
--->
-
 ### PSWinReporting
 This `PowerShell Module`, which started as an event library (`Get-EventsLibrary.ps1`), has now grown up and became full fledged PowerShell Module. This module has multiple functionalities but one of the signature features of this module is ability to parse Security (mostly) logs on `Domain Controllers`.
 
