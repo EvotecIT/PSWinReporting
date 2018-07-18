@@ -36,7 +36,8 @@ function Start-Notifications {
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
     $TableEventLogClearedLogsOther = @()
-    $Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid | Where {$_.RecordID -eq $eventRecordID }
+    #$Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -Verbose:$ReportOptions.Debug.Verbose | Where { $_.RecordID -eq $EventRecordID }
+    $Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -RecordID $eventRecordID -Verbose:$ReportOptions.Debug.Verbose
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
         Write-Color @script:WriteParameters "[i] Running ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
