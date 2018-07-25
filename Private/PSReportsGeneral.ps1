@@ -75,9 +75,9 @@ function Start-Report {
         $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
         $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
     } else {
-        Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on defined servers: ', ([string] $Servers) -Color White, Yellow, White
+        Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on defined servers: ', ($Servers -Join ', ') -Color White, Yellow, White
         $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose $ReportOptions.Debug.Verbose
-        Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers: ', ([string] $Servers) -Color White, Yellow, White
+        Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers: ', ($Servers -Join ', ') -Color White, Yellow, White
         $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose $ReportOptions.Debug.Verbose
     }
     Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on defined servers for warnings.' -Color White, Yellow, White
