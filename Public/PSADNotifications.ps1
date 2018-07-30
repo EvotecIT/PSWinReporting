@@ -1,3 +1,52 @@
+
+function Move-ArchivedLogs {
+    [CmdletBinding()]
+    param (
+        $ServerName,
+        $SourcePath,
+        $DestinationPath
+    )
+    $NewSourcePath = "\\$ServerName\$($SourcePath.Replace(':\','$\'))"
+    $PathExists = Test-Path $NewSourcePath
+    if ($PathExists) {
+        Write-Color @script:WriteParameters '[i] Moving log file from ', $NewSourcePath, ' to ', $DestinationPath -Color White, Yellow, White, Yellow
+        Move-Item -Path $NewSourcePath -Destination $DestinationPath -WhatIf
+        if (!$?) {
+            Write-Color @script:WriteParameters '[i] File ', $NewSourcePath, ' couldn not be moved.' -Color White, Yellow, White
+        }
+    }
+}
+
+function Protect-ArchivedLogs {
+    [CmdletBinding()]
+    param (
+        $TableEventLogClearedLogs,
+        $DestinationPath
+    )
+    <#
+        $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
+        @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+        @{label = 'Backup Path'; expression = { if ($_.BackupPath -eq $null) { 'N/A' } else { $_.BackupPath} }},
+        @{label = 'Log Type'; expression = { if ($Type -eq 'Security') { 'Security' } else {  $_.Channel } }},
+        @{label = 'Who'; expression = { if ($_.ID -eq 1105) { "Automatic Backup" } else { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }}},
+        @{label = 'When'; expression = { $_.Date }},
+        @{label = 'Event ID'; expression = { $_.ID }},
+        @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
+        $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
+    #>
+    foreach ($BackupEvent in $TableEventLogClearedLogs) {
+        if ($BackupEvent.'Event ID' -eq 1105) {
+            $SourcePath = $BackupEvent.'Backup Path'
+            $ServerName = $BackupEvent.'Domain Controller'
+            if ($SourcePath -and $ServerName -and $DestinationPath) {
+                Write-Color @script:WriteParameters '[i] Found log file ', $SourcePath, ' on ', $ServerName, ' moving to ', $DestinationPath -Color White, Yellow, White, Yellow
+                Move-ArchivedLogs -ServerName $ServerName -SourcePath $SourcePath -DestinationPath $DestinationPath
+            }
+        }
+    }
+}
+
+
 function Start-Notifications {
     [CmdletBinding()]
     param(
@@ -131,6 +180,9 @@ function Start-Notifications {
     Send-Notificaton -Events $LogonEventsKerberos -ReportOptions $ReportOptions
     Send-Notificaton -Events $RebootEventsTable -ReportOptions $ReportOptions
 
+    if ($ReportOptions.Backup.Use) {
+        Protect-ArchivedLogs -TableEventLogClearedLogs $TableEventLogClearedLogs -DestinationPath $ReportOptions.DestinationPath -Verbose:$ReportOptions.Debug.Verbose
+    }
 }
 
 function Send-Notificaton {

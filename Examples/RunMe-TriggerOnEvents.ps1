@@ -45,13 +45,16 @@ $ReportOptions = @{
         MicrosoftTeams = @{
             Use     = $false
             TeamsID = ''
-
         }
         Slack          = @{
             Use     = $false
             Channel = '#general'
             Uri     = ""
         }
+    }
+    Backup                = @{
+        Use             = $true
+        DestinationPath = 'C:\MyEvents\'
     }
 }
 $ReportDefinitions = @{
