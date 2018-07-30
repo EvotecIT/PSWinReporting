@@ -126,7 +126,7 @@ $ReportDefinitions = @{
             }
             LogsClearedSecurity    = @{
                 Enabled     = $true
-                Events      = 1102
+                Events      = 1102, 1105
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
