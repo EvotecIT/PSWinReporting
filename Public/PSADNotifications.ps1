@@ -45,7 +45,6 @@ function Protect-ArchivedLogs {
     }
 }
 
-
 function Start-Notifications {
     [CmdletBinding()]
     param(
@@ -280,7 +279,7 @@ function New-SqlInsert {
         [hashtable] $ReportOptions
     )
 
-    $Query = New-Query -Events $Events
+    $Query = New-Query -Events $Events -ReportOptions $ReportOptions
     $Query
 
     #$Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query
@@ -288,21 +287,25 @@ function New-SqlInsert {
 
 function New-Query {
     param (
+        $ReportOptions,
         $Events
     )
-    $Events | fl *
+    # $Events | fl *
 
-    $Mapping = @{
-        '<ForestName>'    = $Forest.ForestName
-        '<ForestNameDN>'  = $Forest.RootDSE.defaultNamingContext
-        '<Domain>'        = $Domain
-        '<DomainNetBios>' = $Forest.FoundDomains.$Domain.DomainInformation.NetBIOSName
-        '<DomainDN>'      = $Forest.FoundDomains.$Domain.DomainInformation.DistinguishedName
+    $TableMapping = $ReportOptions.Notifications.MSSQL.TableMapping
+
+    $Events.PSObject.Properties
+
+    foreach ($E in $Events.PSObject.Properties) {
+        $FieldName = $E.Name
+        $E.$FieldName
     }
 
+    foreach ($Map in $TableMapping.Keys) {
 
-    foreach ($Log in $Events) {
-        $Log
+
+        # $Map
+        # $ReportOptions.Notifications.MSSQL.TableMapping.$Map
     }
 
 
