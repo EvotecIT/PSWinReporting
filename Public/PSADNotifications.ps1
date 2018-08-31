@@ -290,7 +290,7 @@ function New-Query {
     param (
         $Events
     )
-    $Events
+    $Events | fl *
 
     $Mapping = @{
         '<ForestName>'    = $Forest.ForestName
@@ -306,81 +306,44 @@ function New-Query {
     }
 
 
-    "INSERT INTO [dbo].[Events]
-        ([ID]
-        ,[EventType]
-        ,[EventID]
-        ,[EventWho]
-        ,[EventWhen]
-        ,[EventRecordID]
-        ,[DomainController]
-        ,[Action]
-        ,[GroupName]
-        ,[UserAffected]
-        ,[MemberName]
-        ,[ComputerLockoutOn]
-        ,[ReportedBy]
-        ,[SamAccountName]
-        ,[DisplayName]
-        ,[UserPrincipalName]
-        ,[HomeDirectory]
-        ,[HomePath]
-        ,[ScriptPath]
-        ,[ProfilePath]
-        ,[UserWorkstation]
-        ,[PasswordLastSet]
-        ,[AccountExpires]
-        ,[PrimaryGroupId]
-        ,[AllowedToDelegateTo]
-        ,[OldUacValue]
-        ,[NewUacValue]
-        ,[UserAccountControl]
-        ,[UserParameters]
-        ,[SidHistory]
-        ,[LogonHours]
-        ,[OperationType]
-        ,[Message]
-        ,[BackupPath]
-        ,[LogType]
-        ,[EventAdded]
-        ,[EventAddedWho])
-    VALUES
-        (<ID, int,>
-        ,<EventType, nvarchar(50),>
-        ,<EventID, int,>
-        ,<EventWho, nchar(10),>
-        ,<EventWhen, datetime,>
-        ,<EventRecordID, int,>
-        ,<DomainController, nvarchar(max),>
-        ,<Action, nvarchar(max),>
-        ,<GroupName, nvarchar(max),>
-        ,<UserAffected, nvarchar(max),>
-        ,<MemberName, nvarchar(max),>
-        ,<ComputerLockoutOn, nvarchar(max),>
-        ,<ReportedBy, nvarchar(max),>
-        ,<SamAccountName, nvarchar(max),>
-        ,<DisplayName, nvarchar(max),>
-        ,<UserPrincipalName, nvarchar(max),>
-        ,<HomeDirectory, nvarchar(max),>
-        ,<HomePath, nvarchar(max),>
-        ,<ScriptPath, nvarchar(max),>
-        ,<ProfilePath, nvarchar(max),>
-        ,<UserWorkstation, nvarchar(max),>
-        ,<PasswordLastSet, datetime,>
-        ,<AccountExpires, datetime,>
-        ,<PrimaryGroupId, int,>
-        ,<AllowedToDelegateTo, nvarchar(50),>
-        ,<OldUacValue, nvarchar(50),>
-        ,<NewUacValue, nvarchar(50),>
-        ,<UserAccountControl, nvarchar(50),>
-        ,<UserParameters, nvarchar(50),>
-        ,<SidHistory, nvarchar(max),>
-        ,<LogonHours, nvarchar(max),>
-        ,<OperationType, nvarchar(max),>
-        ,<Message, nvarchar(max),>
-        ,<BackupPath, nvarchar(max),>
-        ,<LogType, nvarchar(max),>
-        ,<EventAdded, datetime,>
-        ,<EventAddedWho, nvarchar(50),>)"
+    $Mapping = @{
+        'ID'                  = '<PrimaryKey>'
+        'EventType'           = ''
+        'EventID'             = 'Event ID'
+        'EventWho'            = 'Who'
+        'EventWhen'           = 'When'
+        'EventRecordID'       = 'Record ID'
+        'DomainController'    = 'Domain Controller'
+        'Action'              = 'Action'
+        'GroupName'           = ''
+        'UserAffected'        = 'User Affected'
+        'MemberName'          = ''
+        'ComputerLockoutOn'   = ''
+        'ReportedBy'          = ''
+        'SamAccountName'      = ''
+        'DisplayName'         = ''
+        'UserPrincipalName'   = ''
+        'HomeDirectory'       = ''
+        'HomePath'            = ''
+        'ScriptPath'          = ''
+        'ProfilePath'         = ''
+        'UserWorkstation'     = ''
+        'PasswordLastSet'     = ''
+        'AccountExpires'      = ''
+        'PrimaryGroupId'      = ''
+        'AllowedToDelegateTo' = ''
+        'OldUacValue'         = ''
+        'NewUacValue'         = ''
+        'UserAccountControl'  = ''
+        'UserParameters'      = ''
+        'SidHistory'          = ''
+        'LogonHours'          = ''
+        'OperationType'       = ''
+        'Message'             = ''
+        'BackupPath'          = ''
+        'LogType'             = ''
+        'EventAdded'          = '<CurrentUserName>'
+        'EventAddedWho'       = '<CurrentDateTime>'
+    }
 
 }
