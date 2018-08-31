@@ -12,12 +12,14 @@ Update-Module PSWinReporting
 Update-Module PSWriteColor
 Update-Module ImportExcel
 Update-Module PSSlack
+Update-Module DBATools
 #>
 Import-Module PSTeams
 Import-Module PSEventViewer
-Import-Module PSWinReporting
+Import-Module PSWinReporting -Force
 Import-Module PSWriteColor
 Import-Module PSSlack
+Import-Module DBATools
 
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
@@ -50,6 +52,12 @@ $ReportOptions = @{
             Use     = $false
             Channel = '#general'
             Uri     = ""
+        }
+        MSSQL          = @{
+            Use      = $true
+            Server   = 'EVO1'
+            Database = 'SSAE18'
+            Table    = ''
         }
     }
     Backup                = @{

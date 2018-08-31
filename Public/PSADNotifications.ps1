@@ -60,18 +60,32 @@ function Start-Notifications {
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
 
     Write-Color @script:WriteParameters -Text '[i] Using Microsoft Teams: ', $ReportOptions.Notifications.MicrosoftTeams.Use -Color White, Yellow
-    if ($ReportOptions.Notifications.MicrosoftTeams.Use -and $($ReportOptions.Notifications.MicrosoftTeams.TeamsID).Count -gt 50) {
-        Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($($ReportOptions.Notifications.MicrosoftTeams.TeamsID).Substring(0, 50))..." -Color White, Yellow
-    } else {
-        Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($($ReportOptions.Notifications.MicrosoftTeams.TeamsID))..." -Color White, Yellow
+    if ($ReportOptions.Notifications.MicrosoftTeams.Use) {
+        if ($($ReportOptions.Notifications.MicrosoftTeams.TeamsID).Count -gt 50) {
+            Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($($ReportOptions.Notifications.MicrosoftTeams.TeamsID).Substring(0, 50))..." -Color White, Yellow
+        } else {
+            Write-Color @script:WriteParameters -Text '[i] TeamsID: ', "$($($ReportOptions.Notifications.MicrosoftTeams.TeamsID))..." -Color White, Yellow
+        }
     }
     Write-Color @script:WriteParameters -Text '[i] Using Slack: ', $ReportOptions.Notifications.Slack.Use -Color White, Yellow
-    if ($ReportOptions.Notifications.Slack.Use -and $($ReportOptions.Notifications.Slack.URI).Count -gt 25) {
-        Write-Color @script:WriteParameters -Text '[i] Slack URI: ', "$($($ReportOptions.Notifications.Slack.URI).Substring(0, 25))..." -Color White, Yellow
-    } else {
-        Write-Color @script:WriteParameters -Text '[i] Slack URI: ', "$($($ReportOptions.Notifications.Slack.URI))..." -Color White, Yellow
+    if ($ReportOptions.Notifications.Slack.Use) {
+        if ($($ReportOptions.Notifications.Slack.URI).Count -gt 25) {
+            Write-Color @script:WriteParameters -Text '[i] Slack URI: ', "$($($ReportOptions.Notifications.Slack.URI).Substring(0, 25))..." -Color White, Yellow
+        } else {
+            Write-Color @script:WriteParameters -Text '[i] Slack URI: ', "$($($ReportOptions.Notifications.Slack.URI))..." -Color White, Yellow
+        }
+        Write-Color @script:WriteParameters -Text '[i] Slack Channel: ', "$($($ReportOptions.Notifications.Slack.Channel))" -Color White, Yellow
     }
-    Write-Color @script:WriteParameters -Text '[i] Slack Channel: ', "$($($ReportOptions.Notifications.Slack.Channel))" -Color White, Yellow
+
+    Write-Color @script:WriteParameters -Text '[i] Using MSSQL: ', $ReportOptions.Notifications.MSSQL.Use -Color White, Yellow
+
+
+    if (-not $ReportOptions.Notifications.Slack.Use -and -not $ReportOptions.Notifications.MicrosoftTeams.Use -and -not $ReportOptions.Notifications.MSSQL.Use) {
+        # Terminating as no options are $true
+        return
+    }
+
+
     #Write-Color @script:WriteParameters -Text "Start-TeamsReport (PSWinReporting) - This is a PSSCRIPTROOT path ", " $PSScriptRoot"
     $GroupsEventsTable = @()
     $GroupCreateDeleteTable = @()
@@ -250,6 +264,123 @@ function Send-Notificaton {
                 # -Verbose
                 Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
+            if ($ReportOptions.Notifications.MSSQL.Use) {
+                Write-Color @script:WriteParameters -Text "Event was found but not sent anywhere yet", $Data -Color White, Yellow
+                New-SqlInsert -Events $Events -ReportOptions $ReportOptions
+
+            }
         }
     }
+}
+
+function New-SqlInsert {
+    [CmdletBinding()]
+    param(
+        [System.Object] $Events,
+        [hashtable] $ReportOptions
+    )
+
+    $Query = New-Query -Events $Events
+    $Query
+
+    #$Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query
+}
+
+function New-Query {
+    param (
+        $Events
+    )
+    $Events
+
+    $Mapping = @{
+        '<ForestName>'    = $Forest.ForestName
+        '<ForestNameDN>'  = $Forest.RootDSE.defaultNamingContext
+        '<Domain>'        = $Domain
+        '<DomainNetBios>' = $Forest.FoundDomains.$Domain.DomainInformation.NetBIOSName
+        '<DomainDN>'      = $Forest.FoundDomains.$Domain.DomainInformation.DistinguishedName
+    }
+
+
+    foreach ($Log in $Events) {
+        $Log
+    }
+
+
+    "INSERT INTO [dbo].[Events]
+        ([ID]
+        ,[EventType]
+        ,[EventID]
+        ,[EventWho]
+        ,[EventWhen]
+        ,[EventRecordID]
+        ,[DomainController]
+        ,[Action]
+        ,[GroupName]
+        ,[UserAffected]
+        ,[MemberName]
+        ,[ComputerLockoutOn]
+        ,[ReportedBy]
+        ,[SamAccountName]
+        ,[DisplayName]
+        ,[UserPrincipalName]
+        ,[HomeDirectory]
+        ,[HomePath]
+        ,[ScriptPath]
+        ,[ProfilePath]
+        ,[UserWorkstation]
+        ,[PasswordLastSet]
+        ,[AccountExpires]
+        ,[PrimaryGroupId]
+        ,[AllowedToDelegateTo]
+        ,[OldUacValue]
+        ,[NewUacValue]
+        ,[UserAccountControl]
+        ,[UserParameters]
+        ,[SidHistory]
+        ,[LogonHours]
+        ,[OperationType]
+        ,[Message]
+        ,[BackupPath]
+        ,[LogType]
+        ,[EventAdded]
+        ,[EventAddedWho])
+    VALUES
+        (<ID, int,>
+        ,<EventType, nvarchar(50),>
+        ,<EventID, int,>
+        ,<EventWho, nchar(10),>
+        ,<EventWhen, datetime,>
+        ,<EventRecordID, int,>
+        ,<DomainController, nvarchar(max),>
+        ,<Action, nvarchar(max),>
+        ,<GroupName, nvarchar(max),>
+        ,<UserAffected, nvarchar(max),>
+        ,<MemberName, nvarchar(max),>
+        ,<ComputerLockoutOn, nvarchar(max),>
+        ,<ReportedBy, nvarchar(max),>
+        ,<SamAccountName, nvarchar(max),>
+        ,<DisplayName, nvarchar(max),>
+        ,<UserPrincipalName, nvarchar(max),>
+        ,<HomeDirectory, nvarchar(max),>
+        ,<HomePath, nvarchar(max),>
+        ,<ScriptPath, nvarchar(max),>
+        ,<ProfilePath, nvarchar(max),>
+        ,<UserWorkstation, nvarchar(max),>
+        ,<PasswordLastSet, datetime,>
+        ,<AccountExpires, datetime,>
+        ,<PrimaryGroupId, int,>
+        ,<AllowedToDelegateTo, nvarchar(50),>
+        ,<OldUacValue, nvarchar(50),>
+        ,<NewUacValue, nvarchar(50),>
+        ,<UserAccountControl, nvarchar(50),>
+        ,<UserParameters, nvarchar(50),>
+        ,<SidHistory, nvarchar(max),>
+        ,<LogonHours, nvarchar(max),>
+        ,<OperationType, nvarchar(max),>
+        ,<Message, nvarchar(max),>
+        ,<BackupPath, nvarchar(max),>
+        ,<LogType, nvarchar(max),>
+        ,<EventAdded, datetime,>
+        ,<EventAddedWho, nvarchar(50),>)"
+
 }
