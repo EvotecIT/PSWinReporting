@@ -69,7 +69,7 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = 'Start-ADReporting', 'Start-Notifications', 'New-SubscriptionTemplates', 'Set-SubscriptionTemplates'
+    FunctionsToExport = 'Start-ADReporting', 'Start-Notifications', 'New-SubscriptionTemplates', 'Set-SubscriptionTemplates', 'Remove-TaskScheduledForwarder', 'Add-TaskScheduledForwarder', 'Start-SubscriptionService'
     #FunctionsToExport = '*'
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = @()

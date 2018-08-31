@@ -1,7 +1,7 @@
 # Collects all named paramters (all others end up in $Args)
 param(
-    $eventid = 4757,
-    $eventRecordID = 432314, # 425358 ,
+    $eventid = 4725,
+    $eventRecordID = 1507624, # 425358 ,
     $eventChannel,
     $eventSeverity
 )

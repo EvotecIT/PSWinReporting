@@ -58,6 +58,12 @@ function Set-SubscriptionTemplates {
     }
 }
 
+function Start-SubscriptionService {
+    param()
+    Write-Color 'Starting Windows Event Collector service.' -Color White, Green, White
+    Start-MyProgram -Program $Script:ProgramWecutil -cmdArgList 'qc', '/q:true'
+}
+
 function Remove-Subscription {
     param(
         [switch] $All,

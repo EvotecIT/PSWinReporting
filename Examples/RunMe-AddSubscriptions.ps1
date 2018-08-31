@@ -53,5 +53,6 @@ $ReportDefinitions = @{
     }
 }
 
+Start-SubscriptionService
 $Providers = New-SubscriptionTemplates -ReportDefinitions $ReportDefinitions
 Set-SubscriptionTemplates -ListTemplates $Providers -DeleteOwn
