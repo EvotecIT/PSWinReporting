@@ -58,6 +58,8 @@ $ReportOptions = @{
             Server       = 'EVO1'
             Database     = 'SSAE18'
             Table        = 'dbo.[Events]'
+            # Left Side is ColumnName in SQL, right side is data in PSWinReporting.
+            # Changing makes sense only for left side...
             TableMapping = [ordered] @{
                 #'ID'                  = '<PrimaryKey>'
                 'EventType'           = ''
