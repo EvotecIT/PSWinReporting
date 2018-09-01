@@ -264,21 +264,21 @@ function Send-Notificaton {
                 Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
             if ($ReportOptions.Notifications.MSSQL.Use) {
-                $SqlQuery = New-SqlInsert -Events $Events -ReportOptions $ReportOptions
+                $SqlQuery = Send-SqlInsert -Events $Events -ReportOptions $ReportOptions
                 Write-Color @script:WriteParameters -Text '[i] ', 'SQL Query: ', $SQLQuery -Color White, White, Yellow
             }
         }
     }
 }
 
-function New-SqlInsert {
+function Send-SqlInsert {
     [CmdletBinding()]
     param(
         [System.Object] $Events,
         [hashtable] $ReportOptions
     )
 
-    $Query = New-Query -Events $Events -ReportOptions $ReportOptions
+    $Query = New-SqlQuery -Events $Events -ReportOptions $ReportOptions
     try {
         $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query -ErrorAction Stop
     } catch {
@@ -288,7 +288,8 @@ function New-SqlInsert {
     return $Query
 }
 
-function New-Query {
+function New-SqlQuery {
+    [CmdletBinding()]
     param (
         $ReportOptions,
         $Events
@@ -299,6 +300,10 @@ function New-Query {
     $ArrayMain = New-ArrayList
     $ArrayKeys = New-ArrayList
     $ArrayValues = New-ArrayList
+
+    #
+    #'EventAdded'          = '<CurrentDateTime>'
+    #'EventAddedWho'       = '<CurrentUserName>'
     Add-ToArray -List $ArrayMain -Element "INSERT INTO $SQLTable ("
     foreach ($E in $Events.PSObject.Properties) {
         $FieldName = $E.Name

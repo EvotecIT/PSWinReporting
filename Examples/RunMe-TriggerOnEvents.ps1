@@ -94,8 +94,8 @@ $ReportOptions = @{
                 'Message'             = 'Message'
                 'BackupPath'          = 'Backup Path'
                 'LogType'             = 'Log Type'
-                'EventAdded'          = '<CurrentUserName>'
-                'EventAddedWho'       = '<CurrentDateTime>'
+                'EventAdded'          = '<CurrentDateTime>'
+                'EventAddedWho'       = '<CurrentUserName>'
             }
         }
     }
