@@ -264,9 +264,8 @@ function Send-Notificaton {
                 Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
             if ($ReportOptions.Notifications.MSSQL.Use) {
-                Write-Color @script:WriteParameters -Text "Event was found but not sent anywhere yet", $Data -Color White, Yellow
-                New-SqlInsert -Events $Events -ReportOptions $ReportOptions
-
+                $SqlQuery = New-SqlInsert -Events $Events -ReportOptions $ReportOptions
+                Write-Color @script:WriteParameters -Text '[i] ', 'SQL Query: ', $SQLQuery -Color White, White, Yellow
             }
         }
     }
@@ -313,20 +312,13 @@ function New-Query {
             }
         }
     }
-
     Add-ToArray -List $ArrayMain -Element ($ArrayKeys -join ',')
     Add-ToArray -List $ArrayMain -Element ') VALUES ('
     Add-ToArray -List $ArrayMain -Element ($ArrayValues -join ',')
     Add-ToArray -List $ArrayMain -Element ')'
 
-    #Write-Color $ArrayKeys -COlor White
-    #Write-Color $ArrayMain -Color Red
-    #Write-Color $ArrayValues -COlor White
-    # $Map
-    # $ReportOptions.Notifications.MSSQL.TableMapping.$Map
-    #  }
-    $ArrayMain | Out-File 'C:\test.txt'
-    return $ArrayMain -join ' '
+    $SQLQuery = [string] ($ArrayMain) -replace "`n", ", " -replace "`r", ", "
+    return $SQLQuery
 
     $Mapping = @{
         # 'ID'                  = '<PrimaryKey>'

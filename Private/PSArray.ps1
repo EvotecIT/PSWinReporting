@@ -21,7 +21,7 @@ function Add-ToArray {
         [ValidateNotNullOrEmpty()][Object[]] $Element
     )
     foreach ($E in $Element) {
-        Write-Verbose $E
+        #Write-Verbose $E
         $List.Add($E) > $null
     }
 }

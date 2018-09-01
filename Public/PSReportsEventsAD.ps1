@@ -3,7 +3,7 @@ function Get-GroupCreateDelete($Events, $IgnoreWords = '') {
     $EventsNeeded = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'Group Name'; expression = { $_.TargetUserName }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
@@ -11,6 +11,7 @@ function Get-GroupCreateDelete($Events, $IgnoreWords = '') {
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
+    # 'Domain Controller', 'Action', 'Group Name', Who', 'When', 'Event ID', 'Record ID'
 }
 function Get-GroupMembershipChanges($Events, $IgnoreWords = '') {
 
@@ -18,7 +19,7 @@ function Get-GroupMembershipChanges($Events, $IgnoreWords = '') {
     $EventsNeeded = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'Group Name'; expression = { $_.TargetUserName }},
     @{label = 'Member Name'; expression = {$_.MemberName -replace '^CN=|,.*$' }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
@@ -27,6 +28,7 @@ function Get-GroupMembershipChanges($Events, $IgnoreWords = '') {
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
+    # 'Domain Controller', 'Action', 'Group Name','Member Name', 'Who', 'When', 'Event ID', 'Record ID'
 }
 function Get-UserStatuses {
     param (
@@ -38,7 +40,7 @@ function Get-UserStatuses {
     $EventsNeeded = 4722, 4725, 4767, 4723, 4724, 4726
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'User Affected'; expression = { "$($_.TargetDomainName)\$($_.TargetUserName)" }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
@@ -46,13 +48,14 @@ function Get-UserStatuses {
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
+    # 'Domain Controller', 'Action', 'User Affected', 'Who', 'When', 'Event ID', 'Record ID'
 }
 function Get-UserLockouts($Events, $IgnoreWords = '') {
     $EventsType = 'Security'
     $EventsNeeded = 4740
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'Computer Lockout On'; expression = { "$($_.TargetDomainName)" }},
     @{label = 'User Affected'; expression = { "$($_.TargetUserName)" }},
     @{label = 'Reported By'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
@@ -61,6 +64,7 @@ function Get-UserLockouts($Events, $IgnoreWords = '') {
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
+    # 'Domain Controller', 'Action','Computer Lockout On', 'User Affected','Reported By', 'When', 'Event ID', 'Record ID'
 }
 function Get-UserChanges($Events, $IgnoreWords = '') {
 
@@ -76,7 +80,7 @@ function Get-UserChanges($Events, $IgnoreWords = '') {
         else { $EventsFoundCleaned += $u }
     }
     $EventsFoundCleaned = $EventsFoundCleaned | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'User Affected'; expression = { "$($_.TargetDomainName)\$($_.TargetUserName)" }},
     @{label = 'SamAccountName'; expression = { $_.SamAccountName }},
     @{label = 'Display Name'; expression = { $_.DisplayName }},
@@ -108,6 +112,10 @@ function Get-UserChanges($Events, $IgnoreWords = '') {
 
     $EventsFoundCleaned = Find-EventsIgnored -Events $EventsFoundCleaned -IgnoreWords $IgnoreWords
     return $EventsFoundCleaned
+    # 'Domain Controller', 'Action','User Affected', 'User Affected','SamAccountName', 'Display Name','UserPrincipalName',
+    # 'Home Directory', 'Home Path', 'Script Path', 'Profile Path','User Workstation', 'Password Last Set','Account Expires'
+    # 'Primary Group Id','Allowed To Delegate To','Old Uac Value','User Account Control','User Parameters', 'Sid History'
+    # 'Logon Hours', 'Who, 'When', 'Event ID', 'Record ID'
 }
 function Get-GroupPolicyChanges ($Events, $IgnoreWords = '') {
     # 5136 Group Policy changes, value changes, links, unlinks.
@@ -117,7 +125,7 @@ function Get-GroupPolicyChanges ($Events, $IgnoreWords = '') {
     $EventsNeeded = 5136, 5137, 5141
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
@@ -127,6 +135,7 @@ function Get-GroupPolicyChanges ($Events, $IgnoreWords = '') {
     AttributeValue, Id, Task | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
+    # 'Domain Controller', 'Action', 'who, 'When', 'Event ID', 'Record ID', 'OperationType'
 }
 function Get-LogonEvents($Events, $IgnoreWords = '') {
 
@@ -146,7 +155,7 @@ function Get-LogonEventsKerberos($Events, $IgnoreWords = '') {
     $EventsNeeded = 4768
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'Computer/User Affected'; expression = { "$($_.TargetDomainName)\$($_.TargetUserName)" }},
     @{label = 'IpAddress'; expression = { if ($_.IpAddress -match "::1" ) { "localhost" }   else {     $_.IpAddress       }     }},
     @{label = 'Port'; expression = { $_.IpPort }},
@@ -188,7 +197,7 @@ function Get-EventLogClearedLogs($Events, $Type, $IgnoreWords = '') {
     }
     #return $EventsFound
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { ($_.Message -split '\n')[0] }},
+    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'Backup Path'; expression = { if ($_.BackupPath -eq $null) { 'N/A' } else { $_.BackupPath} }},
     @{label = 'Log Type'; expression = { if ($Type -eq 'Security') { 'Security' } else {  $_.Channel } }},
     @{label = 'Who'; expression = { if ($_.ID -eq 1105) { "Automatic Backup" } else { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }}},
@@ -197,4 +206,5 @@ function Get-EventLogClearedLogs($Events, $Type, $IgnoreWords = '') {
     @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
+    # 'Domain Controller', 'Action', 'Backup Path, 'Log Type','Who', 'When', 'Event ID', 'Record ID'
 }
