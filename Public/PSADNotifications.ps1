@@ -301,9 +301,10 @@ function New-SqlQuery {
     $ArrayKeys = New-ArrayList
     $ArrayValues = New-ArrayList
 
-    #
-    #'EventAdded'          = '<CurrentDateTime>'
-    #'EventAddedWho'       = '<CurrentUserName>'
+    ## Added fields to know when event was added to SQL and by WHO (in this case TaskS Scheduler User)
+    Add-Member -InputObject $Events -MemberType NoteProperty -Name "EventAdded" -Value (Get-Date)
+    Add-Member -InputObject $Events -MemberType NoteProperty -Name "EventAddedWho" -Value ($Env:USERNAME)
+
     Add-ToArray -List $ArrayMain -Element "INSERT INTO $SQLTable ("
     foreach ($E in $Events.PSObject.Properties) {
         $FieldName = $E.Name

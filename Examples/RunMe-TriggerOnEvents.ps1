@@ -94,8 +94,8 @@ $ReportOptions = @{
                 'Message'             = 'Message'
                 'BackupPath'          = 'Backup Path'
                 'LogType'             = 'Log Type'
-                'EventAdded'          = '<CurrentDateTime>'
-                'EventAddedWho'       = '<CurrentUserName>'
+                'EventAdded'          = 'EventAdded' # ColumnsToTrack when it was added to database and by who / not part of event
+                'EventAddedWho'       = 'EventAddedWho' # ColumnsToTrack when it was added to database and by who / not part of event
             }
         }
     }
