@@ -20,7 +20,6 @@ Import-Module PSWinReporting -Force
 Import-Module PSWriteColor
 Import-Module PSSlack
 Import-Module DBATools
-Import-Module PSWriteWord -Force
 
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
