@@ -1,7 +1,7 @@
 # Collects all named paramters (all others end up in $Args)
 param(
-    $eventid = 4725,
-    $eventRecordID = 1507624, # 425358 ,
+    $eventid = 4722,
+    $eventRecordID = 1543223, # 425358 ,
     $eventChannel,
     $eventSeverity
 )
@@ -59,7 +59,7 @@ $ReportOptions = @{
             Database     = 'SSAE18'
             Table        = 'dbo.[Events]'
             TableMapping = [ordered] @{
-                'ID'                  = '<PrimaryKey>'
+                #'ID'                  = '<PrimaryKey>'
                 'EventType'           = ''
                 'EventID'             = 'Event ID'
                 'EventWho'            = 'Who'

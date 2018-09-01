@@ -26,6 +26,7 @@ function Add-ToArray {
     }
 }
 function Remove-FromArray {
+    [CmdletBinding()]
     param(
         [System.Collections.ArrayList] $List,
         [Object] $Element,
@@ -40,6 +41,7 @@ function Remove-FromArray {
 }
 
 function Split-Array {
+    [CmdletBinding()]
     <#
         .SYNOPSIS
         Split an array

@@ -272,14 +272,20 @@ function Send-Notificaton {
 }
 
 function New-SqlInsert {
-    # [CmdletBinding()]
+    [CmdletBinding()]
     param(
         [System.Object] $Events,
         [hashtable] $ReportOptions
     )
 
     $Query = New-Query -Events $Events -ReportOptions $ReportOptions
-    $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query
+    try {
+        $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query -ErrorAction Stop
+    } catch {
+        $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+        Write-Color @script:WriteParameters -Text '[e] ', 'SQL Error: ', $ErrorMessage -Color White, White, Yellow
+    }
+    return $Query
 }
 
 function New-Query {
@@ -287,8 +293,6 @@ function New-Query {
         $ReportOptions,
         $Events
     )
-    #$Events | fl *
-
     $TableMapping = $ReportOptions.Notifications.MSSQL.TableMapping
     $SQLTable = $ReportOptions.Notifications.MSSQL.Table
 
@@ -304,10 +308,7 @@ function New-Query {
             $MapValue = $TableMapping.$MapKey
             if ($FieldName -eq $MapValue) {
 
-                #Write-Color $FieldName, ' ', $MapKey, ' ', $MapValue, ' ', $FieldValue -Color Red, White, Yellow, White, Red, White, Yellow
-                #  $MapKey
                 Add-ToArray -List $ArrayKeys -Element "[$MapKey]"
-                #  $FieldValue
                 Add-ToArray -List $ArrayValues -Element "'$FieldValue'"
             }
         }
@@ -317,47 +318,7 @@ function New-Query {
     Add-ToArray -List $ArrayMain -Element ($ArrayValues -join ',')
     Add-ToArray -List $ArrayMain -Element ')'
 
-    $SQLQuery = [string] ($ArrayMain) -replace "`n", ", " -replace "`r", ", "
+    $SQLQuery = [string] ($ArrayMain) -replace "`n", "" -replace "`r", ""
+    # Write-Verbose "SQLQuery: $SqlQuery"
     return $SQLQuery
-
-    $Mapping = @{
-        # 'ID'                  = '<PrimaryKey>'
-        'EventType'           = ''
-        'EventID'             = 'Event ID'
-        'EventWho'            = 'Who'
-        'EventWhen'           = 'When'
-        'EventRecordID'       = 'Record ID'
-        'DomainController'    = 'Domain Controller'
-        'Action'              = 'Action'
-        'GroupName'           = ''
-        'UserAffected'        = 'User Affected'
-        'MemberName'          = ''
-        'ComputerLockoutOn'   = ''
-        'ReportedBy'          = ''
-        'SamAccountName'      = ''
-        'DisplayName'         = ''
-        'UserPrincipalName'   = ''
-        'HomeDirectory'       = ''
-        'HomePath'            = ''
-        'ScriptPath'          = ''
-        'ProfilePath'         = ''
-        'UserWorkstation'     = ''
-        'PasswordLastSet'     = ''
-        'AccountExpires'      = ''
-        'PrimaryGroupId'      = ''
-        'AllowedToDelegateTo' = ''
-        'OldUacValue'         = ''
-        'NewUacValue'         = ''
-        'UserAccountControl'  = ''
-        'UserParameters'      = ''
-        'SidHistory'          = ''
-        'LogonHours'          = ''
-        'OperationType'       = ''
-        'Message'             = ''
-        'BackupPath'          = ''
-        'LogType'             = ''
-        'EventAdded'          = '<CurrentUserName>'
-        'EventAddedWho'       = '<CurrentDateTime>'
-    }
-
 }
