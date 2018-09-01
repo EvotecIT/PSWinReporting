@@ -48,11 +48,11 @@ function Protect-ArchivedLogs {
 function Start-Notifications {
     [CmdletBinding()]
     param(
-        $ReportOptions,
-        $ReportDefinitions,
-        $EventID,
-        $EventRecordID,
-        $EventChannel
+        [hashtable] $ReportOptions,
+        [hashtable] $ReportDefinitions,
+        [int] $EventID,
+        [int] $EventRecordID,
+        [string] $EventChannel
     )
     Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
 
@@ -200,7 +200,7 @@ function Start-Notifications {
 function Send-Notificaton {
     [CmdletBinding()]
     param(
-        [System.Object] $Events,
+        [PSCustomObject] $Events,
         [hashtable] $ReportOptions
     )
 
@@ -264,7 +264,7 @@ function Send-Notificaton {
                 Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
             if ($ReportOptions.Notifications.MSSQL.Use) {
-                $SqlQuery = Send-SqlInsert -Events $Events -ReportOptions $ReportOptions
+                $SqlQuery = Send-SqlInsert -Object $Events -ReportOptions $ReportOptions
                 Write-Color @script:WriteParameters -Text '[i] ', 'SQL Query: ', $SQLQuery -Color White, White, Yellow
             }
         }
@@ -274,11 +274,10 @@ function Send-Notificaton {
 function Send-SqlInsert {
     [CmdletBinding()]
     param(
-        [System.Object] $Events,
+        [PSCustomObject] $Object,
         [hashtable] $ReportOptions
     )
-
-    $Query = New-SqlQuery -Events $Events -ReportOptions $ReportOptions
+    $Query = New-SqlQuery -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL
     try {
         $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query -ErrorAction Stop
     } catch {
@@ -291,22 +290,22 @@ function Send-SqlInsert {
 function New-SqlQuery {
     [CmdletBinding()]
     param (
-        $ReportOptions,
-        $Events
+        [hashtable ]$SqlSettings,
+        [PSCustomObject] $Object
     )
-    $TableMapping = $ReportOptions.Notifications.MSSQL.TableMapping
-    $SQLTable = $ReportOptions.Notifications.MSSQL.Table
+    $TableMapping = $SqlSettings.TableMapping
+    $SQLTable = $SqlSettings.Table
 
     $ArrayMain = New-ArrayList
     $ArrayKeys = New-ArrayList
     $ArrayValues = New-ArrayList
 
     ## Added fields to know when event was added to SQL and by WHO (in this case TaskS Scheduler User)
-    Add-Member -InputObject $Events -MemberType NoteProperty -Name "EventAdded" -Value (Get-Date)
-    Add-Member -InputObject $Events -MemberType NoteProperty -Name "EventAddedWho" -Value ($Env:USERNAME)
+    Add-Member -InputObject $Object -MemberType NoteProperty -Name "AddedWhen" -Value (Get-Date)
+    Add-Member -InputObject $Object -MemberType NoteProperty -Name "AddedWho" -Value ($Env:USERNAME)
 
     Add-ToArray -List $ArrayMain -Element "INSERT INTO $SQLTable ("
-    foreach ($E in $Events.PSObject.Properties) {
+    foreach ($E in $Object.PSObject.Properties) {
         $FieldName = $E.Name
         $FieldValue = $E.Value
 

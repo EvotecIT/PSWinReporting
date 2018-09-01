@@ -20,6 +20,7 @@ Import-Module PSWinReporting -Force
 Import-Module PSWriteColor
 Import-Module PSSlack
 Import-Module DBATools
+Import-Module PSWriteWord -Force
 
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
@@ -94,8 +95,8 @@ $ReportOptions = @{
                 'Message'             = 'Message'
                 'BackupPath'          = 'Backup Path'
                 'LogType'             = 'Log Type'
-                'EventAdded'          = 'EventAdded' # ColumnsToTrack when it was added to database and by who / not part of event
-                'EventAddedWho'       = 'EventAddedWho' # ColumnsToTrack when it was added to database and by who / not part of event
+                'EventAdded'          = 'AddedWhen' # ColumnsToTrack when it was added to database and by who / not part of event
+                'EventAddedWho'       = 'AddedWho' # ColumnsToTrack when it was added to database and by who / not part of event
             }
         }
     }
