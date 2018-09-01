@@ -307,7 +307,7 @@ function New-Query {
         foreach ($MapKey in $TableMapping.Keys) {
             $MapValue = $TableMapping.$MapKey
             if ($FieldName -eq $MapValue) {
-
+                $FieldValue = $FieldValue -Replace "'", "''"
                 Add-ToArray -List $ArrayKeys -Element "[$MapKey]"
                 Add-ToArray -List $ArrayValues -Element "'$FieldValue'"
             }
