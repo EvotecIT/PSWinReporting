@@ -273,16 +273,14 @@ function Send-Notificaton {
 }
 
 function New-SqlInsert {
-    [CmdletBinding()]
+    # [CmdletBinding()]
     param(
         [System.Object] $Events,
         [hashtable] $ReportOptions
     )
 
     $Query = New-Query -Events $Events -ReportOptions $ReportOptions
-    $Query
-
-    #$Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query
+    $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query
 }
 
 function New-Query {
@@ -290,27 +288,48 @@ function New-Query {
         $ReportOptions,
         $Events
     )
-    # $Events | fl *
+    #$Events | fl *
 
     $TableMapping = $ReportOptions.Notifications.MSSQL.TableMapping
+    $SQLTable = $ReportOptions.Notifications.MSSQL.Table
 
-    $Events.PSObject.Properties
-
+    $ArrayMain = New-ArrayList
+    $ArrayKeys = New-ArrayList
+    $ArrayValues = New-ArrayList
+    Add-ToArray -List $ArrayMain -Element "INSERT INTO $SQLTable ("
     foreach ($E in $Events.PSObject.Properties) {
         $FieldName = $E.Name
-        $E.$FieldName
+        $FieldValue = $E.Value
+
+        foreach ($MapKey in $TableMapping.Keys) {
+            $MapValue = $TableMapping.$MapKey
+            if ($FieldName -eq $MapValue) {
+
+                #Write-Color $FieldName, ' ', $MapKey, ' ', $MapValue, ' ', $FieldValue -Color Red, White, Yellow, White, Red, White, Yellow
+                #  $MapKey
+                Add-ToArray -List $ArrayKeys -Element "[$MapKey]"
+                #  $FieldValue
+                Add-ToArray -List $ArrayValues -Element "'$FieldValue'"
+            }
+        }
     }
 
-    foreach ($Map in $TableMapping.Keys) {
+    Add-ToArray -List $ArrayMain -Element ($ArrayKeys -join ',')
+    Add-ToArray -List $ArrayMain -Element ') VALUES ('
+    Add-ToArray -List $ArrayMain -Element ($ArrayValues -join ',')
+    Add-ToArray -List $ArrayMain -Element ')'
 
-
-        # $Map
-        # $ReportOptions.Notifications.MSSQL.TableMapping.$Map
-    }
-
+    #Write-Color $ArrayKeys -COlor White
+    #Write-Color $ArrayMain -Color Red
+    #Write-Color $ArrayValues -COlor White
+    # $Map
+    # $ReportOptions.Notifications.MSSQL.TableMapping.$Map
+    #  }
+    $ArrayMain | Out-File 'C:\test.txt'
+    return $ArrayMain -join ' '
 
     $Mapping = @{
-        'ID'                  = '<PrimaryKey>'
+        # 'ID'                  = '<PrimaryKey>'
         'EventType'           = ''
         'EventID'             = 'Event ID'
         'EventWho'            = 'Who'
