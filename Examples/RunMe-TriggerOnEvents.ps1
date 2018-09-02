@@ -54,13 +54,13 @@ $ReportOptions = @{
             Uri     = ""
         }
         MSSQL          = @{
-            Use          = $true
-            Server       = 'EVO1'
-            Database     = 'SSAE18'
-            Table        = 'dbo.[Events]'
+            Use             = $true
+            SqlServer       = 'EVO1'
+            SqlDatabase     = 'SSAE18'
+            SqlTable        = 'dbo.[Events]'
             # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
             # Changing makes sense only for right side...
-            TableMapping = [ordered] @{
+            SqlTableMapping = [ordered] @{
                 'Event ID'               = 'EventID'
                 'Who'                    = 'EventWho'
                 'When'                   = 'EventWhen'

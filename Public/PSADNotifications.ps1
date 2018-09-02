@@ -278,7 +278,7 @@ function Send-SqlInsert {
     )
     $Query = New-SqlQuery -Object $Object -SqlSettings $ReportOptions.Notifications.MSSQL
     try {
-        $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query -ErrorAction Stop
+        $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.SqlServer -Database $ReportOptions.Notifications.MSSQL.SqlDatabase -Query $Query -ErrorAction Stop
     } catch {
         $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
         Write-Color @script:WriteParameters -Text '[e] ', 'SQL Error: ', $ErrorMessage -Color White, White, Yellow
@@ -292,8 +292,8 @@ function New-SqlQuery {
         [hashtable ]$SqlSettings,
         [PSCustomObject] $Object
     )
-    $TableMapping = $SqlSettings.TableMapping
-    $SQLTable = $SqlSettings.Table
+    $TableMapping = $SqlSettings.SqlTableMapping
+    $SQLTable = $SqlSettings.SqlTable
 
     $ArrayMain = New-ArrayList
     $ArrayKeys = New-ArrayList
