@@ -265,7 +265,7 @@ function Send-Notificaton {
             }
             if ($ReportOptions.Notifications.MSSQL.Use) {
                 $SqlQuery = Send-SqlInsert -Object $Events -ReportOptions $ReportOptions
-                Write-Color @script:WriteParameters -Text '[i] ', 'SQL Query: ', $SQLQuery -Color White, White, Yellow
+                Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Query: ', $SQLQuery -Color White, White, Yellow
             }
         }
     }
@@ -310,10 +310,10 @@ function New-SqlQuery {
         $FieldValue = $E.Value
 
         foreach ($MapKey in $TableMapping.Keys) {
-            $MapValue = $TableMapping.$MapKey
-            if ($FieldName -eq $MapValue) {
+            if ($FieldName -eq $MapKey) {
+                $MapValue = $TableMapping.$MapKey
                 $FieldValue = $FieldValue -Replace "'", "''"
-                Add-ToArray -List $ArrayKeys -Element "[$MapKey]"
+                Add-ToArray -List $ArrayKeys -Element "[$MapValue]"
                 Add-ToArray -List $ArrayValues -Element "'$FieldValue'"
             }
         }
