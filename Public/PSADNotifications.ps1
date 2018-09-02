@@ -276,7 +276,7 @@ function Send-SqlInsert {
         [PSCustomObject] $Object,
         [hashtable] $ReportOptions
     )
-    $Query = New-SqlQuery -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL
+    $Query = New-SqlQuery -Object $Object -SqlSettings $ReportOptions.Notifications.MSSQL
     try {
         $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.Server -Database $ReportOptions.Notifications.MSSQL.Database -Query $Query -ErrorAction Stop
     } catch {
