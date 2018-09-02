@@ -270,7 +270,6 @@ function Send-Notificaton {
         }
     }
 }
-
 function Send-SqlInsert {
     [CmdletBinding()]
     param(
@@ -304,7 +303,6 @@ function New-SqlQuery {
     Add-Member -InputObject $Object -MemberType NoteProperty -Name "AddedWhen" -Value (Get-Date)
     Add-Member -InputObject $Object -MemberType NoteProperty -Name "AddedWho" -Value ($Env:USERNAME)
 
-    Add-ToArray -List $ArrayMain -Element "INSERT INTO $SQLTable ("
     foreach ($E in $Object.PSObject.Properties) {
         $FieldName = $E.Name
         $FieldValue = $E.Value
@@ -318,6 +316,7 @@ function New-SqlQuery {
             }
         }
     }
+    Add-ToArray -List $ArrayMain -Element "INSERT INTO $SQLTable ("
     Add-ToArray -List $ArrayMain -Element ($ArrayKeys -join ',')
     Add-ToArray -List $ArrayMain -Element ') VALUES ('
     Add-ToArray -List $ArrayMain -Element ($ArrayValues -join ',')
