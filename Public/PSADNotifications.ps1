@@ -264,65 +264,11 @@ function Send-Notificaton {
                 Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
             if ($ReportOptions.Notifications.MSSQL.Use) {
-                $SqlQuery = Send-SqlInsert -Object $Events -ReportOptions $ReportOptions
-                Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Query: ', $SQLQuery -Color White, White, Yellow
+                $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL -Verbose
+                foreach ($Query in $SqlQuery) {
+                    Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
+                }
             }
         }
     }
-}
-function Send-SqlInsert {
-    [CmdletBinding()]
-    param(
-        [PSCustomObject] $Object,
-        [hashtable] $ReportOptions
-    )
-    $Query = New-SqlQuery -Object $Object -SqlSettings $ReportOptions.Notifications.MSSQL
-    try {
-        $Data = Invoke-Sqlcmd2 -SqlInstance $ReportOptions.Notifications.MSSQL.SqlServer -Database $ReportOptions.Notifications.MSSQL.SqlDatabase -Query $Query -ErrorAction Stop
-    } catch {
-        $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-        Write-Color @script:WriteParameters -Text '[e] ', 'SQL Error: ', $ErrorMessage -Color White, White, Yellow
-    }
-    return $Query
-}
-
-function New-SqlQuery {
-    [CmdletBinding()]
-    param (
-        [hashtable ]$SqlSettings,
-        [PSCustomObject] $Object
-    )
-    $TableMapping = $SqlSettings.SqlTableMapping
-    $SQLTable = $SqlSettings.SqlTable
-
-    $ArrayMain = New-ArrayList
-    $ArrayKeys = New-ArrayList
-    $ArrayValues = New-ArrayList
-
-    ## Added fields to know when event was added to SQL and by WHO (in this case TaskS Scheduler User)
-    Add-Member -InputObject $Object -MemberType NoteProperty -Name "AddedWhen" -Value (Get-Date)
-    Add-Member -InputObject $Object -MemberType NoteProperty -Name "AddedWho" -Value ($Env:USERNAME)
-
-    foreach ($E in $Object.PSObject.Properties) {
-        $FieldName = $E.Name
-        $FieldValue = $E.Value
-
-        foreach ($MapKey in $TableMapping.Keys) {
-            if ($FieldName -eq $MapKey) {
-                $MapValue = $TableMapping.$MapKey
-                $FieldValue = $FieldValue -Replace "'", "''"
-                Add-ToArray -List $ArrayKeys -Element "[$MapValue]"
-                Add-ToArray -List $ArrayValues -Element "'$FieldValue'"
-            }
-        }
-    }
-    Add-ToArray -List $ArrayMain -Element "INSERT INTO $SQLTable ("
-    Add-ToArray -List $ArrayMain -Element ($ArrayKeys -join ',')
-    Add-ToArray -List $ArrayMain -Element ') VALUES ('
-    Add-ToArray -List $ArrayMain -Element ($ArrayValues -join ',')
-    Add-ToArray -List $ArrayMain -Element ')'
-
-    $SQLQuery = [string] ($ArrayMain) -replace "`n", "" -replace "`r", ""
-    # Write-Verbose "SQLQuery: $SqlQuery"
-    return $SQLQuery
 }

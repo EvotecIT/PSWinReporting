@@ -20,6 +20,7 @@ Import-Module PSWinReporting -Force
 Import-Module PSWriteColor
 Import-Module PSSlack
 Import-Module DBATools
+Import-Module PSSharedGoods -Force
 
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
@@ -60,11 +61,12 @@ $ReportOptions = @{
             SqlTable        = 'dbo.[Events]'
             # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
             # Changing makes sense only for right side...
+            SqlTableCreate  = $true
             SqlTableMapping = [ordered] @{
-                'Event ID'               = 'EventID'
+                'Event ID'               = 'EventID,[int]'
                 'Who'                    = 'EventWho'
-                'When'                   = 'EventWhen'
-                'Record ID'              = 'EventRecordID'
+                'When'                   = 'EventWhen,[datetime]'
+                'Record ID'              = 'EventRecordID,[bigint]'
                 'Domain Controller'      = 'DomainController'
                 'Action'                 = 'Action'
                 'Group Name'             = 'GroupName'
@@ -80,8 +82,8 @@ $ReportOptions = @{
                 'Script Path'            = 'ScriptPath'
                 'Profile Path'           = 'ProfilePath'
                 'User Workstation'       = 'UserWorkstation'
-                'Password Last Set'      = 'PasswordLastSet'
-                'Account Expires'        = 'AccountExpires'
+                'Password Last Set'      = 'PasswordLastSet,[datetime]'
+                'Account Expires'        = 'AccountExpires,[datetime]'
                 'Primary Group Id'       = 'PrimaryGroupId'
                 'Allowed To Delegate To' = 'AllowedToDelegateTo'
                 'Old Uac Value'          = 'OldUacValue'
@@ -94,7 +96,7 @@ $ReportOptions = @{
                 'Message'                = 'Message'
                 'Backup Path'            = 'BackupPath'
                 'Log Type'               = 'LogType'
-                'AddedWhen'              = 'EventAdded' # ColumnsToTrack when it was added to database and by who / not part of event
+                'AddedWhen'              = 'EventAdded,[datetime],null' # ColumnsToTrack when it was added to database and by who / not part of event
                 'AddedWho'               = 'EventAddedWho'  # ColumnsToTrack when it was added to database and by who / not part of event
             }
         }
@@ -195,5 +197,7 @@ $ReportDefinitions = @{
         }
     }
 }
+
+#$ReportOptions.Notifications.MSSQL.SqlTableMapping.GetEnumerator().Name
 
 Start-Notifications -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -Verbose

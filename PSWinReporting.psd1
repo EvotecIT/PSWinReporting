@@ -12,7 +12,7 @@
     RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.7.0.16'
+    ModuleVersion     = '1.7.1'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -51,7 +51,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules   = @('PSEventViewer', 'PSWriteColor', 'ImportExcel')
+    RequiredModules   = @('PSEventViewer', 'PSWriteColor', 'ImportExcel', 'PSSharedGoods', 'dbatools', 'PSWriteExcel', 'PSSlack', 'PSTeams')
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
@@ -92,9 +92,9 @@
     PrivateData       = @{
 
         PSData = @{
-
+            Prerelease = '-alpha1'
             # Tags applied to this module. These help with module discovery in online galleries.
-            # Tags = @()
+            Tags       = @('PSWinReporting', 'ActiveDirectory', 'Events', 'Reporting')
 
             # A URL to the license for this module.
             # LicenseUri = ''
