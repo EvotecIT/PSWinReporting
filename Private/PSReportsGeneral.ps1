@@ -4,7 +4,8 @@ function Get-EventLogSize ($Servers, $LogName = "Security") {
         try {
             $result = get-WinEvent -ListLog $LogName -ComputerName $server | Select-Object MaximumSizeInBytes, FileSize, IsLogFul, LastAccessTime, LastWriteTime, OldestRecordNumber, RecordCount, LogName, LogType, LogIsolation, IsEnabled, LogMode
         } catch {
-            Write-Color @script:WriteParameters "[-] ", "Event Log Error", "$($_.Exception)" -Color White, Red
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            Write-Color @script:WriteParameters "[-] ", "Event Log Error on ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
             continue
         }
         $CurrentFileSize = Convert-Size -Value $($result.FileSize) -From Bytes -To GB -Precision 2 -Display
