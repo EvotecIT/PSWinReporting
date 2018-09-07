@@ -10,7 +10,7 @@ Update-Module PSTeams
 Update-Module PSEventViewer
 Update-Module PSWinReporting
 Update-Module PSWriteColor
-Update-Module ImportExcel
+Update-Module PSWriteExcel
 Update-Module PSSlack
 Update-Module DBATools
 #>
@@ -25,7 +25,7 @@ Import-Module PSSharedGoods -Force
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
 
-    AsExcel               = $true # attaches Excel to email with all events, required ImportExcel module
+    AsExcel               = $true # attaches Excel to email with all events, required PSWriteExcel module
     AsCSV                 = $false # attaches CSV to email with all events,
     AsHTML                = $true # puts exported data into email directly with all events
     SendMail              = $false

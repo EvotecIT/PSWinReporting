@@ -164,14 +164,14 @@ Function Test-Prerequisite () {
         Write-Color @script:WriteParameters  "[-] ", "PSWinReporting", " module not found." -Color White, Red, White
     }
 
-    $ImportExcel = Get-ModulesAvailability -Name "ImportExcel"
+    $ImportExcel = Get-ModulesAvailability -Name "PSWriteExcel"
     if ($ImportExcel -eq $true) {
-        Write-Color @script:WriteParameters  "[+] ", "ImportExcel", " module imported. Continuing..." -Color White, Green, White
+        Write-Color @script:WriteParameters  "[+] ", "PSWriteExcel", " module imported. Continuing..." -Color White, Green, White
     } else {
-        Write-Color @script:WriteParameters  "[-] ", "ImportExcel", " module not found." -Color White, Red, White
+        Write-Color @script:WriteParameters  "[-] ", "PSWriteExcel", " module not found." -Color White, Red, White
         if ($ReportOptions.AsExcel -eq $true) {
-            Write-Color @script:WriteParameters  "[-] ", "ImportExcel ", "module is not installed. Disable ", "AsExcel", " under ", "ReportOptions", " option before rerunning this script." -Color White, Red, White, Yellow, White, Yellow, White
-            Write-Color @script:WriteParameters  "[-] ", "Alternatively run ", "Install-Module -Name ImportExcel", " before re-running this script. It's quite useful module!" -Color White, White, Yellow, White
+            Write-Color @script:WriteParameters  "[-] ", "PSWriteExcel ", "module is not installed. Disable ", "AsExcel", " under ", "ReportOptions", " option before rerunning this script." -Color White, Red, White, Yellow, White, Yellow, White
+            Write-Color @script:WriteParameters  "[-] ", "Alternatively run ", "Install-Module -Name PSWriteExcel", " before re-running this script. It's quite useful module!" -Color White, White, Yellow, White
             Write-Color @script:WriteParameters  "[-] ", "If ", "Install-Module", " is not there as well (", "poor you - running older system are you?", ") you need to download PackageManagement PowerShell Modules." -Color White, White, Yellow, White, Yellow, White
             Write-Color @script:WriteParameters  "[-] ", "It can be found at ", "https://www.microsoft.com/en-us/download/details.aspx?id=51451", ". After download, install and re-run Install-Module again." -Color White, White, Yellow, White
         }
