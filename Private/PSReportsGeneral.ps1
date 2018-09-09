@@ -37,6 +37,7 @@ function Invoke-EventLogVerification ($Results, $Dates) {
 }
 
 function Start-Report {
+    [CmdletBinding()]
     param (
         [hashtable] $Dates,
         [hashtable] $EmailParameters,
@@ -57,12 +58,14 @@ function Start-Report {
     $RebootEventsTable = @()
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
-    $ServersTable = @()
+    # $ServersTable = @()
     $GroupCreateDeleteTable = @()
     $TableExecutionTimes = ''
 
     Write-Color @script:WriteParameters '[i] Establishing servers list to ', 'process...' -Color White, Yellow
-    $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions
+
+    $ServersAD = Get-DC
+    $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions -DC $ServersAD    #-OnlyPDC:$ReportDefinitions.ReportsAD.Servers.OnlyPDC -Automatic:$ReportDefinitions.ReportsAD.Servers.Automatic
 
     Write-Color @script:WriteParameters '[i] Preparing ', 'Security Events', ' list to be processed on servers.' -Color White, Yellow, White
     $EventsToProcessSecurity = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'Security'
@@ -204,7 +207,7 @@ function Start-Report {
         if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
 
         } else {
-            $ServersTable = Get-DomainControllers -Servers $Servers
+            #$ServersTable = Get-DomainControllers -Servers $Servers
         }
         $script:TimeToGenerateReports.Reports.ServersData.Total = Stop-TimeLog -Time $ExecutionTime
     }
@@ -216,7 +219,7 @@ function Start-Report {
     # prepare body with HTML
     if ($ReportOptions.AsHTML) {
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.TimeToGenerate -ReportTable $TableExecutionTimes -ReportTableText 'Following report shows execution times' -Special
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersTable -ReportTableText 'Following servers have been processed for events'
+        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following servers have been processed for events'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportTable $UsersEventsTable -ReportTableText 'Following user changes happend'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -ReportTable $UsersEventsStatusesTable -ReportTableText 'Following user status happend'
@@ -233,7 +236,7 @@ function Start-Report {
     $Reports = @()
     If ($ReportOptions.AsExcel) {
         $ReportFilePathXLSX = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension "xlsx"
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersTable
+        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersAD
         Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Event log sizes" -ReportTable $EventLogTable
         Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName  "User Changes" -ReportTable $UsersEventsTable
         Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName  "User Status Changes" -ReportTable $UsersEventsStatusesTable
@@ -249,7 +252,7 @@ function Start-Report {
         $Reports += $ReportFilePathXLSX
     }
     If ($ReportOptions.AsCSV) {
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportServers" -ReportTable $ServersTable
+        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportServers" -ReportTable $ServersAD
         $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportEventLogSize" -ReportTable $EventLogTable
         $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserEvents" -ReportTable $UsersEventsTable
         $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserStatuses" -ReportTable $UsersEventsStatusesTable
@@ -378,76 +381,70 @@ function Get-DomainControllers($Servers) {
     return $DomainControllers
 }
 
-function Get-Servers($ReportOptions) {
-    $Servers = @()
-    if ($ReportOptions.OnlyPrimaryDC -eq $true) {
-        $ServerOptions = @{
-            Server      = (get-addomain).pdcemulator;
-            ErrorAction = "Stop"
-        }
-    } else {
-        $ServerOptions = @{
-            Filter      = "*";
-            ErrorAction = "Stop"
-        }
-    }
+function Get-DC {
+    param()
+    $DCs = @()
     try {
-        $Servers = Get-ADDomainController @ServerOptions | Select-Object Name, HostName, Ipv4Address, IsGlobalCatalog, IsReadOnly, OperatingSystem, Site, Enabled, Supported #, EventsFound
+        $Forest = Get-ADForest -ErrorAction Stop
     } catch {
-        if ($_.Exception -match "Unable to find a default server with Active Directory Web Services running.") {
-            Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
-        }
-        Write-Color @script:WriteParameters "[i] Error: ", "$($_.Exception.Message)" -Color White, Red
+        $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+        Write-Color @script:WriteParameters "[i] Get-ADForest Error: ", "$($_.Exception.Message)" -Color White, Red
+        #return $ErrorMessage
     }
-    return $Servers
-}
-
-
-function Find-ServersAD {
-    param (
-        $ReportDefinitions
-    )
-    <#
-        Servers    = @{
-            UseForwarders   = $false # if $true skips Automatic/OnlyPDC/DC otherwise below applies
-            ForwardServer   = 'EVO1'
-            ForwardEventLog = 'ForwardedEvents'
-
-            Automatic       = $true
-            OnlyPDC         = $false
-            DC              = ''
-        }
-    #>
-    if ($ReportDefinitions.ReportsAD.Servers.Automatic -eq $true) {
-        if ($ReportDefinitions.ReportsAD.Servers.OnlyPDC -eq $true) {
-            $ServerOptions = @{
-                Server = (get-addomain).pdcemulator; ErrorAction = "Stop"
-            }
-        } else {
-            $ServerOptions = @{
-                Filter = "*"; ErrorAction = "Stop"
-            }
-        }
+    foreach ($DomainName in $Forest.Domains) {
+        $Domain = Get-AdDomain -Server $DomainName -ErrorAction SilentlyContinue
         try {
-            $Servers = Get-ADDomainController @ServerOptions | Select-Object Name , HostName, Ipv4Address, IsGlobalCatalog, IsReadOnly, OperatingSystem, Site, Enabled, Supported #, EventsFound
-            $Servers = $Servers | Where-Object { $_.OperatingSystem -notlike "*2003*" -and $_.OperatingSystem -notlike "*2000*" }
-            $Servers = $Servers.Hostname
-            return $Servers
+            $DomainControllers = $(Get-ADDomainController -Server $DomainName -Filter * -ErrorAction Stop )
+            foreach ($Policy in $DomainControllers) {
+                $DCs += [ordered] @{
+                    'Name'             = $Policy.Name
+                    'Domain'           = $DomainName
+                    'Host Name'        = $Policy.HostName
+                    'Operating System' = $Policy.OperatingSystem
+                    'Site'             = $Policy.Site
+                    'Ipv4'             = if ($Policy.Ipv4Address -eq '') { 'N/A' } else { $Policy.Ipv4Address }
+                    'Ipv6'             = if ($Policy.Ipv6Address -eq '') { 'N/A' } else { $Policy.Ipv4Address }
+                    'Is GC'            = $Policy.IsGlobalCatalog
+                    'Is ReadOnly'      = $Policy.IsReadOnly
+                    'Is PDC'           = if ($Policy.HostName -eq $Domain.PDCEmulator) { 'No' } else { 'Yes' }
+                    'Is Supported'     = if ($Policy.OperatingSystem -notlike "*2003*" -and $Policy.OperatingSystem -notlike "*2000*") { 'Yes' } else { 'No' }
+                    'Is Included'      = ''
+                    'Enabled'          = $Policy.Enabled
+                }
+            }
         } catch {
             if ($_.Exception -match "Unable to find a default server with Active Directory Web Services running.") {
                 Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
             }
-            Write-Color @script:WriteParameters "[i] Error: ", "$($_.Exception.Message)" -Color White, Red
-            Exit
+            Write-Color @script:WriteParameters "[i] Get-ADDomainController Error: ", "$($_.Exception.Message)" -Color White, Red
+        }
+
+    }
+    return Format-TransposeTable $DCs
+}
+
+
+
+function Find-ServersAD {
+    param (
+        $DC,
+        $ReportDefinitions
+    )
+    if ($ReportDefinitions.ReportsAD.Servers.Automatic -eq $true) {
+        if ($ReportDefinitions.ReportsAD.Servers.OnlyPDC -eq $true) {
+            $Servers = ($DC | Where { $_.'Is PDC' -eq 'Yes' }).'Host Name'
+        } else {
+            $Servers = $DC.'Host Name'
         }
     } else {
         if ($ReportDefinitions.ReportsAD.Servers.DC -eq '' -and $ReportDefinitions.ReportsAD.Servers.UseForwarders -eq $false) {
             Write-Color @script:WriteParameters "[i] Error: ", "Parameter ", 'ReportDefinitions.ReportsAD.Servers.DC', ' is empty. Please choose ', 'Automatic', ' or fill in this field.' -Color White, White, Yellow, White, Yellow, White
             Exit
         } else {
-            return $ReportDefinitions.ReportsAD.Servers.DC
+            $Servers = $ReportDefinitions.ReportsAD.Servers.DC
         }
     }
+    return $Servers
 }
 
 function Find-AllEvents($ReportDefinitions, $LogNameSearch, [switch] $All) {

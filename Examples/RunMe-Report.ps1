@@ -67,7 +67,7 @@ $ReportOptions = @{
     }
     Debug                 = @{
         DisplayTemplateHTML = $false
-        Verbose             = $false
+        Verbose             = $true
     }
 }
 $ReportTimes = @{
@@ -119,8 +119,8 @@ $ReportDefinitions = @{
             ForwardServer   = 'EVO1'
             ForwardEventLog = 'ForwardedEvents'
 
-            Automatic       = $true
-            OnlyPDC         = $false
+            Automatic       = $true # will use all DCs for a forest
+            OnlyPDC         = $false # will use PDC of current domain returned by Get-ADDomain
             DC              = ''
         }
         EventBased = @{

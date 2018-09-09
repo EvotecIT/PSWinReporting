@@ -1,5 +1,6 @@
 Clear-Host
 Import-Module PSWinReporting -Force
+Import-Module PSSharedGoods -Force
 
 $ReportDefinitions = @{
     ReportsAD = @{
@@ -54,5 +55,5 @@ $ReportDefinitions = @{
 }
 
 Start-SubscriptionService
-$Providers = New-SubscriptionTemplates -ReportDefinitions $ReportDefinitions
+$Providers = New-SubscriptionTemplates -ReportDefinitions $ReportDefinitions -Verbose
 Set-SubscriptionTemplates -ListTemplates $Providers -DeleteOwn

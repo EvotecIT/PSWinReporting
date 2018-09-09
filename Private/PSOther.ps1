@@ -2,13 +2,15 @@ $Script:ProgramWecutil = "wecutil.exe"
 $Script:ProgramWevtutil = 'wevtutil.exe'
 
 function Get-EventsData {
+    [CmdletBinding()]
     param (
         $ReportDefinitions,
         $LogName
     )
-    Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch $LogName
+    return Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch $LogName
 }
 function New-EventQuery {
+    [CmdletBinding()]
     param (
         [string[]]$Events,
         [string] $Type
@@ -22,10 +24,11 @@ function New-EventQuery {
         </QueryList>
                 ]]>
     #>
+    Write-Verbose "New-EventQuery - Events Count: $($Events.Count)"
     $values = New-ArrayList
     #  Add-ToArray -List $Values -Element '<![CDATA[ <QueryList><Query Id="0" Path="Security">'
     Add-ToArray -List $Values -Element '<QueryList><Query Id="0" Path="Security">'
-    Add-ToArray -List $Values -Element "<Select Path =", "`"$Type`"", ">*[System[("
+    Add-ToArray -List $Values -Element "<Select Path=`"$Type`">*[System[("
     foreach ($E in $Events) {
         Add-ToArray -List $Values -Element "EventID=$E"
         Add-ToArray -List $Values -Element "or"
@@ -33,10 +36,12 @@ function New-EventQuery {
     Remove-FromArray -List $values -LastElement
     #Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>]]>'
     Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>'
-
+    $FinalQuery = ([string] $Values)
+    Write-Verbose $FinalQuery
     return ([string] $Values) #.Replace(' ', '').Replace('or', ' or ').Replace('SelectPath', 'Select Path')
 }
 function Start-MyProgram {
+    [CmdletBinding()]
     param (
         [string] $Program,
         [string[]]$cmdArgList
@@ -44,6 +49,7 @@ function Start-MyProgram {
     return & $Program $cmdArgList
 }
 function Find-MyProgramData {
+    [CmdletBinding()]
     param (
         $Data,
         $FindText
@@ -57,6 +63,7 @@ function Find-MyProgramData {
     return ''
 }
 function Set-ServersPermissions {
+    [CmdletBinding()]
     param (
         $ProgramWevtutil,
         $Servers,

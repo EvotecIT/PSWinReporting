@@ -1,4 +1,5 @@
 function Remove-TaskScheduledForwarder {
+    [CmdletBinding()]
     param(
         $TaskPath = '\Event Viewer Tasks\',
         $TaskName = 'ForwardedEvents'
@@ -7,6 +8,7 @@ function Remove-TaskScheduledForwarder {
 }
 
 function Add-TaskScheduledForwarder {
+    [CmdletBinding()]
     param(
         $TaskPath = '\Event Viewer Tasks\',
         $TaskName = 'ForwardedEvents',

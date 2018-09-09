@@ -1,4 +1,5 @@
 function New-SubscriptionTemplates {
+    [CmdletBinding()]
     param (
         $ReportDefinitions
     )
@@ -6,7 +7,8 @@ function New-SubscriptionTemplates {
     $Systems = Get-EventsData -ReportDefinitions $ReportDefinitions -LogName 'System'
     Write-Color 'Found Security Events ', ([string] $Events) -Color White, Yellow
     Write-Color 'Found System Events ', ([string] $Systems) -Color White, Yellow
-    $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions
+    $ServersAD = Get-DC
+    $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions -DC $ServersAD
     Write-Color 'Found Servers ', ([string] $Servers) -Color White, Yellow
     # $xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-Collector.xml"
     $XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-Collector.xml"
@@ -17,9 +19,14 @@ function New-SubscriptionTemplates {
             $Array = New-ArrayList
             $SplitArrayID = Split-Array -inArray $Events -size 22  # Support for more ID's then 22 (limitation of Get-WinEvent)
             foreach ($ID in $SplitArrayID) {
-                Add-ToArray -List $Array -Element (New-EventQuery -Events $ID -Type 'Security')
+                $Query = New-EventQuery -Events $ID -Type 'Security' -Verbose
+                Add-ToArray -List $Array -Element $Query
             }
-            Add-ToArray -List $Array -Element (New-EventQuery -Events $Systems -Type 'System')
+            $SplitArrayID = Split-Array -inArray $Systems -size 22  # Support for more ID's then 22 (limitation of Get-WinEvent)
+            foreach ($ID in $SplitArrayID) {
+                $Query = New-EventQuery -Events $ID -Type 'System' -Verbose
+                Add-ToArray -List $Array -Element $Query
+            }
             $i = 0
             foreach ($Events in $Array) {
                 $i++
@@ -44,6 +51,7 @@ function New-SubscriptionTemplates {
 }
 
 function Set-SubscriptionTemplates {
+    [CmdletBinding()]
     param(
         [System.Array] $ListTemplates,
         [switch] $DeleteOwn,
@@ -59,12 +67,14 @@ function Set-SubscriptionTemplates {
 }
 
 function Start-SubscriptionService {
+    [CmdletBinding()]
     param()
     Write-Color 'Starting Windows Event Collector service.' -Color White, Green, White
     Start-MyProgram -Program $Script:ProgramWecutil -cmdArgList 'qc', '/q:true'
 }
 
 function Remove-Subscription {
+    [CmdletBinding()]
     param(
         [switch] $All,
         [switch] $Own
