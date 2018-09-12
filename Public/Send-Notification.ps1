@@ -65,7 +65,7 @@ function Send-Notificaton {
                 Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
             if ($ReportOptions.Notifications.MSSQL.Use) {
-                $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL -Verbose
+                $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL -Verbose:$ReportOptions.Debug.Verbose
                 foreach ($Query in $SqlQuery) {
                     Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
                 }
