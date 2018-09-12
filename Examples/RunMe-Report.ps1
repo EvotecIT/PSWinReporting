@@ -67,7 +67,7 @@ $ReportOptions = @{
     }
     Debug                 = @{
         DisplayTemplateHTML = $false
-        Verbose             = $true
+        Verbose             = $false
     }
 }
 $ReportTimes = @{

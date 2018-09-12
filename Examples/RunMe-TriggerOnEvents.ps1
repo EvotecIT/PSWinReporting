@@ -1,7 +1,7 @@
 # Collects all named paramters (all others end up in $Args)
 param(
-    $eventid = 4724,
-    $eventRecordID = 1545045, # 425358 ,
+    $eventid = 1105,
+    $eventRecordID = 1854610, # 425358 ,
     $eventChannel,
     $eventSeverity
 )
@@ -20,7 +20,7 @@ Import-Module PSWinReporting -Force
 Import-Module PSWriteColor
 Import-Module PSSlack
 Import-Module DBATools
-Import-Module PSSharedGoods -Force
+Import-Module PSSharedGoods #-Force
 
 $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
@@ -42,7 +42,7 @@ $ReportOptions = @{
     }
     Debug                 = @{
         DisplayTemplateHTML = $false
-        Verbose             = $false
+        Verbose             = $true
     }
     Notifications         = @{
         MicrosoftTeams = @{
@@ -200,4 +200,4 @@ $ReportDefinitions = @{
 
 #$ReportOptions.Notifications.MSSQL.SqlTableMapping.GetEnumerator().Name
 
-Start-Notifications -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -Verbose
+Start-Notifications -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel #-Verbose
