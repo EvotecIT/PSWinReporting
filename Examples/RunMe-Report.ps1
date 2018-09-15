@@ -150,6 +150,18 @@ $ReportDefinitions = @{
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
+            ComputerCreatedChanged = @{
+                Enabled     = $true
+                Events      = 4741, 4742 # created, changed
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
+            ComputerDeleted        = @{
+                Enabled     = $true
+                Events      = 4743 # deleted
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
             UserLogon              = @{
                 Enabled     = $false
                 Events      = 4624

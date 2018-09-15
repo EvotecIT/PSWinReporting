@@ -50,6 +50,8 @@ function Start-Notifications {
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
     $TableEventLogClearedLogsOther = @()
+    $ComputerChanges = @()
+    $ComputerDeleted = @()
     #$Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -Verbose:$ReportOptions.Debug.Verbose | Where { $_.RecordID -eq $EventRecordID }
     $Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -RecordID $eventRecordID -Verbose:$ReportOptions.Debug.Verbose
     ### USER EVENTS STARTS ###
@@ -89,6 +91,22 @@ function Start-Notifications {
         Write-Color @script:WriteParameters "[i] Ending ", "Logon Events (Kerberos) Report." -Color White, Green, White, Green, White, Green, White
     }
     ### USER EVENTS END ###
+
+    if ($ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "Computer Created / Changed Report." -Color White, Green, White, Green, White, Green, White
+        $ExecutionTime = Start-TimeLog # Timer
+        $ComputerChanges = Get-ComputerChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.IgnoreWords
+        $script:TimeToGenerateReports.Reports.ComputerCreatedChanged.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "Computer Created / Changed Report." -Color White, Green, White, Green, White, Green, White
+    }
+    if ($ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.Enabled -eq $true) {
+        Write-Color @script:WriteParameters "[i] Running ", "Computer Deleted Report." -Color White, Green, White, Green, White, Green, White
+        $ExecutionTime = Start-TimeLog # Timer
+        $ComputerDeleted = Get-ComputerStatus -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.IgnoreWords
+        $script:TimeToGenerateReports.Reports.ComputerDeleted.Total = Stop-TimeLog -Time $ExecutionTime
+        Write-Color @script:WriteParameters "[i] Ending ", "Computer Deleted Report." -Color White, Green, White, Green, White, Green, White
+    }
+
 
     if ($ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -eq $true) {
         Write-Color @script:WriteParameters "[i] Running ", "Group Membership Changes Report" -Color White, Green, White, Green, White, Green, White
@@ -144,6 +162,8 @@ function Start-Notifications {
     Send-Notificaton -Events $LogonEvents -ReportOptions $ReportOptions
     Send-Notificaton -Events $LogonEventsKerberos -ReportOptions $ReportOptions
     Send-Notificaton -Events $RebootEventsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $ComputerChanges -ReportOptions $ReportOptions
+    Send-Notificaton -Events $ComputerDeleted -ReportOptions $ReportOptions
 
     if ($ReportOptions.Backup.Use) {
         Protect-ArchivedLogs -TableEventLogClearedLogs $TableEventLogClearedLogs -DestinationPath $ReportOptions.Backup.DestinationPath -Verbose:$ReportOptions.Debug.Verbose

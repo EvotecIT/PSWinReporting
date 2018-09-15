@@ -7,7 +7,7 @@ function Get-EventsData {
         $ReportDefinitions,
         $LogName
     )
-    return Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch $LogName
+    return Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch $LogName | Sort-Object
 }
 function New-EventQuery {
     [CmdletBinding()]

@@ -55,14 +55,15 @@ $ReportOptions = @{
             Uri     = ""
         }
         MSSQL          = @{
-            Use             = $true
-            SqlServer       = 'EVO1'
-            SqlDatabase     = 'SSAE18'
-            SqlTable        = 'dbo.[Events]'
+            Use                   = $true
+            SqlServer             = 'EVO1'
+            SqlDatabase           = 'SSAE18'
+            SqlTable              = 'dbo.[Events]'
             # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
             # Changing makes sense only for right side...
-            SqlTableCreate  = $true
-            SqlTableMapping = [ordered] @{
+            SqlTableCreate        = $true
+            SqlTableAlterIfNeeded = $true
+            SqlTableMapping       = [ordered] @{
                 'Event ID'               = 'EventID,[int]'
                 'Who'                    = 'EventWho'
                 'When'                   = 'EventWhen,[datetime]'
@@ -145,6 +146,18 @@ $ReportDefinitions = @{
             UserLogon              = @{
                 Enabled     = $false
                 Events      = 4624
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
+            ComputerCreatedChanged = @{
+                Enabled     = $true
+                Events      = 4741, 4742 # created, changed
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
+            ComputerDeleted        = @{
+                Enabled     = $true
+                Events      = 4743 # deleted
                 LogName     = 'Security'
                 IgnoreWords = ''
             }

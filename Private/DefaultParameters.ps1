@@ -44,5 +44,11 @@ $script:TimeToGenerateReports = [ordered]@{
         ServersData            = @{
             Total = $null
         }
+        ComputerCreatedChanged = @{
+            Total = $null
+        }
+        ComputerDeleted        = @{
+            Total = $null
+        }
     }
 }

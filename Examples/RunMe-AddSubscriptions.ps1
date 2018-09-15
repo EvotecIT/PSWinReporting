@@ -20,6 +20,18 @@ $ReportDefinitions = @{
                 Events  = 4722, 4725, 4767, 4723, 4724, 4726
                 LogName = 'Security'
             }
+            ComputerCreatedChanged = @{
+                Enabled     = $true
+                Events      = 4741, 4742 # created, changed
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
+            ComputerDeleted        = @{
+                Enabled     = $true
+                Events      = 4743 # deleted
+                LogName     = 'Security'
+                IgnoreWords = ''
+            }
             UserLockouts           = @{
                 Enabled = $true
                 Events  = 4740
