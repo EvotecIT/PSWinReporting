@@ -250,4 +250,4 @@ $ReportDefinitions = @{
     }
 }
 
-Start-RescanEvents -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -ReportTimes $ReportTimes
+Start-RescanEvents -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -ReportTimes $ReportTimes -Verbose
