@@ -51,26 +51,3 @@ function Export-ReportToCSV ($Report, $ReportOptions, $Extension, $ReportName, $
         return ""
     }
 }
-function Export-ReportToHTML($Report, $ReportTable, $ReportTableText, [switch] $Special) {
-    if ($Report -eq $true) {
-        if ($special) {
-            return Set-EmailBodyPreparedTable -TableData $ReportTable -TableWelcomeMessage $ReportTableText
-        }
-        return Set-Emailbody -TableData $ReportTable -TableWelcomeMessage $ReportTableText
-    } else {
-        return ''
-    }
-}
-
-function Set-ReportFileName($ReportOptions, $ReportExtension, $ReportName = "") {
-    $ReportTime = $(get-date -f $ReportOptions.FilePatternDateFormat)
-    if ($ReportOptions.KeepReportsPath -ne "") { $Path = $ReportOptions.KeepReportsPath} else { $Path = $env:TEMP }
-    $ReportPath = $Path + "\" + $ReportOptions.FilePattern
-    $ReportPath = $ReportPath -replace "<currentdate>", $ReportTime
-    if ($ReportName -ne "") {
-        $ReportPath = $ReportPath.Replace(".<extension>", "-$ReportName.$ReportExtension")
-    } else {
-        $ReportPath = $ReportPath.Replace(".<extension>", ".$ReportExtension")
-    }
-    return $ReportPath
-}

@@ -72,7 +72,7 @@ $ReportOptions = @{
 }
 $ReportTimes = @{
     # Report Per Hour
-    PastHour             = $false # if it's 23:22 it will report 22:00 till 23:00
+    PastHour             = $true # if it's 23:22 it will report 22:00 till 23:00
     CurrentHour          = $false # if it's 23:22 it will report 23:00 till 00:00
     # Report Per Day
     PastDay              = $false # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
