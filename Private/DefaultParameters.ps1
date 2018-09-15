@@ -1,3 +1,5 @@
+$Script:ProgramWecutil = "wecutil.exe"
+$Script:ProgramWevtutil = 'wevtutil.exe'
 $script:WriteParameters = @{
     ShowTime   = $true
     LogFile    = ""
