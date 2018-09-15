@@ -8,30 +8,31 @@ function Send-Notificaton {
 
     if ($Events -ne $null) {
         foreach ($Event in $Events) {
+            if ($ReportOptions.Notifications.Slack.Use -or $ReportOptions.Notifications.MicrosoftTeams.Use) {
+                $MessageTitle = 'Active Directory Changes'
+                [string] $ActivityTitle = $($Event.Action).Trim()
+                if ($ActivityTitle -like '*added*') {
+                    $Color = [System.Drawing.Color]::Green
+                    $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
+                } elseif ($ActivityTitle -like '*remove*') {
+                    $Color = [System.Drawing.Color]::Red
+                    $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
+                } else {
+                    $Color = [System.Drawing.Color]::Yellow
+                    $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
+                }
 
-            $MessageTitle = 'Active Directory Changes'
-            [string] $ActivityTitle = $($Event.Action).Trim()
-            if ($ActivityTitle -like '*added*') {
-                $Color = [System.Drawing.Color]::Green
-                $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
-            } elseif ($ActivityTitle -like '*remove*') {
-                $Color = [System.Drawing.Color]::Red
-                $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
-            } else {
-                $Color = [System.Drawing.Color]::Yellow
-                $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
-            }
-
-            $FactsSlack = @()
-            $FactsTeams = @()
-            foreach ($Property in $event.PSObject.Properties) {
-                if ($Property.Value -ne $null -and $Property.Value -ne '') {
-                    if ($Property.Name -eq 'When') {
-                        $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
-                        $FactsSlack += @{ title = $Property.Name; value = $Property.Value.DateTime; short = $true }
-                    } else {
-                        $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value
-                        $FactsSlack += @{ title = $Property.Name; value = $Property.Value; short = $true }
+                $FactsSlack = @()
+                $FactsTeams = @()
+                foreach ($Property in $event.PSObject.Properties) {
+                    if ($Property.Value -ne $null -and $Property.Value -ne '') {
+                        if ($Property.Name -eq 'When') {
+                            $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
+                            $FactsSlack += @{ title = $Property.Name; value = $Property.Value.DateTime; short = $true }
+                        } else {
+                            $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value
+                            $FactsSlack += @{ title = $Property.Name; value = $Property.Value; short = $true }
+                        }
                     }
                 }
             }
@@ -64,6 +65,7 @@ function Send-Notificaton {
                 # -Verbose
                 Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
+
             if ($ReportOptions.Notifications.MSSQL.Use) {
                 $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL -Verbose:$ReportOptions.Debug.Verbose
                 foreach ($Query in $SqlQuery) {
