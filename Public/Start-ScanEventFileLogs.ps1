@@ -1,8 +1,9 @@
 function Start-ScanEventFileLogs {
     [CmdletBinding()]
     param(
-        [hashtable] $ReportOptions,
-        [hashtable] $ReportDefinitions
+        [OrderedDictionary] $ReportOptions,
+        [OrderedDictionary] $ReportDefinitions,
+        [OrderedDictionary] $ReportTimes
     )
     Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
 
@@ -49,12 +50,18 @@ function Start-ScanEventFileLogs {
     $ComputerDeleted = @()
     #$Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -Verbose:$ReportOptions.Debug.Verbose | Where { $_.RecordID -eq $EventRecordID }
 
+
     $Events = @()
-    #$Events += Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -RecordID $eventRecordID -Verbose:$ReportOptions.Debug.Verbose
-    #$DateFrom = Get-Date -Year 2018 -Month 09 -Day 12
+    $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
+    foreach ($Date in $Dates) {
 
-    $Events += Get-Events -Path 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx' -ID 4799 -Verbose -DateFrom $DateFrom
 
+
+        #$Events += Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -RecordID $eventRecordID -Verbose:$ReportOptions.Debug.Verbose
+        #$DateFrom = Get-Date -Year 2018 -Month 09 -Day 12
+
+        $Events += Get-Events -Path 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx' -ID 4799 -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
+    }
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
         Write-Color @script:WriteParameters "[i] Running ", "User Changes Report." -Color White, Green, White, Green, White, Green, White
