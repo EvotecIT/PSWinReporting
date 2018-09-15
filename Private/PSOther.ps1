@@ -1,43 +1,3 @@
-
-function Get-EventsData {
-    [CmdletBinding()]
-    param (
-        $ReportDefinitions,
-        $LogName
-    )
-    return Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch $LogName | Sort-Object
-}
-function New-EventQuery {
-    [CmdletBinding()]
-    param (
-        [string[]]$Events,
-        [string] $Type
-    )
-    <#
-        <![CDATA[
-        <QueryList>
-        <Query Id="0" Path="Security">
-        <Select Path="Security">*[System[(EventID=122 or EventID=212 or EventID=323)]]</Select>
-        </Query>
-        </QueryList>
-                ]]>
-    #>
-    Write-Verbose "New-EventQuery - Events Count: $($Events.Count)"
-    $values = New-ArrayList
-    #  Add-ToArray -List $Values -Element '<![CDATA[ <QueryList><Query Id="0" Path="Security">'
-    Add-ToArray -List $Values -Element '<QueryList><Query Id="0" Path="Security">'
-    Add-ToArray -List $Values -Element "<Select Path=`"$Type`">*[System[("
-    foreach ($E in $Events) {
-        Add-ToArray -List $Values -Element "EventID=$E"
-        Add-ToArray -List $Values -Element "or"
-    }
-    Remove-FromArray -List $values -LastElement
-    #Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>]]>'
-    Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>'
-    $FinalQuery = ([string] $Values)
-    Write-Verbose $FinalQuery
-    return ([string] $Values) #.Replace(' ', '').Replace('or', ' or ').Replace('SelectPath', 'Select Path')
-}
 function Start-MyProgram {
     [CmdletBinding()]
     param (
@@ -139,32 +99,4 @@ function Add-ServersToXML {
     }
 
     Save-XML -FilePath $FilePath -xml $xmlDocument
-}
-
-function Set-XML {
-    param (
-        [string] $FilePath,
-        [string[]]$Paths,
-        [string] $Node,
-        [string] $Value
-    )
-    [xml]$xmlDocument = Get-Content -Path $FilePath -Encoding UTF8
-    $XmlElement = $xmlDocument
-    foreach ($Path in $Paths) {
-        $XmlElement = $XmlElement.$Path
-    }
-    $XmlElement.$Node = $Value
-    $xmlDocument.Save($FilePath)
-    # Save-XML -FilePath $FilePath -xml $xmlDocument
-}
-
-function Save-XML {
-    param (
-        [string] $FilePath,
-        [System.Xml.XmlNode] $xml
-    )
-    $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
-    $writer = New-Object System.IO.StreamWriter($FilePath, $false, $utf8WithoutBom)
-    $xml.Save( $writer )
-    $writer.Close()
 }
