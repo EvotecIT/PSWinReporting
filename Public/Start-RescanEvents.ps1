@@ -1,10 +1,3 @@
-
-function Get-EventLogFiles {
-    param(
-
-    )
-}
-
 function Start-RescanEvents {
     [CmdletBinding()]
     param(
@@ -13,8 +6,6 @@ function Start-RescanEvents {
         [Hashtable] $ReportTimes
     )
     Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
-
-    Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
 
     Write-Color @script:WriteParameters -Text '[i] Using Microsoft Teams: ', $ReportOptions.Notifications.MicrosoftTeams.Use -Color White, Yellow
     if ($ReportOptions.Notifications.MicrosoftTeams.Use) {
@@ -62,11 +53,16 @@ function Start-RescanEvents {
     Write-Color @script:WriteParameters '[i] Preparing ', 'System Events', ' list to be processed on servers.' -Color White, Yellow, White
     $EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
 
+    $EventLogFiles = Get-CongfigurationEvents -Sections $ReportOptions.RescanFiles
+
     $Events = @()
     $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
     foreach ($Date in $Dates) {
-        $Events += Get-Events -Path 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx' -ID $EventsToProcessSecurity -LogName 'Security' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
-        $Events += Get-Events -Path 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx' -ID $EventsToProcessSystem -LogName 'System' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
+        foreach ($File in $EventLogFiles) {
+            Write-Color @script:WriteParameters '[i] Scanning file ', $File, ' for events between ', $Dates.DateFrom, ' and ', $Dates.DateTo  -Color White, Yellow, White, Green, White, Green
+            $Events += Get-Events -Path $File -ID $EventsToProcessSecurity -LogName 'Security' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
+            $Events += Get-Events -Path $File -ID $EventsToProcessSystem -LogName 'System' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
+        }
     }
     ### USER EVENTS STARTS ###
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
@@ -165,21 +161,21 @@ function Start-RescanEvents {
         $script:TimeToGenerateReports.Reports.LogsClearedOther.Total = Stop-TimeLog -Time $ExecutionTime
     }
 
-    #Send-Notificaton -Events $UsersEventsTable -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $UsersLockoutsTable -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $UsersEventsStatusesTable -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $TableGroupPolicyChanges -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $TableEventLogClearedLogs -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $TableEventLogClearedLogsOther -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $GroupsEventsTable -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $GroupCreateDeleteTable -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $LogonEvents -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $LogonEventsKerberos -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $RebootEventsTable -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $ComputerChanges -ReportOptions $ReportOptions
-    #Send-Notificaton -Events $ComputerDeleted -ReportOptions $ReportOptions
+    Send-Notificaton -Events $UsersEventsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $UsersLockoutsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $UsersEventsStatusesTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $TableGroupPolicyChanges -ReportOptions $ReportOptions
+    Send-Notificaton -Events $TableEventLogClearedLogs -ReportOptions $ReportOptions
+    Send-Notificaton -Events $TableEventLogClearedLogsOther -ReportOptions $ReportOptions
+    Send-Notificaton -Events $GroupsEventsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $GroupCreateDeleteTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $LogonEvents -ReportOptions $ReportOptions
+    Send-Notificaton -Events $LogonEventsKerberos -ReportOptions $ReportOptions
+    Send-Notificaton -Events $RebootEventsTable -ReportOptions $ReportOptions
+    Send-Notificaton -Events $ComputerChanges -ReportOptions $ReportOptions
+    Send-Notificaton -Events $ComputerDeleted -ReportOptions $ReportOptions
 
     if ($ReportOptions.Backup.Use) {
-        #  Protect-ArchivedLogs -TableEventLogClearedLogs $TableEventLogClearedLogs -DestinationPath $ReportOptions.Backup.DestinationPath -Verbose:$ReportOptions.Debug.Verbose
+        Protect-ArchivedLogs -TableEventLogClearedLogs $TableEventLogClearedLogs -DestinationPath $ReportOptions.Backup.DestinationPath -Verbose:$ReportOptions.Debug.Verbose
     }
 }
