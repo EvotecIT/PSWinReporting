@@ -12,7 +12,7 @@
     RootModule        = 'PSWinReporting.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.7.1'
+    ModuleVersion     = '1.7.3'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -92,7 +92,7 @@
     PrivateData       = @{
 
         PSData = @{
-            Prerelease = '-alpha3'
+            Prerelease = ''
             # Tags applied to this module. These help with module discovery in online galleries.
             Tags       = @('PSWinReporting', 'ActiveDirectory', 'Events', 'Reporting')
 
