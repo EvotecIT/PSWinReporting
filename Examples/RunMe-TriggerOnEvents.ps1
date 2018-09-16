@@ -16,7 +16,7 @@ Update-Module DBATools
 #>
 Import-Module PSTeams
 Import-Module PSEventViewer
-Import-Module PSWinReporting -Force
+Import-Module PSWinReporting #-Force
 Import-Module PSWriteColor
 Import-Module PSSlack
 Import-Module DBATools
@@ -55,7 +55,7 @@ $ReportOptions = @{
             Uri     = ""
         }
         MSSQL          = @{
-            Use                   = $true
+            Use                   = $false
             SqlServer             = 'EVO1'
             SqlDatabase           = 'SSAE18'
             SqlTable              = 'dbo.[Events]'
@@ -210,7 +210,5 @@ $ReportDefinitions = @{
         }
     }
 }
-
-#$ReportOptions.Notifications.MSSQL.SqlTableMapping.GetEnumerator().Name
 
 Start-Notifications -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel #-Verbose

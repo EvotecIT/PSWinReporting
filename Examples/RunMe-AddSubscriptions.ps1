@@ -1,6 +1,6 @@
-Clear-Host
-Import-Module PSWinReporting -Force
-Import-Module PSSharedGoods -Force
+#Clear-Host
+Import-Module PSWinReporting #-Force
+Import-Module PSSharedGoods #-Force
 
 $ReportDefinitions = @{
     ReportsAD = @{

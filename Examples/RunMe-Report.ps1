@@ -1,3 +1,8 @@
+### Starts Module (Requires config above)
+Clear-Host
+Import-Module PSWinReporting #-Force
+Import-Module PSSharedGoods #-Force
+
 $EmailParameters = @{
     EmailFrom            = "notifications@domain.com"
     EmailTo              = "przemyslaw.klys@domain.com, admin@domain.com"
@@ -109,6 +114,7 @@ $ReportTimes = @{
         DateFrom = get-date -Year 2018 -Month 03 -Day 19
         DateTo   = get-date -Year 2018 -Month 03 -Day 23
     }
+    Everything           = $false
 }
 $ReportDefinitions = @{
     TimeToGenerate = $false
@@ -228,7 +234,4 @@ $ReportDefinitions = @{
     }
 }
 
-### Starts Module (Requires config above)
-Clear-Host
-Import-Module PSWinReporting -Force
 Start-ADReporting -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportTimes $ReportTimes -ReportDefinitions $ReportDefinitions
