@@ -1,7 +1,7 @@
 ### Starts Module (Requires config above)
 Clear-Host
-Import-Module PSWinReporting #-Force
-Import-Module PSSharedGoods #-Force
+Import-Module PSWinReporting -Force
+Import-Module PSSharedGoods -Force
 
 $EmailParameters = @{
     EmailFrom            = "notifications@domain.com"
@@ -65,6 +65,54 @@ $ReportOptions = @{
     FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
     FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
 
+    AsSql                 = @{
+        Use                   = $true
+        SqlServer             = 'EVO1'
+        SqlDatabase           = 'SSAE18'
+        SqlTable              = 'dbo.[Events]'
+        # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
+        # Changing makes sense only for right side...
+        SqlTableCreate        = $true
+        SqlTableAlterIfNeeded = $true
+        SqlTableMapping       = [ordered] @{
+            'Event ID'               = 'EventID,[int]'
+            'Who'                    = 'EventWho'
+            'When'                   = 'EventWhen,[datetime]'
+            'Record ID'              = 'EventRecordID,[bigint]'
+            'Domain Controller'      = 'DomainController'
+            'Action'                 = 'Action'
+            'Group Name'             = 'GroupName'
+            'User Affected'          = 'UserAffected'
+            'Member Name'            = 'MemberName'
+            'Computer Lockout On'    = 'ComputerLockoutOn'
+            'Reported By'            = 'ReportedBy'
+            'SamAccountName'         = 'SamAccountName'
+            'Display Name'           = 'DisplayName'
+            'UserPrincipalName'      = 'UserPrincipalName'
+            'Home Directory'         = 'HomeDirectory'
+            'Home Path'              = 'HomePath'
+            'Script Path'            = 'ScriptPath'
+            'Profile Path'           = 'ProfilePath'
+            'User Workstation'       = 'UserWorkstation'
+            'Password Last Set'      = 'PasswordLastSet,[datetime]'
+            'Account Expires'        = 'AccountExpires,[datetime]'
+            'Primary Group Id'       = 'PrimaryGroupId'
+            'Allowed To Delegate To' = 'AllowedToDelegateTo'
+            'Old Uac Value'          = 'OldUacValue'
+            'New Uac Value'          = 'NewUacValue'
+            'User Account Control'   = 'UserAccountControl'
+            'User Parameters'        = 'UserParameters'
+            'Sid History'            = 'SidHistory'
+            'Logon Hours'            = 'LogonHours'
+            'OperationType'          = 'OperationType'
+            'Message'                = 'Message'
+            'Backup Path'            = 'BackupPath'
+            'Log Type'               = 'LogType'
+            'AddedWhen'              = 'EventAdded,[datetime],null' # ColumnsToTrack when it was added to database and by who / not part of event
+            'AddedWho'               = 'EventAddedWho'  # ColumnsToTrack when it was added to database and by who / not part of event
+        }
+    }
+
     DisplayConsole        = @{
         ShowTime   = $true
         LogFile    = ''
@@ -77,10 +125,10 @@ $ReportOptions = @{
 }
 $ReportTimes = @{
     # Report Per Hour
-    PastHour             = $true # if it's 23:22 it will report 22:00 till 23:00
+    PastHour             = $false # if it's 23:22 it will report 22:00 till 23:00
     CurrentHour          = $false # if it's 23:22 it will report 23:00 till 00:00
     # Report Per Day
-    PastDay              = $true # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
+    PastDay              = $false # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
     CurrentDay           = $false # if it's 1.04.2018 05:22 it will report 1.04.2018 00:00:00 till 01.04.2018 00:00:00
     # Report Per Week
     OnDay                = @{
@@ -92,7 +140,7 @@ $ReportTimes = @{
         Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
         Force   = $false  # if true - runs always ...
     }
-    CurrentMonth         = $false
+    CurrentMonth         = $true
 
     # Report Per Quarter
     PastQuarter          = @{
@@ -120,16 +168,29 @@ $ReportDefinitions = @{
     TimeToGenerate = $false
 
     ReportsAD      = @{
-        Servers    = @{
-            UseForwarders   = $false # if $true skips Automatic/OnlyPDC/DC for reading logs. However it uses Automatic to deliver size of logs so keep Automatic to $true
+        Servers           = @{
+            UseForwarders   = $true # if $true skips Automatic/OnlyPDC/DC for reading logs. However it uses Automatic to deliver size of logs so keep Automatic to $true
             ForwardServer   = 'EVO1'
             ForwardEventLog = 'ForwardedEvents'
 
+            UseDirectScan   = $false
             Automatic       = $true # will use all DCs for a forest
             OnlyPDC         = $false # will use PDC of current domain returned by Get-ADDomain
             DC              = ''
         }
-        EventBased = @{
+        ArchiveProcessing = @{
+            Use         = $true
+            Directories = [ordered] @{
+                Use          = $false
+                MyEvents     = 'C:\MyEvents' #
+                MyOtherEvent = 'C:\MyEvent1'
+            }
+            Files       = [ordered] @{
+                Use   = $true
+                File1 = 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx'
+            }
+        }
+        EventBased        = @{
             UserChanges            = @{
                 Enabled     = $true
                 Events      = 4720, 4738
@@ -148,6 +209,53 @@ $ReportDefinitions = @{
                     'When'              = ''
                     'Event ID'          = ''
                     'Record ID'         = ''
+                }
+                ExportToSql = @{
+                    Use                   = $true
+                    SqlServer             = 'EVO1'
+                    SqlDatabase           = 'SSAE18'
+                    SqlTable              = 'dbo.[EventsUserStatus]'
+                    # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
+                    # Changing makes sense only for right side...
+                    SqlTableCreate        = $true
+                    SqlTableAlterIfNeeded = $true
+                    SqlTableMapping       = [ordered] @{
+                        'Event ID'               = 'EventID,[int]'
+                        'Who'                    = 'EventWho'
+                        'When'                   = 'EventWhen,[datetime]'
+                        'Record ID'              = 'EventRecordID,[bigint]'
+                        'Domain Controller'      = 'DomainController'
+                        'Action'                 = 'Action'
+                        'Group Name'             = 'GroupName'
+                        'User Affected'          = 'UserAffected'
+                        'Member Name'            = 'MemberName'
+                        'Computer Lockout On'    = 'ComputerLockoutOn'
+                        'Reported By'            = 'ReportedBy'
+                        'SamAccountName'         = 'SamAccountName'
+                        'Display Name'           = 'DisplayName'
+                        'UserPrincipalName'      = 'UserPrincipalName'
+                        'Home Directory'         = 'HomeDirectory'
+                        'Home Path'              = 'HomePath'
+                        'Script Path'            = 'ScriptPath'
+                        'Profile Path'           = 'ProfilePath'
+                        'User Workstation'       = 'UserWorkstation'
+                        'Password Last Set'      = 'PasswordLastSet,[datetime]'
+                        'Account Expires'        = 'AccountExpires,[datetime]'
+                        'Primary Group Id'       = 'PrimaryGroupId'
+                        'Allowed To Delegate To' = 'AllowedToDelegateTo'
+                        'Old Uac Value'          = 'OldUacValue'
+                        'New Uac Value'          = 'NewUacValue'
+                        'User Account Control'   = 'UserAccountControl'
+                        'User Parameters'        = 'UserParameters'
+                        'Sid History'            = 'SidHistory'
+                        'Logon Hours'            = 'LogonHours'
+                        'OperationType'          = 'OperationType'
+                        'Message'                = 'Message'
+                        'Backup Path'            = 'BackupPath'
+                        'Log Type'               = 'LogType'
+                        'AddedWhen'              = 'EventAdded,[datetime],null' # ColumnsToTrack when it was added to database and by who / not part of event
+                        'AddedWho'               = 'EventAddedWho'  # ColumnsToTrack when it was added to database and by who / not part of event
+                    }
                 }
             }
             UserLockouts           = @{
@@ -207,6 +315,16 @@ $ReportDefinitions = @{
                 Events      = 1102, 1105
                 LogName     = 'Security'
                 IgnoreWords = ''
+                ExportToSql = @{
+                    Use                   = $true
+                    SqlServer             = 'EVO1'
+                    SqlDatabase           = 'SSAE18'
+                    SqlTable              = 'dbo.[EventsLogsClearedSecurity]'
+                    # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
+                    # Changing makes sense only for right side...
+                    SqlTableCreate        = $true
+                    SqlTableAlterIfNeeded = $true
+                }
             }
             LogsClearedOther       = @{
                 Enabled     = $true
@@ -221,13 +339,16 @@ $ReportDefinitions = @{
                 IgnoreWords = ''
             }
         }
-        Custom     = @{
+        Custom            = @{
             EventLogSize = @{
                 Enabled = $true
                 Logs    = 'Security', 'Application', 'System'
                 SortBy  = ''
             }
             ServersData  = @{
+                Enabled = $true
+            }
+            FilesData    = @{
                 Enabled = $true
             }
         }

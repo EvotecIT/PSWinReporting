@@ -44,7 +44,8 @@ function Start-Report {
         #$Events += Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog
         $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
         $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
-    } else {
+    }
+    if ($ReportDefinitions.ReportsAD.UseDirectScan) {
         Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on defined servers: ', ($Servers -Join ', ') -Color White, Yellow, White
         $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose $ReportOptions.Debug.Verbose
         Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers: ', ($Servers -Join ', ') -Color White, Yellow, White
@@ -67,7 +68,7 @@ function Start-Report {
         Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on ', ([string] $ReportDefinitions.ReportsAD.Servers.ForwardServer), ' for warnings.' -Color White, Yellow, White
         $EventLogDatesSummary += Get-EventLogSize -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose $ReportOptions.Debug.Verbose
     }
-    if ($Servers -ne '') {
+    if ($ReportDefinitions.ReportsAD.Servers.UseDirectScan) {
         Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on ', ([string] $Servers), ' for warnings.' -Color White, Yellow, White
         $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
         $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
@@ -182,12 +183,11 @@ function Start-Report {
                 $EventLogTable += Get-EventLogSize -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer  -LogName $LogName
                 Write-Color @script:WriteParameters "[i] Ending ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
             }
-        } else {
-            foreach ($LogName in $ReportDefinitions.ReportsAD.Custom.EventLogSize.Logs) {
-                Write-Color @script:WriteParameters "[i] Running ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
-                $EventLogTable += Get-EventLogSize -Servers $Servers -LogName $LogName
-                Write-Color @script:WriteParameters "[i] Ending ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
-            }
+        }
+        foreach ($LogName in $ReportDefinitions.ReportsAD.Custom.EventLogSize.Logs) {
+            Write-Color @script:WriteParameters "[i] Running ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
+            $EventLogTable += Get-EventLogSize -Servers $Servers -LogName $LogName
+            Write-Color @script:WriteParameters "[i] Ending ", "Event Log Size Report", " for event log ", "$LogName" -Color White, Green, White, Yellow
         }
         if ($ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy -ne "") { $EventLogTable = $EventLogTable | Sort-Object $ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy }
         $script:TimeToGenerateReports.Reports.EventLogSize.Total = Stop-TimeLog -Time $ExecutionTime
@@ -210,7 +210,7 @@ function Start-Report {
     # prepare body with HTML
     if ($ReportOptions.AsHTML) {
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.TimeToGenerate -ReportTable $TableExecutionTimes -ReportTableText 'Following report shows execution times' -Special
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following servers have been processed for events'
+        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following AD servers were detected in forest'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportTable $UsersEventsTable -ReportTableText 'Following user changes happend'
@@ -281,11 +281,11 @@ function Start-Report {
     #$script:TimeToGenerateReports | ConvertTo-Json
 
     # Sending email - finalizing package
-    if ($ReportOptions.SendMail -eq $true) {
+    if ($ReportOptions.SendMail) {
         $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
         Write-Color @script:WriteParameters "[i] Sending email with reports..." -Color White, Green -NoNewLine
         $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject
-        if ($SendMail.Status -eq $True) {
+        if ($SendMail.Status) {
             Write-Color "Success!" -Color Green
         } else {
             Write-Color "Not working!" -Color Red
@@ -294,12 +294,32 @@ function Start-Report {
     } else {
         Write-Color @script:WriteParameters "[i] Skipping sending email with reports...", "as per configuration!" -Color White, Green
     }
-    if ($ReportOptions.AsHTML -eq $true) {
+    if ($ReportOptions.AsHTML) {
         $ReportHTMLPath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension 'html'
         Write-Color @script:WriteParameters '[i] Saving report to file ', $ReportHTMLPath, ' and opening it up...' -Color White, Yellow, White
         $EmailBody | Out-File -Encoding unicode -FilePath $ReportHTMLPath
-        if ($ReportOptions.OpenAsFile -eq $true) { Invoke-Item $ReportHTMLPath }
+        if ($ReportOptions.OpenAsFile) { Invoke-Item $ReportHTMLPath }
     }
+
+
+    #Write-Color @script:WriteParameters -Text '[i] ', 'Sending events to SQL' -Color White, White, Yellow
+    #Export-ReportToSql -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -ReportName "Processed Servers" -ReportTable $ServersAD
+    #Export-ReportToSql -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -ReportName "Event log sizes" -ReportTable $EventLogTable
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges -ReportOptions $ReportOptions -ReportName  "User Changes" -ReportTable $UsersEventsTable
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus -ReportOptions $ReportOptions -ReportName  "User Status Changes" -ReportTable $UsersEventsStatusesTable
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserLockouts -ReportOptions $ReportOptions -ReportName "User Lockouts" -ReportTable $UsersLockoutsTable
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged -ReportOptions $ReportOptions -ReportName  "Computer Status Changes" -ReportTable $ComputerChanges
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted -ReportOptions $ReportOptions -ReportName "Computer Deleted" -ReportTable $ComputerDeleted
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserLogon -ReportOptions $ReportOptions -ReportName "User Logon Events" -ReportTable $LogonEvents
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos -ReportOptions $ReportOptions -ReportName "User Logon Kerberos Events" -ReportTable $LogonEventsKerberos
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges -ReportOptions $ReportOptions -ReportName "Group Membership Changes"  -ReportTable $GroupsEventsTable
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete -ReportOptions $ReportOptions -ReportName "Group Creation Deletion Changes"  -ReportTable $GroupCreateDeleteTable
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges -ReportOptions $ReportOptions -ReportName "Group Policy Changes" -ReportTable $TableGroupPolicyChanges
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity -ReportOptions $ReportOptions -ReportName "Clear Log Events (Security)" -ReportTable $TableEventLogClearedLogs
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther -ReportOptions $ReportOptions -ReportName "Clear Log Events (Other)" -ReportTable $TableEventLogClearedLogsOther
+    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots -ReportOptions $ReportOptions -ReportName "Troubleshooting Reboots" -ReportTable $RebootEventsTable
+
+
 
     Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
 }
