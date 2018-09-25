@@ -1,14 +1,18 @@
 function Get-AllRequiredEvents {
     param(
         $Servers,
+        [alias('File')][string] $FilePath,
         $Dates,
         $Events,
-        $LogName,
-        $Verbose = $false
+        [string] $LogName,
+        [bool] $Verbose = $false
     )
     $Count = Get-ObjectCount $Events
     if ($Count -ne 0) {
-        return  Get-Events -Server $Servers -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo -EventID $Events -LogName $LogName -Verbose:$Verbose
-        #Get-Events -Server $Servers -EventID $Events -LogName $LogName -Verbose
+        if ($FilePath) {
+            return  Get-Events -Path $FilePath -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo -EventID $Events -LogName $LogName -Verbose:$Verbose
+        } else {
+            return  Get-Events -Server $Servers -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo -EventID $Events -LogName $LogName -Verbose:$Verbose
+        }
     }
 }
