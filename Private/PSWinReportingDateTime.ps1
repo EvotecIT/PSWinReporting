@@ -127,32 +127,3 @@ function Find-DatesPastWeek($DayName) {
     return $DateParameters
 
 }
-function Get-TimeZoneLegacy () {
-    return ([System.TimeZone]::CurrentTimeZone).StandardName
-}
-function Get-TimeZoneAdvanced {
-    param(
-        [string[]]$ComputerName = $Env:COMPUTERNAME,
-        [System.Management.Automation.PSCredential] $Credential = [System.Management.Automation.PSCredential]::Empty
-    )
-    foreach ($computer in $computerName) {
-        $TimeZone = Get-WmiObject -Class win32_timezone -ComputerName $computer -Credential $Credential
-        $LocalTime = Get-WmiObject -Class win32_localtime -ComputerName $computer -Credential $Credential
-        $Output = @{
-            'ComputerName' = $localTime.__SERVER;
-            'TimeZone'     = $timeZone.Caption;
-            'CurrentTime'  = (Get-Date -Day $localTime.Day -Month $localTime.Month);
-        }
-        $Object = New-Object -TypeName PSObject -Property $Output
-        Write-Output $Object
-    }
-}
-function Start-TimeLog() {
-    $ExecutionTime = [System.Diagnostics.Stopwatch]::StartNew()
-    return $ExecutionTime
-}
-function Stop-TimeLog([System.Diagnostics.Stopwatch] $Time) {
-    $TimeToExecute = "$($Time.Elapsed.Days) days, $($Time.Elapsed.Hours) hours, $($Time.Elapsed.Minutes) minutes, $($Time.Elapsed.Seconds) seconds, $($Time.Elapsed.Milliseconds) milliseconds"
-    $Time.Stop()
-    return $TimeToExecute
-}

@@ -80,7 +80,7 @@ $ReportTimes = @{
     PastHour             = $true # if it's 23:22 it will report 22:00 till 23:00
     CurrentHour          = $false # if it's 23:22 it will report 23:00 till 00:00
     # Report Per Day
-    PastDay              = $false # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
+    PastDay              = $true # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
     CurrentDay           = $false # if it's 1.04.2018 05:22 it will report 1.04.2018 00:00:00 till 01.04.2018 00:00:00
     # Report Per Week
     OnDay                = @{
@@ -92,7 +92,7 @@ $ReportTimes = @{
         Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
         Force   = $false  # if true - runs always ...
     }
-    CurrentMonth         = $true
+    CurrentMonth         = $false
 
     # Report Per Quarter
     PastQuarter          = @{
