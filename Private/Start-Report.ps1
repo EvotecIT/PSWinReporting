@@ -25,6 +25,7 @@ function Start-Report {
     # $ServersTable = @()
     $GroupCreateDeleteTable = @()
     $TableExecutionTimes = ''
+    $TableEventLogFiles = @()
 
     Write-Color @script:WriteParameters '[i] Processing report for dates from: ', $Dates.DateFrom, ' to ', $Dates.DateTo  -Color White, Yellow, White, Yellow
     Write-Color @script:WriteParameters '[i] Establishing servers list to ', 'process...' -Color White, Yellow
@@ -49,6 +50,17 @@ function Start-Report {
         Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers: ', ($Servers -Join ', ') -Color White, Yellow, White
         $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose $ReportOptions.Debug.Verbose
     }
+    if ($ReportDefinitions.ReportsAD.ArchiveProcessing.Use) {
+        $EventLogFiles = Get-CongfigurationEvents -Sections $ReportDefinitions.ReportsAD.ArchiveProcessing
+        foreach ($File in $EventLogFiles) {
+            $TableEventLogFiles += Get-FileInformation -File $File
+            Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on file: ', $File -Color White, Yellow, White
+            $Events += Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose $ReportOptions.Debug.Verbose
+            Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on file ', $File -Color White, Yellow, White
+            $Events += Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose $ReportOptions.Debug.Verbose
+        }
+    }
+
     Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on defined servers for warnings.' -Color White, Yellow, White
     $EventLogDatesSummary = @()
     if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
@@ -199,6 +211,7 @@ function Start-Report {
     if ($ReportOptions.AsHTML) {
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.TimeToGenerate -ReportTable $TableExecutionTimes -ReportTableText 'Following report shows execution times' -Special
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following servers have been processed for events'
+        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportTable $UsersEventsTable -ReportTableText 'Following user changes happend'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -ReportTable $UsersEventsStatusesTable -ReportTableText 'Following user status happend'
