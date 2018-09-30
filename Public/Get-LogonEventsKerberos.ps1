@@ -16,7 +16,9 @@ function Get-LogonEventsKerberos($Events, $IgnoreWords = '') {
 
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
-    @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
+    @{label = 'Record ID'; expression = { $_.RecordId }},
+    @{label = 'Gathered From'; expression = { $_.GatheredFrom }},
+    @{label = 'Gathered LogName'; expression = { $_.GatheredLogName }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
 }

@@ -13,7 +13,9 @@ function Get-GroupPolicyChanges ($Events, $IgnoreWords = '') {
     @{label = 'Record ID'; expression = { $_.RecordId }},
     @{label = 'OperationType'; expression = { Convert-FromGPO -OperationType $_.OperationType }},
     DSName, DSType, ObjectDN, ObjectGUID, ObjectClass, AttributeLDAPDisplayName, AttributeSyntaxOID,
-    AttributeValue, Id, Task | Sort-Object When
+    AttributeValue, Id, Task,
+    @{label = 'Gathered From'; expression = { $_.GatheredFrom }},
+    @{label = 'Gathered LogName'; expression = { $_.GatheredLogName }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
     # 'Domain Controller', 'Action', 'who, 'When', 'Event ID', 'Record ID', 'OperationType'

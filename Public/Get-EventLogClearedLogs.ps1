@@ -14,7 +14,9 @@ function Get-EventLogClearedLogs($Events, $Type, $IgnoreWords = '') {
     @{label = 'Who'; expression = { if ($_.ID -eq 1105) { "Automatic Backup" } else { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }}},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
-    @{label = 'Record ID'; expression = { $_.RecordId }} | Sort-Object When
+    @{label = 'Record ID'; expression = { $_.RecordId }},
+    @{label = 'Gathered From'; expression = { $_.GatheredFrom }},
+    @{label = 'Gathered LogName'; expression = { $_.GatheredLogName }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
     # 'Domain Controller', 'Action', 'Backup Path, 'Log Type','Who', 'When', 'Event ID', 'Record ID'

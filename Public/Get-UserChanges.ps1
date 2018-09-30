@@ -40,7 +40,9 @@ function Get-UserChanges($Events, $IgnoreWords = '') {
     @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
-    @{label = 'Record ID'; expression = { $_.RecordId }}  | Sort-Object When
+    @{label = 'Record ID'; expression = { $_.RecordId }},
+    @{label = 'Gathered From'; expression = { $_.GatheredFrom }},
+    @{label = 'Gathered LogName'; expression = { $_.GatheredLogName }}  | Sort-Object When
 
     $EventsFoundCleaned = Find-EventsIgnored -Events $EventsFoundCleaned -IgnoreWords $IgnoreWords
     return $EventsFoundCleaned
