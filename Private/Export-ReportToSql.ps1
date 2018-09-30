@@ -22,7 +22,5 @@ function Export-ReportToSQL {
                 Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
             }
         }
-
-
     }
 }

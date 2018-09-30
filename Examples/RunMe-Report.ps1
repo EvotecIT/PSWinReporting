@@ -2,6 +2,7 @@
 Clear-Host
 Import-Module PSWinReporting -Force
 Import-Module PSSharedGoods -Force
+Import-Module PSEventViewer -Force
 
 $EmailParameters = @{
     EmailFrom            = "notifications@domain.com"
@@ -74,6 +75,7 @@ $ReportOptions = @{
         # Changing makes sense only for right side...
         SqlTableCreate        = $true
         SqlTableAlterIfNeeded = $true
+        SqlCheckBeforeInsert  = 'EventRecordID' # Based on column name
         SqlTableMapping       = [ordered] @{
             'Event ID'               = 'EventID,[int]'
             'Who'                    = 'EventWho'
@@ -219,6 +221,7 @@ $ReportDefinitions = @{
                     # Changing makes sense only for right side...
                     SqlTableCreate        = $true
                     SqlTableAlterIfNeeded = $true
+                    SqlCheckBeforeInsert  = 'EventRecordID'
                     SqlTableMapping       = [ordered] @{
                         'Event ID'               = 'EventID,[int]'
                         'Who'                    = 'EventWho'
@@ -320,10 +323,9 @@ $ReportDefinitions = @{
                     SqlServer             = 'EVO1'
                     SqlDatabase           = 'SSAE18'
                     SqlTable              = 'dbo.[EventsLogsClearedSecurity]'
-                    # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
-                    # Changing makes sense only for right side...
                     SqlTableCreate        = $true
                     SqlTableAlterIfNeeded = $true
+                    SqlCheckBeforeInsert  = 'RecordID' # column name (generally Record )
                 }
             }
             LogsClearedOther       = @{

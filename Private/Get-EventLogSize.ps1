@@ -1,8 +1,14 @@
-function Get-EventLogSize ($Servers, $LogName = "Security") {
+function Get-EventLogSize {
+    [CmdletBinding()]
+    param(
+        $Servers,
+        $LogName = "Security"
+    )
+    $Verbose = ($PSCmdlet.MyInvocation.BoundParameters['Verbose'] -eq $true)
     $results = @()
     foreach ($server in $Servers) {
         try {
-            $result = get-WinEvent -ListLog $LogName -ComputerName $server | Select-Object MaximumSizeInBytes, FileSize, IsLogFul, LastAccessTime, LastWriteTime, OldestRecordNumber, RecordCount, LogName, LogType, LogIsolation, IsEnabled, LogMode
+            $result = Get-WinEvent -ListLog $LogName -ComputerName $server | Select-Object MaximumSizeInBytes, FileSize, IsLogFul, LastAccessTime, LastWriteTime, OldestRecordNumber, RecordCount, LogName, LogType, LogIsolation, IsEnabled, LogMode
         } catch {
             $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
             Write-Color @script:WriteParameters "[-] ", "Event Log Error on ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
