@@ -40,15 +40,18 @@ function Start-Report {
 
     $Events = @()
     if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
-        Write-Color @script:WriteParameters '[i] Processing ', 'Forwarded Events', ' on defined servers: ', $ReportDefinitions.ReportsAD.Servers.ForwardServer -Color White, Yellow, White
-        #$Events += Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog
-        $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
-        $Events += Get-AllRequiredEvents -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
+        Write-Color @script:WriteParameters '[i] Processing ', 'Forwarded Events', ' on forwarding servers: ', ($ReportDefinitions.ReportsAD.Servers.ForwardServer -join ', ') -Color White, Yellow, White
+
+        foreach ($ForwardedServer in $ReportDefinitions.ReportsAD.Servers.ForwardServer) {
+            #$Events += Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog
+            $Events += Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
+            $Events += Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
+        }
     }
     if ($ReportDefinitions.ReportsAD.UseDirectScan) {
-        Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' on defined servers: ', ($Servers -Join ', ') -Color White, Yellow, White
+        Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' from directly scanned servers: ', ($Servers -Join ', ') -Color White, Yellow, White
         $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
-        Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' on defined servers: ', ($Servers -Join ', ') -Color White, Yellow, White
+        Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' from directly scanned servers: ', ($Servers -Join ', ') -Color White, Yellow, White
         $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
     }
     if ($ReportDefinitions.ReportsAD.ArchiveProcessing.Use) {
@@ -62,6 +65,12 @@ function Start-Report {
         }
     }
 
+    if ($ReportOptions.RemoveDuplicates) {
+        Write-Color @script:WriteParameters '[i] Removing ', 'Duplicates', ' from all events. Current list contains ', $Events.Count, ' events.'  -Color White, Yellow, White, Green, White
+        $Events = Remove-DuplicateObjects -Object $Events -Property 'RecordID'
+        Write-Color @script:WriteParameters '[i] Removed ', 'Duplicates', '. Foloowing ', $Events.Count, ' events will be analyzed further.'  -Color White, Yellow, White, Green, White
+    }
+
     Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on defined servers for warnings.' -Color White, Yellow, White
     $EventLogDatesSummary = @()
     if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
@@ -73,7 +82,7 @@ function Start-Report {
         $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
         $EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
     }
-    Write-Color @script:WriteParameters '[i] Processing ', 'Warnings', ' to make sure things are great.' -Color White, Yellow, White
+    Write-Color @script:WriteParameters '[i] Verifying ', 'Warnings', ' reported earlier.' -Color White, Yellow, White
     $Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
 
     # Prepare email body

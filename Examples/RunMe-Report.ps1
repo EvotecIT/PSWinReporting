@@ -65,6 +65,7 @@ $ReportOptions = @{
     KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
     FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
     FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
+    RemoveDuplicates      = $true #
 
     AsSql                 = @{
         Use                   = $true

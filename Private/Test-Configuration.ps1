@@ -123,6 +123,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "KeepReportsPath" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePattern" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePatternDateFormat" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "RemoveDuplicates" -DisplayProgress $true
     #endregion ReportOptions Options
     if ($ConfigurationFormatting -notcontains $false -and
         $ConfigurationReport -notcontains $false -and
