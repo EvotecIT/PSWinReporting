@@ -48,7 +48,7 @@ function Start-Report {
             $Events += Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
         }
     }
-    if ($ReportDefinitions.ReportsAD.UseDirectScan) {
+    if ($ReportDefinitions.ReportsAD.Servers.UseDirectScan) {
         Write-Color @script:WriteParameters '[i] Processing ', 'Security Events', ' from directly scanned servers: ', ($Servers -Join ', ') -Color White, Yellow, White
         $Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
         Write-Color @script:WriteParameters '[i] Processing ', 'System Events', ' from directly scanned servers: ', ($Servers -Join ', ') -Color White, Yellow, White
@@ -305,9 +305,13 @@ function Start-Report {
     }
     if ($ReportOptions.AsHTML) {
         $ReportHTMLPath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension 'html'
-        Write-Color @script:WriteParameters '[i] Saving report to file ', $ReportHTMLPath, ' and opening it up...' -Color White, Yellow, White
         $EmailBody | Out-File -Encoding unicode -FilePath $ReportHTMLPath
-        if ($ReportOptions.OpenAsFile) { Invoke-Item $ReportHTMLPath }
+        if ($ReportOptions.OpenAsFile) {
+            Write-Color @script:WriteParameters '[i] Saving report to file ', $ReportHTMLPath, ' and opening it up...' -Color White, Yellow, White
+            if (Test-Path $ReportHTMLPath) { Invoke-Item $ReportHTMLPath }
+        } else {
+            Write-Color @script:WriteParameters '[i] Saving report to file ', $ReportHTMLPath, '.' -Color White, Yellow, White
+        }
     }
 
 

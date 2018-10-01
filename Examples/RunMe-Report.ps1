@@ -186,7 +186,7 @@ $ReportDefinitions = @{
             DC              = ''
         }
         ArchiveProcessing = @{
-            Use         = $true
+            Use         = $false
             Directories = [ordered] @{
                 Use          = $true
                 MyEvents     = 'C:\MyEvents' #
