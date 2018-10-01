@@ -60,7 +60,7 @@ $ReportOptions = @{
     AsCSV                 = $false # attaches CSV to email with all events,
     AsHTML                = $true # puts exported data into email directly with all events
     SendMail              = $false
-    OpenAsFile            = $true # requires AsHTML set to $true
+    OpenAsFile            = $false # requires AsHTML set to $true
     KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
     KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
     FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
@@ -75,8 +75,10 @@ $ReportOptions = @{
         # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
         # Changing makes sense only for right side...
         SqlTableCreate        = $true
-        SqlTableAlterIfNeeded = $true
+        SqlTableAlterIfNeeded = $false # if table mapping is defined doesn't do anything
         SqlCheckBeforeInsert  = 'EventRecordID' # Based on column name
+
+
         SqlTableMapping       = [ordered] @{
             'Event ID'               = 'EventID,[int]'
             'Who'                    = 'EventWho'
@@ -113,12 +115,14 @@ $ReportOptions = @{
             'Log Type'               = 'LogType'
             'AddedWhen'              = 'EventAdded,[datetime],null' # ColumnsToTrack when it was added to database and by who / not part of event
             'AddedWho'               = 'EventAddedWho'  # ColumnsToTrack when it was added to database and by who / not part of event
+            'Gathered From'          = 'GatheredFrom'
+            'Gathered LogName'       = 'GatheredLogName'
         }
     }
 
     DisplayConsole        = @{
         ShowTime   = $true
-        LogFile    = ''
+        LogFile    = 'C:\PSWinReporting.log'
         TimeFormat = 'yyyy-MM-dd HH:mm:ss'
     }
     Debug                 = @{
@@ -140,10 +144,10 @@ $ReportTimes = @{
     }
     # Report Per Month
     PastMonth            = @{
-        Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
-        Force   = $false  # if true - runs always ...
+        Enabled = $true # checks for 1st day of the month - won't run on any other day unless used force
+        Force   = $true  # if true - runs always ...
     }
-    CurrentMonth         = $true
+    CurrentMonth         = $false
 
     # Report Per Quarter
     PastQuarter          = @{
@@ -176,7 +180,7 @@ $ReportDefinitions = @{
             ForwardServer   = 'EVO1'
             ForwardEventLog = 'ForwardedEvents'
 
-            UseDirectScan   = $false
+            UseDirectScan   = $true
             Automatic       = $true # will use all DCs for a forest
             OnlyPDC         = $false # will use PDC of current domain returned by Get-ADDomain
             DC              = ''
@@ -184,7 +188,7 @@ $ReportDefinitions = @{
         ArchiveProcessing = @{
             Use         = $true
             Directories = [ordered] @{
-                Use          = $false
+                Use          = $true
                 MyEvents     = 'C:\MyEvents' #
                 MyOtherEvent = 'C:\MyEvent1'
             }
@@ -195,16 +199,18 @@ $ReportDefinitions = @{
         }
         EventBased        = @{
             UserChanges            = @{
-                Enabled     = $true
-                Events      = 4720, 4738
-                LogName     = 'Security'
-                IgnoreWords = ''
+                Enabled          = $true
+                EnabledSqlGlobal = $true
+                Events           = 4720, 4738
+                LogName          = 'Security'
+                IgnoreWords      = ''
             }
             UserStatus             = @{
-                Enabled     = $true
-                Events      = 4722, 4725, 4767, 4723, 4724, 4726
-                LogName     = 'Security'
-                IgnoreWords = @{
+                Enabled          = $true
+                EnabledSqlGlobal = $true
+                Events           = 4722, 4725, 4767, 4723, 4724, 4726
+                LogName          = 'Security'
+                IgnoreWords      = @{
                     'Domain Controller' = ''
                     'Action'            = ''
                     'User Affected'     = 'Win-*', '*AD1$*'
@@ -213,7 +219,7 @@ $ReportDefinitions = @{
                     'Event ID'          = ''
                     'Record ID'         = ''
                 }
-                ExportToSql = @{
+                ExportToSql      = @{
                     Use                   = $true
                     SqlServer             = 'EVO1'
                     SqlDatabase           = 'SSAE18'
@@ -221,7 +227,7 @@ $ReportDefinitions = @{
                     # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
                     # Changing makes sense only for right side...
                     SqlTableCreate        = $true
-                    SqlTableAlterIfNeeded = $true
+                    SqlTableAlterIfNeeded = $false # if table mapping is defined doesn't do anything
                     SqlCheckBeforeInsert  = 'EventRecordID'
                     SqlTableMapping       = [ordered] @{
                         'Event ID'               = 'EventID,[int]'
@@ -259,20 +265,24 @@ $ReportDefinitions = @{
                         'Log Type'               = 'LogType'
                         'AddedWhen'              = 'EventAdded,[datetime],null' # ColumnsToTrack when it was added to database and by who / not part of event
                         'AddedWho'               = 'EventAddedWho'  # ColumnsToTrack when it was added to database and by who / not part of event
+                        #   'Gathered From'          = 'GatheredFrom'
+                        #   'Gathered LogName'       = 'GatheredLogName'
                     }
                 }
             }
             UserLockouts           = @{
-                Enabled     = $true
-                Events      = 4740
-                LogName     = 'Security'
-                IgnoreWords = ''
+                Enabled          = $true
+                EnabledSqlGlobal = $false
+                Events           = 4740
+                LogName          = 'Security'
+                IgnoreWords      = ''
             }
             ComputerCreatedChanged = @{
-                Enabled     = $true
-                Events      = 4741, 4742 # created, changed
-                LogName     = 'Security'
-                IgnoreWords = ''
+                Enabled          = $true
+                EnabledSqlGlobal = $false
+                Events           = 4741, 4742 # created, changed
+                LogName          = 'Security'
+                IgnoreWords      = ''
             }
             ComputerDeleted        = @{
                 Enabled     = $true
@@ -326,7 +336,7 @@ $ReportDefinitions = @{
                     SqlTable              = 'dbo.[EventsLogsClearedSecurity]'
                     SqlTableCreate        = $true
                     SqlTableAlterIfNeeded = $true
-                    SqlCheckBeforeInsert  = 'RecordID' # column name (generally Record )
+                    SqlCheckBeforeInsert  = 'RecordID' # column name (generally 'Record ID') - SQL command removes spaces when not using TableMapping
                 }
             }
             LogsClearedOther       = @{

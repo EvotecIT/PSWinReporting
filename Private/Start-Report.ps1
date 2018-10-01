@@ -33,9 +33,9 @@ function Start-Report {
     $ServersAD = Get-DC
     $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions -DC $ServersAD    #-OnlyPDC:$ReportDefinitions.ReportsAD.Servers.OnlyPDC -Automatic:$ReportDefinitions.ReportsAD.Servers.Automatic
 
-    Write-Color @script:WriteParameters '[i] Preparing ', 'Security Events', ' list to be processed on servers.' -Color White, Yellow, White
+    Write-Color @script:WriteParameters '[i] Preparing ', 'Security Events', ' list to be processed.' -Color White, Yellow, White
     $EventsToProcessSecurity = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'Security'
-    Write-Color @script:WriteParameters '[i] Preparing ', 'System Events', ' list to be processed on servers.' -Color White, Yellow, White
+    Write-Color @script:WriteParameters '[i] Preparing ', 'System Events', ' list to be processed.' -Color White, Yellow, White
     $EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
 
     $Events = @()
@@ -65,12 +65,6 @@ function Start-Report {
         }
     }
 
-    if ($ReportOptions.RemoveDuplicates) {
-        Write-Color @script:WriteParameters '[i] Removing ', 'Duplicates', ' from all events. Current list contains ', $Events.Count, ' events.'  -Color White, Yellow, White, Green, White
-        $Events = Remove-DuplicateObjects -Object $Events -Property 'RecordID'
-        Write-Color @script:WriteParameters '[i] Removed ', 'Duplicates', '. Foloowing ', $Events.Count, ' events will be analyzed further.'  -Color White, Yellow, White, Green, White
-    }
-
     Write-Color @script:WriteParameters '[i] Processing ', 'Event Log Sizes', ' on defined servers for warnings.' -Color White, Yellow, White
     $EventLogDatesSummary = @()
     if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
@@ -84,6 +78,12 @@ function Start-Report {
     }
     Write-Color @script:WriteParameters '[i] Verifying ', 'Warnings', ' reported earlier.' -Color White, Yellow, White
     $Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
+
+    if ($ReportOptions.RemoveDuplicates) {
+        Write-Color @script:WriteParameters '[i] Removing ', 'Duplicates', ' from all events. Current list contains ', $Events.Count, ' events.'  -Color White, Yellow, White, Green, White
+        $Events = Remove-DuplicateObjects -Object $Events -Property 'RecordID'
+        Write-Color @script:WriteParameters '[i] Removed ', 'Duplicates', '. Following ', $Events.Count, ' events will be analyzed further.'  -Color White, Yellow, White, Green, White
+    }
 
     # Prepare email body
     $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
