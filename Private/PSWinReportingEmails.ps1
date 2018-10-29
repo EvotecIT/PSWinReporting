@@ -110,7 +110,7 @@ function Set-EmailBodyPreparedTable ($TableData, $TableWelcomeMessage) {
 function Set-EmailReportBrading($FormattingParameters) {
     $Report = "<a style=`"text-decoration:none`" href=`"$($FormattingParameters.CompanyBranding.Link)`" class=`"clink logo-container`">" +
     #"<img width=171 height=15 src=`"$($FormattingParameters.CompanyLogo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
-    "<img width=<fix> height=<fix> src=`"$($FormattingParameters.CompanyBranding.Logo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
+    "<img width=<fix> height=<fix> src=`"cid:logo`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
     "</a>"
     if ($FormattingParameters.CompanyBranding.Width -ne "") {
         $report = $report -replace "width=<fix>", "width=$($FormattingParameters.CompanyBranding.Width)"
