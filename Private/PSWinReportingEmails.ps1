@@ -108,19 +108,21 @@ function Set-EmailBodyPreparedTable ($TableData, $TableWelcomeMessage) {
     return $body
 }
 function Set-EmailReportBrading($FormattingParameters) {
-    $Report = "<a style=`"text-decoration:none`" href=`"$($FormattingParameters.CompanyBranding.Link)`" class=`"clink logo-container`">" +
-    #"<img width=171 height=15 src=`"$($FormattingParameters.CompanyLogo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
-    "<img width=<fix> height=<fix> src=`"cid:logo`" border=`"0`" class=`"company-logo`" alt=`"company-logo`">" +
-    "</a>"
-    if ($FormattingParameters.CompanyBranding.Width -ne "") {
-        $report = $report -replace "width=<fix>", "width=$($FormattingParameters.CompanyBranding.Width)"
+    $Report = "<a style=`"text-decoration:none`" href=`"$($FormattingParameters.CompanyBranding.Link)`" class=`"clink logo-container`">"
+    if ($FormattingParameters.CompanyBranding.Inline) {
+        $Report += "<img width=<fix> height=<fix> src=`"cid:logo`" border=`"0`" class=`"company-logo`" alt=`"company-logo`"></a>"
     } else {
-        $report = $report -replace "width=<fix>", ""
+		$Report += "<img width=<fix> height=<fix> src=`"$($FormattingParameters.CompanyBranding.Logo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`"></a>"
+    }
+    if ($FormattingParameters.CompanyBranding.Width -ne "") {
+        $Report = $Report -replace "width=<fix>", "width=$($FormattingParameters.CompanyBranding.Width)"
+    } else {
+        $Report = $Report -replace "width=<fix>", ""
     }
     if ($FormattingParameters.CompanyBranding.Height -ne "") {
-        $report = $report -replace "height=<fix>", "height=$($FormattingParameters.CompanyBranding.Height)"
+        $Report = $Report -replace "height=<fix>", "height=$($FormattingParameters.CompanyBranding.Height)"
     } else {
-        $report = $report -replace "height=<fix>", ""
+        $Report = $Report -replace "height=<fix>", ""
     }
     return $Report
 }

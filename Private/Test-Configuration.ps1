@@ -31,6 +31,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationFormatting += Test-Key $FormattingParameters "FormattingParameters" "CompanyBranding" -DisplayProgress $true
     if ($ConfigurationFormatting[ - 1] -eq $true) {
         $ConfigurationFormatting += Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Logo" -DisplayProgress $true
+        $ConfigurationFormatting += Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Inline" -DisplayProgress $true
         $ConfigurationFormatting += Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Width" -DisplayProgress $true
         $ConfigurationFormatting += Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Height" -DisplayProgress $true
         $ConfigurationFormatting += Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Link" -DisplayProgress $true
