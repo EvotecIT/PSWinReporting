@@ -23,7 +23,7 @@ function Get-DC {
                     'Ipv6'             = if ($Policy.Ipv6Address -eq '') { 'N/A' } else { $Policy.Ipv4Address }
                     'Is GC'            = $Policy.IsGlobalCatalog
                     'Is ReadOnly'      = $Policy.IsReadOnly
-                    'Is PDC'           = if ($Policy.HostName -eq $Domain.PDCEmulator) { 'No' } else { 'Yes' }
+                    'Is PDC'           = if ($Policy.HostName -eq $Domain.PDCEmulator) { 'Yes' } else { 'No' }
                     'Is Supported'     = if ($Policy.OperatingSystem -notlike "*2003*" -and $Policy.OperatingSystem -notlike "*2000*") { 'Yes' } else { 'No' }
                     'Is Included'      = ''
                     'Enabled'          = $Policy.Enabled
