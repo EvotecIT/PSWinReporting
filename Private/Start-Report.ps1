@@ -293,7 +293,11 @@ function Start-Report {
     if ($ReportOptions.SendMail) {
         $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
         Write-Color @script:WriteParameters "[i] Sending email with reports..." -Color White, Green -NoNewLine
-        $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject
+        if ($FormattingParameters.CompanyBranding.Inline) {
+            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject -InlineAttachments @{logo = $FormattingParameters.CompanyBranding.Logo}
+        } else {
+            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject
+        }
         if ($SendMail.Status) {
             Write-Color "Success!" -Color Green
         } else {
