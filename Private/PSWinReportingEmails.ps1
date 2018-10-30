@@ -112,7 +112,7 @@ function Set-EmailReportBrading($FormattingParameters) {
     if ($FormattingParameters.CompanyBranding.Inline) {
         $Report += "<img width=<fix> height=<fix> src=`"cid:logo`" border=`"0`" class=`"company-logo`" alt=`"company-logo`"></a>"
     } else {
-		$Report += "<img width=<fix> height=<fix> src=`"$($FormattingParameters.CompanyBranding.Logo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`"></a>"
+        $Report += "<img width=<fix> height=<fix> src=`"$($FormattingParameters.CompanyBranding.Logo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`"></a>"
     }
     if ($FormattingParameters.CompanyBranding.Width -ne "") {
         $Report = $Report -replace "width=<fix>", "width=$($FormattingParameters.CompanyBranding.Width)"
