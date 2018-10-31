@@ -6,6 +6,8 @@ function Start-ADReporting () {
         [hashtable]$ReportTimes,
         [hashtable]$ReportDefinitions
     )
+
+    $ErrorActionPreference = 'Stop'
     Set-DisplayParameters -ReportOptions $ReportOptions
 
     Test-Prerequisite $EmailParameters $FormattingParameters $ReportOptions $ReportTimes $ReportDefinitions

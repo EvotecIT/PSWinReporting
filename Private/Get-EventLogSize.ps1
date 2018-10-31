@@ -8,11 +8,23 @@ function Get-EventLogSize {
     $results = @()
     foreach ($server in $Servers) {
         try {
-            $result = Get-WinEvent -ListLog $LogName -ComputerName $server | Select-Object MaximumSizeInBytes, FileSize, IsLogFul, LastAccessTime, LastWriteTime, OldestRecordNumber, RecordCount, LogName, LogType, LogIsolation, IsEnabled, LogMode
+            $result = Get-WinEvent -ListLog $LogName -ComputerName $Server | Select-Object MaximumSizeInBytes, FileSize, IsLogFul, LastAccessTime, LastWriteTime, OldestRecordNumber, RecordCount, LogName, LogType, LogIsolation, IsEnabled, LogMode
         } catch {
             $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-            Write-Color @script:WriteParameters "[-] ", "Event Log Error on ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
-            continue
+            switch ($ErrorMessage) {
+                {$_ -match 'No events were found'} {
+                    Write-Color @script:WriteParameters "[i] ", "No events were found ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
+                    continue
+                }
+                {$_ -match 'Attempted to perform an unauthorized operation'} {
+                    Write-Color @script:WriteParameters "[-] ", "Unauthorized operation ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
+                    exit
+                }
+                default {
+                    Write-Color @script:WriteParameters "[-] ", "Error occured gathering events ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
+                    exit
+                }
+            }
         }
         $CurrentFileSize = Convert-Size -Value $($result.FileSize) -From Bytes -To GB -Precision 2 -Display
         $MaximumFilesize = Convert-Size -Value $($result.MaximumSizeInBytes) -From Bytes -To GB -Precision 2 -Display
