@@ -43,26 +43,6 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     #endregion FormattingParameters
 
     #region ReportOptions
-    # JustTestPrerequisite  = $false # runs testing without actually running script
-    # AsExcel               = $false # attaches Excel to email with all events, required PSWriteExcel module
-    # AsCSV                 = $false # attaches CSV to email with all events,
-    # AsHTML                = $true # puts exported data into email directly with all events
-    # SendMail              = $true
-    # OpenAsFile            = $false # requires AsHTML set to $true
-    # KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
-    # KeepReportsPath       = 'C:\temp' # if empty, temp path is used
-    # FilePattern           = 'Compassplus-ADMonitoredEvents-<currentdate>.<extension>'
-    # FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
-    # RemoveDuplicates      = $false
-    # DisplayConsole        = @{
-    #     ShowTime   = $true
-    #     LogFile    = ''
-    #     TimeFormat = 'yyyy-MM-dd HH:mm:ss'
-    # }
-    # Debug                 = @{
-    #     DisplayTemplateHTML = $false
-    #     Verbose             = $false
-    # }
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "JustTestPrerequisite" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "AsExcel" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "AsCSV" -DisplayProgress $true
@@ -86,7 +66,6 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "Debug" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions.Debug "ReportOptions.Debug" "DisplayTemplateHTML" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions.Debug "ReportOptions.Debug" "Verbose" -DisplayProgress $true
-
     #endregion ReportOptions
 
     #region Report Definions
