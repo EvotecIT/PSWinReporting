@@ -9,9 +9,9 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationReport = @()
     $ConfigurationEmail = @()
     $ConfigurationDefinitions = @()
+    $ConfigurationReportTimes = @()
 
     #region EmailParameters
-
     $ConfigurationEmail += Test-Key $EmailParameters "EmailParameters" "EmailFrom" -DisplayProgress $true
     $ConfigurationEmail += Test-Key $EmailParameters "EmailParameters" "EmailTo" -DisplayProgress $true
     $ConfigurationEmail += Test-Key $EmailParameters "EmailParameters" "EmailCC" -DisplayProgress $true
@@ -26,8 +26,8 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationEmail += Test-Key $EmailParameters "EmailParameters" "EmailPriority" -DisplayProgress $true
     $ConfigurationEmail += Test-Key $EmailParameters "EmailParameters" "EmailReplyTo" -DisplayProgress $true
     #endregion EmailParameters
+
     #region FormattingParameters
-    #  Write-Color @Global:WriteParameters -Text "[t] ", "Testing for missing parameters in configuration of ", "FormattingParameters", "..." -Color White, White, Yellow
     $ConfigurationFormatting += Test-Key $FormattingParameters "FormattingParameters" "CompanyBranding" -DisplayProgress $true
     if ($ConfigurationFormatting[ - 1] -eq $true) {
         $ConfigurationFormatting += Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Logo" -DisplayProgress $true
@@ -41,6 +41,54 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationFormatting += Test-Key $FormattingParameters "FormattingParameters" "FontHeadingFamily" -DisplayProgress $true
     $ConfigurationFormatting += Test-Key $FormattingParameters "FormattingParameters" "FontHeadingSize" -DisplayProgress $true
     #endregion FormattingParameters
+
+    #region ReportOptions
+    # JustTestPrerequisite  = $false # runs testing without actually running script
+    # AsExcel               = $false # attaches Excel to email with all events, required PSWriteExcel module
+    # AsCSV                 = $false # attaches CSV to email with all events,
+    # AsHTML                = $true # puts exported data into email directly with all events
+    # SendMail              = $true
+    # OpenAsFile            = $false # requires AsHTML set to $true
+    # KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
+    # KeepReportsPath       = 'C:\temp' # if empty, temp path is used
+    # FilePattern           = 'Compassplus-ADMonitoredEvents-<currentdate>.<extension>'
+    # FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
+    # RemoveDuplicates      = $false
+    # DisplayConsole        = @{
+    #     ShowTime   = $true
+    #     LogFile    = ''
+    #     TimeFormat = 'yyyy-MM-dd HH:mm:ss'
+    # }
+    # Debug                 = @{
+    #     DisplayTemplateHTML = $false
+    #     Verbose             = $false
+    # }
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "JustTestPrerequisite" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "AsExcel" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "AsCSV" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "AsHTML" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "SendMail" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "OpenAsFile" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "KeepReports" -DisplayProgress $true
+    if ($ConfigurationReport[ - 1]) {
+        if (-not (Test-Path $ReportOptions.KeepReportsPath -PathType Container)) {
+            $ConfigurationReport += $false
+            Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportOptions.KeepReportsPath", " doesn't exist." -Color White, White, Red, White
+        }
+    }
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePattern" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePatternDateFormat" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "RemoveDuplicates" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "DisplayConsole" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions.DisplayConsole "ReportOptions.DisplayConsole" "ShowTime" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions.DisplayConsole "ReportOptions.DisplayConsole" "LogFile" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions.DisplayConsole "ReportOptions.DisplayConsole" "TimeFormat" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "Debug" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions.Debug "ReportOptions.Debug" "DisplayTemplateHTML" -DisplayProgress $true
+    $ConfigurationReport += Test-Key $ReportOptions.Debug "ReportOptions.Debug" "Verbose" -DisplayProgress $true
+
+    #endregion ReportOptions
+
     #region Report Definions
     $ConfigurationDefinitions += Test-Key $ReportDefinitions "ReportDefinitions" "ReportsAD" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD "ReportDefinitions.ReportsAD" "Servers" -DisplayProgress $true
@@ -51,6 +99,26 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "Automatic" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "OnlyPDC" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "DC" -DisplayProgress $true
+
+    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.ArchiveProcessing "ReportDefinitions.ReportsAD.ArchiveProcessing" "Use" -DisplayProgress $true
+    if ($ReportDefinitions.ReportsAD.ArchiveProcessing.Use) {
+        if (Test-Key $ReportDefinitions.ReportsAD.ArchiveProcessing "ReportDefinitions.ReportsAD.ArchiveProcessing" "Directories" -DisplayProgress $true) {
+            foreach ($Folder in $ReportDefinitions.ReportsAD.ArchiveProcessing.Directories.Values) {
+                if (-not (Test-Path $Folder -PathType Container)) {
+                    $ConfigurationDefinitions += $false
+                    Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportDefinitions.ReportsAD.ArchiveProcessing.Directories", " doesn't exist." -Color White, White, Red, White
+                }
+            }
+        }
+        if (Test-Key $ReportDefinitions.ReportsAD.ArchiveProcessing "ReportDefinitions.ReportsAD.ArchiveProcessing" "Files" -DisplayProgress $true) {
+            foreach ($File in $ReportDefinitions.ReportsAD.ArchiveProcessing.Directories.Values) {
+                if (-not (Test-Path $Folder -PathType Container)) {
+                    $ConfigurationDefinitions += $false
+                    Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportDefinitions.ReportsAD.ArchiveProcessing.Files", " doesn't exist." -Color White, White, Red, White
+                }
+            }
+        }
+    }
 
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD "ReportDefinitions.ReportsAD" "EventBased" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.EventBased "ReportDefinitions.ReportsAD.EventBased" "UserChanges" -DisplayProgress $true
@@ -106,7 +174,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CurrentDayMinuxDaysX" -DisplayProgress $true
     if ($ConfigurationReportTimes[ - 1] -eq $true) {
         $ConfigurationReportTimes += Test-Key $ReportTimes.CurrentDayMinuxDaysX "ReportTimes.CurrentDayMinuxDaysX" "Enabled" -DisplayProgress $true
-        $ConfigConfigurationReportTimesurationReport += Test-Key $ReportTimes.CurrentDayMinuxDaysX "ReportTimes.CurrentDayMinuxDaysX" "Days" -DisplayProgress $true
+        $ConfigurationReportTimes += Test-Key $ReportTimes.CurrentDayMinuxDaysX "ReportTimes.CurrentDayMinuxDaysX" "Days" -DisplayProgress $true
     }
     $ConfigurationReportTimes += Test-Key $ReportTimes "ReportTimes" "CustomDate" -DisplayProgress $true
     if ($ConfigurationReportTimes[ - 1] -eq $true) {

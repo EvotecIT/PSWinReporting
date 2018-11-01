@@ -8,6 +8,7 @@ function Start-ADReporting () {
     )
 
     $ErrorActionPreference = 'Stop'
+    Set-StrictMode -Version Latest
     Set-DisplayParameters -ReportOptions $ReportOptions
 
     Test-Prerequisite $EmailParameters $FormattingParameters $ReportOptions $ReportTimes $ReportDefinitions
