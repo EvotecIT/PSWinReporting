@@ -186,14 +186,12 @@ $ReportDefinitions = @{
             DC              = ''
         }
         ArchiveProcessing = @{
-            Use         = $false
+            Use         = $true
             Directories = [ordered] @{
-                Use          = $true
                 MyEvents     = 'C:\MyEvents' #
                 MyOtherEvent = 'C:\MyEvent1'
             }
             Files       = [ordered] @{
-                Use   = $true
                 File1 = 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx'
             }
         }
