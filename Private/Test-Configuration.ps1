@@ -87,8 +87,8 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
             }
         }
         if (Test-Key $ReportDefinitions.ReportsAD.ArchiveProcessing "ReportDefinitions.ReportsAD.ArchiveProcessing" "Files" -DisplayProgress $true) {
-            foreach ($File in $ReportDefinitions.ReportsAD.ArchiveProcessing.Directories.Values) {
-                if (-not (Test-Path $Folder -PathType Container)) {
+            foreach ($File in $ReportDefinitions.ReportsAD.ArchiveProcessing.Files.Values) {
+                if (-not (Test-Path $File -PathType Leaf)) {
                     $Success = $false
                     Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportDefinitions.ReportsAD.ArchiveProcessing.Files", " doesn't exist." -Color White, White, Red, White
                 }
