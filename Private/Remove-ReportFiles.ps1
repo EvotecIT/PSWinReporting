@@ -4,10 +4,10 @@ function Remove-ReportsFiles ($KeepReports, $AsExcel, $AsCSV, $ReportFiles) {
             if (Test-Path $report) {
                 Write-Color @script:WriteParameters "[i] ", "Removing file ", " $report " -Color White, White, Yellow, White, Red
                 try {
-                    Remove-Item $report -ErrorAction Stop
+                    Remove-Item $report
                 } catch {
-                    #Write-Color @Global:WriteParameters "[i] Error reported when removing file ", "$Report", ". File will be skipped..." -Color White, Red, White
                     Write-Color @script:WriteParameters "[i] Error: ", "$($_.Exception.Message)" -Color White, Red
+                    continue
                 }
             }
         }

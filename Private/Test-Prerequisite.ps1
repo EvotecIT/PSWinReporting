@@ -48,11 +48,17 @@ Function Test-Prerequisite () {
         Write-Color @script:WriteParameters  "[-] ", "Please make sure it's available on the machine before running this script" -Color White, Red
     }
     try {
-        $TestActiveDirectory = get-addomain
+        $TestActiveDirectory = Get-ADDomain
         $AdIsAvailable = $true
     } catch {
-        if ($_.Exception -match "Unable to find a default server with Active Directory Web Services running.") {
-            Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+        $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+        switch ($ErrorMessage) {
+            {$_ -match 'The server has rejected the client credentials'} { 
+                Write-Color @script:WriteParameters "[-] ", "Domain Controller", " has rejected the client credentials. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+            }
+            {$_ -match 'Unable to find a default server with Active Directory Web Services running' } {
+                Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+            }
         }
         Write-Color @script:WriteParameters "[-] ", "Error: $($_.Exception.Message)" -Color White, Red
         $AdIsAvailable = $false

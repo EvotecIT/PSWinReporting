@@ -1,17 +1,17 @@
 function Get-DC {
     param()
-    $DCs = @()
     try {
-        $Forest = Get-ADForest -ErrorAction Stop
+        $Forest = Get-ADForest
     } catch {
         $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-        Write-Color @script:WriteParameters "[i] Get-ADForest Error: ", "$($_.Exception.Message)" -Color White, Red
-        #return $ErrorMessage
+        Write-Color @script:WriteParameters "[-] Get-ADForest Error: ", $ErrorMessage -Color White, Red
+        exit
     }
+    $DCs = @()
     foreach ($DomainName in $Forest.Domains) {
-        $Domain = Get-AdDomain -Server $DomainName -ErrorAction SilentlyContinue
         try {
-            $DomainControllers = $(Get-ADDomainController -Server $DomainName -Filter * -ErrorAction Stop )
+            $Domain = Get-AdDomain -Server $DomainName
+            $DomainControllers = Get-ADDomainController -Server $DomainName -Filter *
             foreach ($Policy in $DomainControllers) {
                 $DCs += [ordered] @{
                     'Name'             = $Policy.Name
@@ -30,10 +30,17 @@ function Get-DC {
                 }
             }
         } catch {
-            if ($_.Exception -match "Unable to find a default server with Active Directory Web Services running.") {
-                Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            switch ($ErrorMessage) {
+                {$_ -match 'The server has rejected the client credentials'} { 
+                    Write-Color @script:WriteParameters "[-] ", "Domain Controller", " has rejected the client credentials. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+                }
+                {$_ -match 'Unable to find a default server with Active Directory Web Services running' } {
+                    Write-Color @script:WriteParameters "[-] ", "Active Directory", " not found. Please run this script with access to ", "Domain Controllers." -Color White, Red, White, Red
+                }
             }
-            Write-Color @script:WriteParameters "[i] Get-ADDomainController Error: ", "$($_.Exception.Message)" -Color White, Red
+            Write-Color @script:WriteParameters "[i] Get-DC Error: ", $ErrorMessage -Color White, Red
+            exit
         }
 
     }
