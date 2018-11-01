@@ -51,25 +51,6 @@ function Set-EmailBodyPreparedTable ($TableData, $TableWelcomeMessage) {
     $body += $TableData
     return $body
 }
-function Set-EmailReportBrading($FormattingParameters) {
-    $Report = "<a style=`"text-decoration:none`" href=`"$($FormattingParameters.CompanyBranding.Link)`" class=`"clink logo-container`">"
-    if ($FormattingParameters.CompanyBranding.Inline) {
-        $Report += "<img width=<fix> height=<fix> src=`"cid:logo`" border=`"0`" class=`"company-logo`" alt=`"company-logo`"></a>"
-    } else {
-        $Report += "<img width=<fix> height=<fix> src=`"$($FormattingParameters.CompanyBranding.Logo)`" border=`"0`" class=`"company-logo`" alt=`"company-logo`"></a>"
-    }
-    if ($FormattingParameters.CompanyBranding.Width -ne "") {
-        $Report = $Report -replace "width=<fix>", "width=$($FormattingParameters.CompanyBranding.Width)"
-    } else {
-        $Report = $Report -replace "width=<fix>", ""
-    }
-    if ($FormattingParameters.CompanyBranding.Height -ne "") {
-        $Report = $Report -replace "height=<fix>", "height=$($FormattingParameters.CompanyBranding.Height)"
-    } else {
-        $Report = $Report -replace "height=<fix>", ""
-    }
-    return $Report
-}
 
 function Set-EmailReportDetails($FormattingParameters, $Dates, $Warnings) {
     $DateReport = get-date

@@ -87,7 +87,7 @@ function Start-Report {
 
     # Prepare email body
     $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
-    $EmailBody += Set-EmailReportBrading -FormattingParameters $FormattingParameters
+    $EmailBody += Set-EmailReportBranding -FormattingParameters $FormattingParameters
     $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
 
     ### USER EVENTS STARTS ###
