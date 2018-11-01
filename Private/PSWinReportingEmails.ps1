@@ -36,21 +36,6 @@ function Set-EmailFormatting ($Template, $FormattingParameters, $ConfigurationPa
     if ($ConfigurationParameters.Debug.DisplayTemplateHTML -eq $true) { Get-HTML($Body) }
     return $Body
 }
-function Set-EmailBody($TableData, $TableWelcomeMessage) {
-    $body = "<p><i>$TableWelcomeMessage</i>"
-    if ($($TableData | Measure-Object).Count -gt 0) {
-        $body += $TableData | ConvertTo-Html -Fragment | Out-String
-        $body += "</p>"
-    } else {
-        $body += "<br><i>No changes happend during that period.</i></p>"
-    }
-    return $body
-}
-function Set-EmailBodyPreparedTable ($TableData, $TableWelcomeMessage) {
-    $body = "<p><i>$TableWelcomeMessage</i>"
-    $body += $TableData
-    return $body
-}
 
 function Set-EmailReportDetails($FormattingParameters, $Dates, $Warnings) {
     $DateReport = get-date
