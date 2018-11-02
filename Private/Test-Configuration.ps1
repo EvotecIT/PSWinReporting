@@ -4,7 +4,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
         Write-Warning "[i] There is not enough parameters passed to the Start-Reporting. Make sure there are 4 parameter groups (hashtables). Check documentation - you would be better to just start from scratch!"
         Exit
     }
-    Write-Color @script:WriteParameters -Text "[t] ", "Testing for missing parameters in configuration...", "Keep tight!" -Color White, White, Yellow
+    Write-Color -Text "[t] ", "Testing for missing parameters in configuration...", "Keep tight!" -Color White, White, Yellow -ShowTime -TimeFormat "yyyy-MM-dd HH:mm:ss"
 
     # Configuration successful check flag
     $Success = $true
@@ -51,7 +51,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     if (Test-Key $ReportOptions "ReportOptions" "KeepReports" -DisplayProgress $false) {
         if (-not (Test-Path $ReportOptions.KeepReportsPath -PathType Container)) {
             $Success = $false
-            Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportOptions.KeepReportsPath", " doesn't exist." -Color White, White, Red, White
+            Write-Color -Text "[-] ", "Path in configuration of ", "ReportOptions.KeepReportsPath", " doesn't exist." -Color White, White, Red, White -ShowTime -TimeFormat "yyyy-MM-dd HH:mm:ss"
         }
     }
     $Success = (Test-Key $ReportOptions "ReportOptions" "FilePattern" -DisplayProgress $true) -and $Success
@@ -133,7 +133,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
             foreach ($Folder in $ReportDefinitions.ReportsAD.ArchiveProcessing.Directories.Values) {
                 if (-not (Test-Path $Folder -PathType Container)) {
                     $Success = $false
-                    Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportDefinitions.ReportsAD.ArchiveProcessing.Directories", " doesn't exist." -Color White, White, Red, White
+                    Write-Color -Text "[-] ", "Path in configuration of ", "ReportDefinitions.ReportsAD.ArchiveProcessing.Directories", " doesn't exist." -Color White, White, Red, White -ShowTime -TimeFormat "yyyy-MM-dd HH:mm:ss"
                 }
             }
         }
@@ -141,7 +141,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
             foreach ($File in $ReportDefinitions.ReportsAD.ArchiveProcessing.Files.Values) {
                 if (-not (Test-Path $File -PathType Leaf)) {
                     $Success = $false
-                    Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportDefinitions.ReportsAD.ArchiveProcessing.Files", " doesn't exist." -Color White, White, Red, White
+                    Write-Color -Text "[-] ", "Path in configuration of ", "ReportDefinitions.ReportsAD.ArchiveProcessing.Files", " doesn't exist." -Color White, White, Red, White -ShowTime -TimeFormat "yyyy-MM-dd HH:mm:ss"
                 }
             }
         }
