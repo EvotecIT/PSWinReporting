@@ -26,8 +26,8 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     #endregion EmailParameters
 
     #region FormattingParameters
-    $Success = $Success -and (Test-Key $FormattingParameters "FormattingParameters" "CompanyBranding" -DisplayProgress $true)
-    if (Test-Key $FormattingParameters "FormattingParameters" "CompanyBranding" -DisplayProgress $true) {
+
+    if ($($Success = $Success -and (Test-Key $FormattingParameters "FormattingParameters" "CompanyBranding" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Logo" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Inline" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $FormattingParameters.CompanyBranding "FormattingParameters.CompanyBranding" "Width" -DisplayProgress $true)
@@ -47,8 +47,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $Success = $Success -and (Test-Key $ReportOptions "ReportOptions" "AsHTML" -DisplayProgress $true)
     $Success = $Success -and (Test-Key $ReportOptions "ReportOptions" "SendMail" -DisplayProgress $true)
     $Success = $Success -and (Test-Key $ReportOptions "ReportOptions" "OpenAsFile" -DisplayProgress $true)
-    $Success = $Success -and (Test-Key $ReportOptions "ReportOptions" "KeepReports" -DisplayProgress $true)
-    if (Test-Key $ReportOptions "ReportOptions" "KeepReports" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportOptions "ReportOptions" "KeepReports" -DisplayProgress $true); $Success)) {
         if (-not (Test-Path $ReportOptions.KeepReportsPath -PathType Container)) {
             $Success = $false
             Write-Color @script:WriteParameters -Text "[-] ", "Path in configuration of ", "ReportOptions.KeepReportsPath", " doesn't exist." -Color White, White, Red, White
@@ -102,8 +101,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD.EventBased.UserChanges "ReportDefinitions.ReportsAD.EventBased.UserChanges" "LogName" -DisplayProgress $true)
     $Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD.EventBased.UserChanges "ReportDefinitions.ReportsAD.EventBased.UserChanges" "IgnoreWords" -DisplayProgress $true)
     $Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD "ReportDefinitions.ReportsAD" "Custom" -DisplayProgress $true)
-    $Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD.Custom "ReportDefinitions.ReportsAD.Custom" "EventLogSize" -DisplayProgress $true)
-    if (Test-Key $ReportDefinitions.ReportsAD.Custom "ReportDefinitions.ReportsAD.Custom" "EventLogSize" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD.Custom "ReportDefinitions.ReportsAD.Custom" "EventLogSize" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD.Custom.EventLogSize "ReportDefinitions.ReportsAD.Custom.EventLogSize" "Enabled" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD.Custom.EventLogSize "ReportDefinitions.ReportsAD.Custom.EventLogSize" "Logs" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportDefinitions.ReportsAD.Custom.EventLogSize "ReportDefinitions.ReportsAD.Custom.EventLogSize" "SortBy" -DisplayProgress $true)
@@ -118,16 +116,14 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     #region ReportTimes Per Day
     $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "PastDay" -DisplayProgress $true)
     $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "CurrentDay" -DisplayProgress $true)
-    $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "OnDay" -DisplayProgress $true)
-    if (Test-Key $ReportTimes "ReportTimes" "OnDay" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "OnDay" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $ReportTimes.OnDay "ReportTimes.OnDay" "Enabled" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportTimes.OnDay "ReportTimes.OnDay" "Days" -DisplayProgress $true)
     }
     #endregion ReportTimes Per Day
 
     #region ReportTimes Per Month
-    $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "PastMonth" -DisplayProgress $true)
-    if (Test-Key $ReportTimes "ReportTimes" "PastMonth" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "PastMonth" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $ReportTimes.PastMonth "ReportTimes.PastMonth" "Enabled" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportTimes.PastMonth "ReportTimes.PastMonth" "Force" -DisplayProgress $true)
     }
@@ -135,8 +131,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     #endregion ReportTimes Per Month
 
     #region ReportTimes Per Quarter
-    $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "PastQuarter" -DisplayProgress $true)
-    if (Test-Key $ReportTimes "ReportTimes" "PastQuarter" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "PastQuarter" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $ReportTimes.PastQuarter "ReportTimes.PastQuarter" "Enabled" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportTimes.PastQuarter "ReportTimes.PastQuarter" "Force" -DisplayProgress $true)
     }
@@ -144,18 +139,15 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     #endregion ReportTimes Per Quarter
 
     #region ReportTimes Custom Dates
-    $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "CurrentDayMinusDayX" -DisplayProgress $true)
-    if (Test-Key $ReportTimes "ReportTimes" "CurrentDayMinusDayX" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "CurrentDayMinusDayX" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $ReportTimes.CurrentDayMinusDayX "ReportTimes.CurrentDayMinusDayX" "Enabled" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportTimes.CurrentDayMinusDayX "ReportTimes.CurrentDayMinusDayX" "Days" -DisplayProgress $true)
     }
-    $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "CurrentDayMinuxDaysX" -DisplayProgress $true)
-    if (Test-Key $ReportTimes "ReportTimes" "CurrentDayMinuxDaysX" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "CurrentDayMinuxDaysX" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $ReportTimes.CurrentDayMinuxDaysX "ReportTimes.CurrentDayMinuxDaysX" "Enabled" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportTimes.CurrentDayMinuxDaysX "ReportTimes.CurrentDayMinuxDaysX" "Days" -DisplayProgress $true)
     }
-    $Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "CustomDate" -DisplayProgress $true)
-    if (Test-Key $ReportTimes "ReportTimes" "CustomDate" -DisplayProgress $true) {
+    if ($($Success = $Success -and (Test-Key $ReportTimes "ReportTimes" "CustomDate" -DisplayProgress $true); $Success)) {
         $Success = $Success -and (Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "Enabled" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "DateFrom" -DisplayProgress $true)
         $Success = $Success -and (Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "DateTo" -DisplayProgress $true)
