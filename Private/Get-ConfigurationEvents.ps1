@@ -4,7 +4,7 @@ function Get-CongfigurationEvents {
         $Sections
     )
     $EventFiles = New-ArrayList
-    if ($Sections.ContainsKey("Directories")) {
+    if ($Sections.Contains("Directories")) {
         foreach ($Folder in $Sections.Directories.Keys) {
             $Files = Get-FilesInFolder -Folder $Sections.Directories.$Folder -Extension '*.evtx'
             foreach ($File in $Files) {
@@ -12,7 +12,7 @@ function Get-CongfigurationEvents {
             }
         }
     }
-    if ($Sections.ContainsKey("Files")) {
+    if ($Sections.Contains("Files")) {
         foreach ($FileName in $Sections.Files.Keys) {
             $File = $($Sections.Files.$FileName)
             Add-ToArrayAdvanced -List $EventFiles -Element $File -RequireUnique
