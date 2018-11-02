@@ -3,7 +3,7 @@ function Test-Key ($ConfigurationTable, $ConfigurationSection = "", $Configurati
     if ($ConfigurationKey -eq $null) { return $false }
     if ($ConfigurationTable -eq $null) { return $false }
 
-    if ($ConfigurationTable.ContainsKey($ConfigurationKey)) {
+    if ($ConfigurationTable.Contains($ConfigurationKey)) {
         if ($DisplayProgress) {
             Write-Color @script:WriteParameters -Text "[i] ", "Parameter in configuration of ", "$ConfigurationSection.$ConfigurationKey", " exists." -Color White, White, Green, White
         }
