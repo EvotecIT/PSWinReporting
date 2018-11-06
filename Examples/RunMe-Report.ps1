@@ -5,19 +5,21 @@ Import-Module PSSharedGoods -Force
 Import-Module PSEventViewer -Force
 
 $EmailParameters = @{
-    EmailFrom            = "notifications@domain.com"
-    EmailTo              = "przemyslaw.klys@domain.com, admin@domain.com"
-    EmailCC              = ""
-    EmailBCC             = ""
-    EmailReplyTo         = ""
-    EmailServer          = "smtp.office365.com"
-    EmailServerPassword  = "YourPassword"
-    EmailServerPort      = "587"
-    EmailServerLogin     = "notifications@domain.com"
-    EmailServerEnableSSL = 1
-    EmailEncoding        = "Unicode"
-    EmailSubject         = "[Reporting] Event Changes for period <<DateFrom>> to <<DateTo>>"
-    EmailPriority        = "Low" # Normal, High
+    EmailFrom                   = "notifications@domain.com"
+    EmailTo                     = "przemyslaw.klys@domain.com, admin@domain.com"
+    EmailCC                     = ""
+    EmailBCC                    = ""
+    EmailReplyTo                = ""
+    EmailServer                 = "smtp.office365.com"
+    EmailServerPassword         = "YourPassword"
+    EmailServerPasswordAsSecure = $false
+    EmailServerPasswordFromFile = $false
+    EmailServerPort             = "587"
+    EmailServerLogin            = "notifications@domain.com"
+    EmailServerEnableSSL        = 1
+    EmailEncoding               = "Unicode"
+    EmailSubject                = "[Reporting] Event Changes for period <<DateFrom>> to <<DateTo>>"
+    EmailPriority               = "Low" # Normal, High
 }
 $FormattingParameters = @{
     CompanyBranding        = @{
@@ -25,6 +27,7 @@ $FormattingParameters = @{
         Width  = '200'
         Height = ''
         Link   = 'https://evotec.xyz'
+        Inline = $false
     }
     FontFamily             = 'Calibri Light'
     FontSize               = '9pt'
@@ -188,8 +191,8 @@ $ReportDefinitions = @{
         ArchiveProcessing = @{
             Use         = $true
             Directories = [ordered] @{
-                MyEvents     = 'C:\MyEvents' #
-                MyOtherEvent = 'C:\MyEvent1'
+                MyEvents = 'C:\MyEvents' #
+                #MyOtherEvent = 'C:\MyEvent1'
             }
             Files       = [ordered] @{
                 File1 = 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx'
