@@ -9,7 +9,7 @@ function Export-ReportToSQL {
     #Get-ObjectType -Object $ReportOptions -Verbose -VerboseOnly
     if ($Report.Enabled) {
         # checks if Report is enabled
-        if ($Report.Contains('AsSql') -and $ReportOptions.AsSql.Use) {
+        if ($ReportOptions.Contains('AsSql') -and $ReportOptions.AsSql.Use) {
             # checks if global sql is enabled
             if ($Report.EnabledSqlGlobal) {
                 # checks if global sql is enabled for particular dataset
