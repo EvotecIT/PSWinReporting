@@ -4,7 +4,7 @@ function Start-Notifications {
         [hashtable] $ReportOptions,
         [hashtable] $ReportDefinitions,
         [int] $EventID,
-        [int] $EventRecordID,
+        [int64] $EventRecordID,
         [string] $EventChannel
     )
     Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
