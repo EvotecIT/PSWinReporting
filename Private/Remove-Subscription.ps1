@@ -6,14 +6,13 @@ function Remove-Subscription {
     )
     $Subscriptions = Start-MyProgram -Program $Script:ProgramWecutil -cmdArgList 'es'
     foreach ($Subscription in $Subscriptions) {
-        if ($Own -eq $true -and $Subscription -like '*PSWinReporting*') {
-            Write-Color 'Deleting own providers - ', $Subscription -Color White, Green
+        if ($Own -and $Subscription -like '*PSWinReporting*') {
+            $Logger.AddRecord("Deleting own providers: $Subscription")
             Start-MyProgram -Program $Script:ProgramWecutil -cmdArgList 'ds', $Subscription
         }
-        if ($All -eq $true -and $Subscription -notlike '*PSWinReporting*') {
-            Write-Color 'Deleting all providers - ', $Subscription -Color White, Green
+        if ($All -and $Subscription -notlike '*PSWinReporting*') {
+            $Logger.AddRecord("Deleting all providers: $Subscription")
             Start-MyProgram -Program $Script:ProgramWecutil -cmdArgList 'ds', $Subscription
         }
-
     }
 }

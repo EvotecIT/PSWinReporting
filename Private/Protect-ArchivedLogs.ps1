@@ -22,7 +22,7 @@ function Protect-ArchivedLogs {
             $SourcePath = $BackupEvent.'Backup Path'
             $ServerName = $BackupEvent.'Domain Controller'
             if ($SourcePath -and $ServerName -and $DestinationPath) {
-                Write-Color @script:WriteParameters '[i] Found Event Log file ', $SourcePath, ' on ', $ServerName, '. Will try moving to: ', $DestinationPath -Color White, Yellow, White, Yellow
+                $Logger.AddRecord("Found Event Log file $SourcePath on $ServerName. Will try moving to: $DestinationPath")
                 Move-ArchivedLogs -ServerName $ServerName -SourcePath $SourcePath -DestinationPath $DestinationPath
             }
         }
