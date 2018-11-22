@@ -366,4 +366,12 @@ $ReportDefinitions = @{
     }
 }
 
-Start-ADReporting -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportTimes $ReportTimes -ReportDefinitions $ReportDefinitions -LoggerParameters $LoggerParameters 
+$Params = @{
+	EmailParameters      = $EmailParameters
+	FormattingParameters = $FormattingParameters
+	ReportOptions        = $ReportOptions
+	ReportTimes          = $ReportTimes
+	ReportDefinitions    = $ReportDefinitions
+	LoggerParameters     = $LoggerParameters
+}
+Start-ADReporting @Params

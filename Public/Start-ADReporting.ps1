@@ -1,16 +1,22 @@
 function Start-ADReporting () {
     param (
+        [Parameter(Mandatory = $true)]
         [hashtable]$LoggerParameters,
+        [Parameter(Mandatory = $true)]
         [hashtable]$EmailParameters,
+        [Parameter(Mandatory = $true)]
         [hashtable]$FormattingParameters,
+        [Parameter(Mandatory = $true)]
         [hashtable]$ReportOptions,
+        [Parameter(Mandatory = $true)]
         [hashtable]$ReportTimes,
+        [Parameter(Mandatory = $true)]
         [hashtable]$ReportDefinitions
     )
 
     $ErrorActionPreference = 'Stop'
     Set-StrictMode -Version Latest
-    
+
     <#
         Set logger
     #>
@@ -44,7 +50,7 @@ function Start-ADReporting () {
         $Logger.AddErrorRecord("Install the necessary modules. Can't continue running.")
     }
 
-    if ($ReportOptions.JustTestPrerequisite -and $ReportOptions.JustTestPrerequisite -eq $true) {
+    if ($ReportOptions.JustTestPrerequisite -and $ReportOptions.JustTestPrerequisite) {
         exit
     }
 
