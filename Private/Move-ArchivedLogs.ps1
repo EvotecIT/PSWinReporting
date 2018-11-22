@@ -6,14 +6,14 @@ function Move-ArchivedLogs {
         [string] $DestinationPath
     )
     $NewSourcePath = "\\$ServerName\$($SourcePath.Replace(':\','$\'))"
-    if (Test-Path $NewSourcePath) {
-        $Logger.AddRecord("Moving log file from $NewSourcePath to $DestinationPath")
-        try {
-            Move-Item -Path $NewSourcePath -Destination $DestinationPath
-        } catch {
-            $Logger.AddErrorRecord("File $NewSourcePath couldn not be moved: $($_.Exception.Message)")
+    $PathExists = Test-Path $NewSourcePath
+    if ($PathExists) {
+        Write-Color @script:WriteParameters '[i] Moving log file from ', $NewSourcePath, ' to ', $DestinationPath -Color White, Yellow, White, Yellow
+        Move-Item -Path $NewSourcePath -Destination $DestinationPath
+        if (!$?) {
+            Write-Color @script:WriteParameters '[i] File ', $NewSourcePath, ' couldn not be moved.' -Color White, Yellow, White
         }
     } else {
-        $Logger.AddRecord("Event Log Move $NewSourcePath was skipped. No file exists on drive")
+        Write-Color @script:WriteParameters '[i] Event Log Move ', $NewSourcePath, ' was skipped. No file exists on drive.' -Color White, Yellow, White, Yellow
     }
 }

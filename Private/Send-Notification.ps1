@@ -5,6 +5,7 @@ function Send-Notificaton {
         [hashtable] $ReportOptions
     )
 
+
     if ($Events -ne $null) {
         foreach ($Event in $Events) {
             if ($ReportOptions.Notifications.Slack.Use -or $ReportOptions.Notifications.MicrosoftTeams.Use) {
@@ -37,6 +38,7 @@ function Send-Notificaton {
             }
 
             if ($ReportOptions.Notifications.Slack.Use) {
+
                 $Data = New-SlackMessageAttachment -Color $Color `
                     -Title "$MessageTitle - $ActivityTitle"  `
                     -Fields $FactsSlack `
@@ -44,7 +46,8 @@ function Send-Notificaton {
                     New-SlackMessage -Channel $ReportOptions.Notifications.Slack.Channel `
                     -IconEmoji :bomb: |
                     Send-SlackMessage -Uri $ReportOptions.Notifications.Slack.URI
-                $Logger.AddRecord("Slack output: $Data")
+
+                Write-Color @script:WriteParameters -Text "[i] Slack output: ", $Data -Color White, Yellow
             }
             if ($ReportOptions.Notifications.MicrosoftTeams.Use) {
 
@@ -58,13 +61,15 @@ function Send-Notificaton {
                     -MessageTitle $MessageTitle `
                     -Color $Color `
                     -Sections $Section1 `
-                    -Supress $false
-                $Logger.AddRecord("Teams output: $Data")
+                    -Supress $false #`
+                # -Verbose
+                Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
             }
+
             if ($ReportOptions.Notifications.MSSQL.Use) {
                 $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL -Verbose:$ReportOptions.Debug.Verbose
                 foreach ($Query in $SqlQuery) {
-                    $Logger.AddRecord("MS SQL output: $Query")
+                    Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
                 }
             }
         }

@@ -9,7 +9,7 @@ function Set-SubscriptionTemplates {
         Remove-Subscription -All:$DeleteAllOther -Own:$DeleteOwn
     }
     foreach ($TemplatePath in $ListTemplates) {
-        $Logger.AddRecord("Adding provider $TemplatePath  to Subscriptions")
+        Write-Color 'Adding provider ', $TemplatePath, ' to Subscriptions.' -Color White, Green, White
         Start-MyProgram -Program $Script:ProgramWecutil -cmdArgList 'cs', $TemplatePath
     }
 }
