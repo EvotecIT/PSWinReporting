@@ -28,19 +28,12 @@ function Set-TimeReports ($HashTable) {
 
     foreach ($reportName in $reports) {
         $htmlStart += '<tr align="left" bgcolor="#dddddd">'
-
         $htmlStart += '<td>' + $reportName + '</td>'
-
         foreach ($ElapsedTime in $($HashTable[$reportName].GetEnumerator())) {
-
-            # Write-Color -Text $($ElapsedTime.Value) -Color Red
-            $htmlStart += '<td>' + $($ElapsedTime.Value) + '</td>'
+            $htmlStart += '<td>' + $ElapsedTime.Value + '</td>'
         }
         $htmlStart += '</tr>'
     }
-
     $htmlStart += '</table>'
-
-
     return $htmlStart
 }
