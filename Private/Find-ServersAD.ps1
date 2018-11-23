@@ -13,8 +13,8 @@ function Find-ServersAD {
         }
     } else {
         if ($ReportDefinitions.ReportsAD.Servers.DC -eq '' -and $ReportDefinitions.ReportsAD.Servers.UseForwarders -eq $false) {
-            Write-Color @script:WriteParameters "[i] Error: ", "Parameter ", 'ReportDefinitions.ReportsAD.Servers.DC', ' is empty. Please choose ', 'Automatic', ' or fill in this field.' -Color White, White, Yellow, White, Yellow, White
-            Exit
+            $Logger.AddErrorRecord("Parameter ReportDefinitions.ReportsAD.Servers.DC is empty. Please choose Automatic or fill in this field")
+            exit
         } else {
             $Servers += $ReportDefinitions.ReportsAD.Servers.DC
         }

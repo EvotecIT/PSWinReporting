@@ -1,16 +1,21 @@
-function Test-Key ($ConfigurationTable, $ConfigurationSection = "", $ConfigurationKey, $DisplayProgress = $false) {
-
-    if ($ConfigurationKey -eq $null) { return $false }
-    if ($ConfigurationTable -eq $null) { return $false }
-
+function Test-Key () {
+    param (
+        [Parameter(Mandatory = $true)]
+        [hashtable] $ConfigurationTable,
+        [Parameter(Mandatory = $true)]
+        [string] $ConfigurationSection,
+        [Parameter(Mandatory = $true)]
+        [string] $ConfigurationKey,
+        [switch] $DisplayProgress
+    )
     if ($ConfigurationTable.Contains($ConfigurationKey)) {
         if ($DisplayProgress) {
-            Write-Color @script:WriteParameters -Text "[i] ", "Parameter in configuration of ", "$ConfigurationSection.$ConfigurationKey", " exists." -Color White, White, Green, White
+            $Logger.AddSuccessRecord("Parameter $ConfigurationKey in configuration of $ConfigurationSection exists")
         }
         return $true
     } else {
         if ($DisplayProgress) {
-            Write-Color @script:WriteParameters -Text "[i] ", "Parameter in configuration of ", "$ConfigurationSection.$ConfigurationKey", " doesn't exist." -Color White, White, Red, White
+            $Logger.AddErrorRecord("Parameter $ConfigurationKey in configuration of $ConfigurationSection doesn't exist")
         }
         return $false
     }

@@ -1,7 +1,7 @@
 # Collects all named paramters (all others end up in $Args)
 param(
     $eventid = 1105,
-    $eventRecordID = 1854610, # 425358 ,
+    $eventRecordID = 4621481195, # 425358 ,
     $eventChannel,
     $eventSeverity
 )
@@ -16,7 +16,7 @@ Update-Module DBATools
 #>
 Import-Module PSTeams
 Import-Module PSEventViewer
-Import-Module PSWinReporting #-Force
+Import-Module PSWinReporting -Force
 Import-Module PSWriteColor
 Import-Module PSSlack
 Import-Module DBATools

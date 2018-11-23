@@ -1,42 +1,40 @@
 function Get-EventLogSize {
-    [CmdletBinding()]
-    param(
-        $Servers,
-        $LogName = "Security"
-    )
-    $Verbose = ($PSCmdlet.MyInvocation.BoundParameters['Verbose'] -eq $true)
-    $results = @()
-    foreach ($server in $Servers) {
-        try {
-            $result = Get-WinEvent -ListLog $LogName -ComputerName $Server | Select-Object MaximumSizeInBytes, FileSize, IsLogFul, LastAccessTime, LastWriteTime, OldestRecordNumber, RecordCount, LogName, LogType, LogIsolation, IsEnabled, LogMode
-        } catch {
-            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-            switch ($ErrorMessage) {
-                {$_ -match 'No events were found'} {
-                    Write-Color @script:WriteParameters "[i] ", "No events were found ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
-                    continue
-                }
-                {$_ -match 'Attempted to perform an unauthorized operation'} {
-                    Write-Color @script:WriteParameters "[-] ", "Unauthorized operation ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
-                    exit
-                }
-                default {
-                    Write-Color @script:WriteParameters "[-] ", "Error occured gathering events ", $Server, ': ', $ErrorMessage -Color White, White, Yellow, White, Red
-                    exit
-                }
-            }
-        }
-        $CurrentFileSize = Convert-Size -Value $($result.FileSize) -From Bytes -To GB -Precision 2 -Display
-        $MaximumFilesize = Convert-Size -Value $($result.MaximumSizeInBytes) -From Bytes -To GB -Precision 2 -Display
-        $EventOldest = (Get-WinEvent -MaxEvents 1 -LogName $result.LogName -Oldest -ComputerName $Server).TimeCreated
-        $EventNewest = (Get-WinEvent -MaxEvents 1 -LogName $result.LogName -ComputerName $Server).TimeCreated
-        Add-Member -InputObject $result -MemberType NoteProperty -Name "Server" -Value $server
-        Add-Member -InputObject $result -MemberType NoteProperty -Name "CurrentFileSize" -Value $CurrentFileSize
-        Add-Member -InputObject $result -MemberType NoteProperty -Name "MaximumFileSize" -Value $MaximumFilesize
-        Add-Member -InputObject $result -MemberType NoteProperty -Name "EventOldest" -Value $EventOldest
-        Add-Member -InputObject $result -MemberType NoteProperty -Name "EventNewest" -Value $EventNewest
-        $results += $result
-    }
-
-    return $results | Select-Object Server, LogName, LogType, EventOldest, EventNewest, "CurrentFileSize", "MaximumFileSize", LogMode, IsEnabled
+	[CmdletBinding()]
+	param(
+		$Servers,
+		$LogName = "Security"
+	)
+	# $Verbose = ($PSCmdlet.MyInvocation.BoundParameters['Verbose'] -eq $true)
+	$results = @()
+	foreach ($Server in $Servers) {
+		$result = @{
+			Server  = $Server
+			LogName = $LogName
+		}
+		try {
+			$EventsInfo = Get-WinEvent -ListLog $LogName -ComputerName $Server
+			$result.LogType = $EventsInfo.LogType
+			$result.LogMode = $EventsInfo.LogMode
+			$result.IsEnabled = $EventsInfo.IsEnabled
+			$result.CurrentFileSize = Convert-Size -Value $EventsInfo.FileSize -From Bytes -To GB -Precision 2 -Display
+			$result.MaximumFilesize = Convert-Size -Value $EventsInfo.MaximumSizeInBytes -From Bytes -To GB -Precision 2 -Display
+			$result.EventOldest = (Get-WinEvent -MaxEvents 1 -LogName $LogName -Oldest -ComputerName $Server).TimeCreated
+			$result.EventNewest = (Get-WinEvent -MaxEvents 1 -LogName $LogName -ComputerName $Server).TimeCreated
+		} catch {
+			$ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+			switch ($ErrorMessage) {
+				{$_ -match 'No events were found'} {
+					$Logger.AddInfoRecord("No events were found on the $Server")
+				}
+				{$_ -match 'Attempted to perform an unauthorized operation'} {
+					$Logger.AddInfoRecord("Unauthorized operation $Server")
+				}
+				default {
+					$Logger.AddErrorRecord("Error occured gathering events on the $Server`: $Exception")
+				}
+			}
+		}
+		$results += [PSCustomObject]$result | Select-Object Server, LogName, LogType, EventOldest, EventNewest, "CurrentFileSize", "MaximumFileSize", LogMode, IsEnabled
+	}
+	return $results
 }

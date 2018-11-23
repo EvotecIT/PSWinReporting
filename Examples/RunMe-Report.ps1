@@ -1,9 +1,12 @@
-### Starts Module (Requires config above)
-Clear-Host
 Import-Module PSWinReporting -Force
 Import-Module PSSharedGoods -Force
 Import-Module PSEventViewer -Force
 
+$LoggerParameters = @{
+    ShowTime   = $true
+    LogsDir    = 'C:\temp\logs'
+    TimeFormat = 'yyyy-MM-dd HH:mm:ss'
+}
 $EmailParameters = @{
     EmailFrom                   = "notifications@domain.com"
     EmailTo                     = "przemyslaw.klys@domain.com, admin@domain.com"
@@ -122,12 +125,6 @@ $ReportOptions = @{
             'Gathered LogName'       = 'GatheredLogName'
         }
     }
-
-    DisplayConsole        = @{
-        ShowTime   = $true
-        LogFile    = 'C:\PSWinReporting.log'
-        TimeFormat = 'yyyy-MM-dd HH:mm:ss'
-    }
     Debug                 = @{
         DisplayTemplateHTML = $false
         Verbose             = $false
@@ -191,11 +188,11 @@ $ReportDefinitions = @{
         ArchiveProcessing = @{
             Use         = $true
             Directories = [ordered] @{
-                MyEvents = 'C:\MyEvents' #
+                #MyEvents = 'C:\MyEvents' #
                 #MyOtherEvent = 'C:\MyEvent1'
             }
             Files       = [ordered] @{
-                File1 = 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx'
+                #File1 = 'C:\MyEvents\Archive-Security-2018-09-14-22-13-07-710.evtx'
             }
         }
         EventBased        = @{
@@ -369,4 +366,12 @@ $ReportDefinitions = @{
     }
 }
 
-Start-ADReporting -EmailParameters $EmailParameters -FormattingParameters $FormattingParameters -ReportOptions $ReportOptions -ReportTimes $ReportTimes -ReportDefinitions $ReportDefinitions
+$Params = @{
+	EmailParameters      = $EmailParameters
+	FormattingParameters = $FormattingParameters
+	ReportOptions        = $ReportOptions
+	ReportTimes          = $ReportTimes
+	ReportDefinitions    = $ReportDefinitions
+	LoggerParameters     = $LoggerParameters
+}
+Start-ADReporting @Params
