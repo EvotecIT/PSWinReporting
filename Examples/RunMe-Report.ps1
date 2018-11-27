@@ -66,7 +66,7 @@ $ReportOptions = @{
     AsCSV                 = $false # attaches CSV to email with all events,
     AsHTML                = $true # puts exported data into email directly with all events
     SendMail              = $false
-    OpenAsFile            = $false # requires AsHTML set to $true
+    OpenAsFile            = $true # requires AsHTML set to $true
     KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
     KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
     FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
@@ -144,10 +144,10 @@ $ReportTimes = @{
     }
     # Report Per Month
     PastMonth            = @{
-        Enabled = $true # checks for 1st day of the month - won't run on any other day unless used force
-        Force   = $true  # if true - runs always ...
+        Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
+        Force   = $false  # if true - runs always ...
     }
-    CurrentMonth         = $false
+    CurrentMonth         = $true
 
     # Report Per Quarter
     PastQuarter          = @{
@@ -289,13 +289,13 @@ $ReportDefinitions = @{
                 IgnoreWords = ''
             }
             UserLogon              = @{
-                Enabled     = $false
+                Enabled     = $false # do not set to TRUE (takes days to scan)
                 Events      = 4624
                 LogName     = 'Security'
                 IgnoreWords = ''
             }
             UserLogonKerberos      = @{
-                Enabled     = $false
+                Enabled     = $false # do not set to TRUE. Didn't have any good results
                 Events      = 4768
                 LogName     = 'Security'
                 IgnoreWords = ''
@@ -317,7 +317,7 @@ $ReportDefinitions = @{
                 }
             }
             GroupPolicyChanges     = @{
-                Enabled     = $true
+                Enabled     = $false # not ready
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
                 IgnoreWords = ''

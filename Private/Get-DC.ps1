@@ -27,19 +27,19 @@ function Get-DC {
             }
 
             $DCs += [PsCustomObject][ordered] @{
-                'Name'             = $DomainName
+                'Name'             = 'Error'
                 'Domain'           = $DomainName
                 'Host Name'        = 'N/A'
                 'Operating System' = 'N/A'
                 'Site'             = 'N/A'
                 'Ipv4'             = 'N/A'
                 'Ipv6'             = 'N/A'
-                'Is GC'            = $false
-                'Is ReadOnly'      = $false
-                'Is PDC'           = $false
-                'Is Supported'     = $false
-                'Is Included'      = $false
-                'Enabled'          = $false
+                'Is GC'            = 'No'
+                'Is ReadOnly'      = 'No'
+                'Is PDC'           = 'No'
+                'Is Supported'     = 'No'
+                'Is Included'      = 'No'
+                'Enabled'          = 'No'
                 'Comment'          = "$ErrorMessage"
             }
             continue
@@ -57,13 +57,13 @@ function Get-DC {
                     'Site'             = $Policy.Site
                     'Ipv4'             = if ($Policy.Ipv4Address -eq '') { 'N/A' } else { $Policy.Ipv4Address }
                     'Ipv6'             = if ($Policy.Ipv6Address -eq '') { 'N/A' } else { $Policy.Ipv4Address }
-                    'Is GC'            = $Policy.IsGlobalCatalog
-                    'Is ReadOnly'      = $Policy.IsReadOnly
+                    'Is GC'            = if ($Policy.IsGlobalCatalog) { 'Yes' } else { 'No' }
+                    'Is ReadOnly'      = if ($Policy.IsReadOnly) { 'Yes' } else { 'No' }
                     'Is PDC'           = if ($Policy.HostName -eq $Domain.PDCEmulator) { 'Yes' } else { 'No' }
                     'Is Supported'     = if ($Policy.OperatingSystem -notlike "*2003*" -and $Policy.OperatingSystem -notlike "*2000*") { 'Yes' } else { 'No' }
                     'Is Included'      = ''
-                    'Enabled'          = $Policy.Enabled
-                    'Comment'          = ''
+                    'Enabled'          = if ($Policy.Enabled) { 'Yes' } else { 'No'}
+                    'Comment'          = 'OK'
                 }
             }
         } catch {
