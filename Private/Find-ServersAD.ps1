@@ -1,7 +1,7 @@
 function Find-ServersAD {
     param (
-        $DC,
-        $ReportDefinitions
+        [string[]] $DC,
+        [Object] $ReportDefinitions
     )
     $Servers = @()
 
