@@ -1,4 +1,9 @@
-function Find-AllEvents($ReportDefinitions, $LogNameSearch, [switch] $All) {
+function Find-AllEvents {
+    param (
+        $ReportDefinitions,
+        $LogNameSearch,
+        [switch] $All
+    )
     $EventsToProcess = @()
     foreach ($report in $ReportDefinitions.ReportsAD.EventBased.GetEnumerator()) {
         $ReportName = $report.Name

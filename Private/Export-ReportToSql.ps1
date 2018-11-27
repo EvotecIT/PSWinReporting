@@ -11,7 +11,7 @@ function Export-ReportToSQL {
         # checks if Report is enabled
         if ($ReportOptions.Contains('AsSql') -and $ReportOptions.AsSql.Use) {
             # checks if global sql is enabled
-            if ($Report.EnabledSqlGlobal) {
+            if ($Report.Contains('EnabledSqlGlobal') -and $Report.EnabledSqlGlobal) {
                 # checks if global sql is enabled for particular dataset
                 $Logger.AddInfoRecord("Sending $ReportName to SQL at Global level")
                 $SqlQuery = Send-SqlInsert -Object $ReportTable -SqlSettings $ReportOptions.AsSql -Verbose:$ReportOptions.Debug.Verbose

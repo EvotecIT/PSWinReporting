@@ -345,7 +345,5 @@ function Start-Report {
     Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther -ReportOptions $ReportOptions -ReportName "Clear Log Events (Other)" -ReportTable $TableEventLogClearedLogsOther
     Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots -ReportOptions $ReportOptions -ReportName "Troubleshooting Reboots" -ReportTable $RebootEventsTable
 
-
-
     Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
 }
