@@ -5,9 +5,26 @@ function Start-Notifications {
         [hashtable] $ReportDefinitions,
         [int] $EventID,
         [int64] $EventRecordID,
-        [string] $EventChannel
+        [string] $EventChannel,
+        [hashtable] $LoggerParameters
     )
-    Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
+    <#
+        Set logger
+    #>
+    if (-not $LoggerParameters) {
+        $LoggerParameters = @{
+            ShowTime   = $true
+            LogsDir    = 'C:\temp\logs'
+            TimeFormat = 'yyyy-MM-dd HH:mm:ss'
+        }
+    }
+
+    $Params = @{
+        LogPath = Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log"
+        ShowTime = $LoggerParameters.ShowTime
+        TimeFormat = $LoggerParameters.TimeFormat
+    }
+    $Logger = Get-Logger @Params
 
     Write-Color @script:WriteParameters -Text '[i] Executed ', 'Trigger', ' for ID: ', $eventid, ' and RecordID: ', $eventRecordID -Color White, Yellow, White, Yellow, White, Yellow
 
@@ -37,8 +54,6 @@ function Start-Notifications {
         return
     }
 
-
-    #Write-Color @script:WriteParameters -Text "Start-TeamsReport (PSWinReporting) - This is a PSSCRIPTROOT path ", " $PSScriptRoot"
     $GroupsEventsTable = @()
     $GroupCreateDeleteTable = @()
     $UsersEventsTable = @()

@@ -211,4 +211,10 @@ $ReportDefinitions = @{
     }
 }
 
-Start-Notifications -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel #-Verbose
+$LoggerParameters = @{
+    ShowTime   = $true
+    LogsDir    = 'C:\temp\logs'
+    TimeFormat = 'yyyy-MM-dd HH:mm:ss'
+}
+
+Start-Notifications -ReportDefinitions $ReportDefinitions -ReportOptions $ReportOptions -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -LoggerParameters $LoggerParameters

@@ -174,7 +174,6 @@ function Start-Report {
 		$script:TimeToGenerateReports.Reports.GroupPolicyChanges.Total = Stop-TimeLog -Time $ExecutionTime
 		$Logger.AddInfoRecord('Ending Group Policy Changes Report')
     }
-
     $Logger.AddInfoRecord('Processing log clearing events')
 	if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -eq $true) {
 		$Logger.AddInfoRecord('Running Who Cleared Logs Report')

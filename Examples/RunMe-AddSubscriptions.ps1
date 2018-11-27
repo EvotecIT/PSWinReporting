@@ -1,5 +1,5 @@
 #Clear-Host
-Import-Module PSWinReporting #-Force
+Import-Module PSWinReporting -Force
 Import-Module PSSharedGoods #-Force
 
 $ReportDefinitions = @{
@@ -65,7 +65,12 @@ $ReportDefinitions = @{
         }
     }
 }
+$LoggerParameters = @{
+    ShowTime   = $true
+    LogsDir    = 'C:\temp\logs'
+    TimeFormat = 'yyyy-MM-dd HH:mm:ss'
+}
 
-Start-SubscriptionService
-$Providers = New-SubscriptionTemplates -ReportDefinitions $ReportDefinitions -Verbose
-Set-SubscriptionTemplates -ListTemplates $Providers -DeleteOwn
+Start-SubscriptionService -LoggerParameters $LoggerParameters
+$Providers = New-SubscriptionTemplates -ReportDefinitions $ReportDefinitions -LoggerParameters $LoggerParameters
+Set-SubscriptionTemplates -ListTemplates $Providers -DeleteOwn -LoggerParameters $LoggerParameters
