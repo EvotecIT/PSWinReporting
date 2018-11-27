@@ -1,4 +1,5 @@
 function Find-ServersAD {
+    [CmdletBinding()]
     param (
         [string[]] $DC,
         [Object] $ReportDefinitions
@@ -7,7 +8,6 @@ function Find-ServersAD {
 
     # Cleans up empty HostName for failed domain
     $DC = $DC | Where-Object { $_.'Host Name' -ne '' }
-
 
     if ($ReportDefinitions.ReportsAD.Servers.Automatic -eq $true) {
         if ($ReportDefinitions.ReportsAD.Servers.OnlyPDC -eq $true) {

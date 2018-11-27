@@ -1,4 +1,5 @@
 function Get-DC {
+    [CmdletBinding()]
     param()
     try {
         $Forest = Get-ADForest

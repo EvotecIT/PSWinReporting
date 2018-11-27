@@ -10,8 +10,8 @@ function Get-EventLogSize {
 		$result = @{
 			Server  = $Server
 			LogName = $LogName
-		}
-		try {
+        }
+        try {
 			$EventsInfo = Get-WinEvent -ListLog $LogName -ComputerName $Server
 			$result.LogType = $EventsInfo.LogType
 			$result.LogMode = $EventsInfo.LogMode
