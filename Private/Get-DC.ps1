@@ -29,17 +29,17 @@ function Get-DC {
             $DCs += [PsCustomObject][ordered] @{
                 'Name'             = $DomainName
                 'Domain'           = $DomainName
-                'Host Name'        = ''
+                'Host Name'        = 'N/A'
                 'Operating System' = 'N/A'
                 'Site'             = 'N/A'
                 'Ipv4'             = 'N/A'
                 'Ipv6'             = 'N/A'
-                'Is GC'            = 'N/A'
-                'Is ReadOnly'      = 'N/A'
-                'Is PDC'           = 'N/A'
-                'Is Supported'     = 'N/A'
-                'Is Included'      = 'N/A'
-                'Enabled'          = 'N/A'
+                'Is GC'            = $false
+                'Is ReadOnly'      = $false
+                'Is PDC'           = $false
+                'Is Supported'     = $false
+                'Is Included'      = $false
+                'Enabled'          = $false
                 'Comment'          = "$ErrorMessage"
             }
             continue
