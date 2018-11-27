@@ -13,19 +13,19 @@ function Export-ReportToSQL {
             # checks if global sql is enabled
             if ($Report.EnabledSqlGlobal) {
                 # checks if global sql is enabled for particular dataset
-                $Logger.AddRecord("Sending $ReportName to SQL at Global level")
+                $Logger.AddInfoRecord("Sending $ReportName to SQL at Global level")
                 $SqlQuery = Send-SqlInsert -Object $ReportTable -SqlSettings $ReportOptions.AsSql -Verbose:$ReportOptions.Debug.Verbose
                 foreach ($Query in $SqlQuery) {
-                    $Logger.AddRecord("MS SQL Output: $Query")
+                    $Logger.AddInfoRecord("MS SQL Output: $Query")
                 }
             }
         }
         if ($Report.Contains('ExportToSql') -and $Report.ExportToSql.Use) {
             # checks if local sql is enabled for dataset
-            $Logger.AddRecord("Sending $ReportName to SQL at Local level")
+            $Logger.AddInfoRecord("Sending $ReportName to SQL at Local level")
             $SqlQuery = Send-SqlInsert -Object $ReportTable -SqlSettings $Report.ExportToSql -Verbose:$ReportOptions.Debug.Verbose
             foreach ($Query in $SqlQuery) {
-                $Logger.AddRecord("MS SQL Output: $Query")
+                $Logger.AddInfoRecord("MS SQL Output: $Query")
             }
         }
     }
