@@ -36,31 +36,41 @@ function Start-Report {
 	$Logger.AddInfoRecord('Preparing Security Events list to be processed')
 	$EventsToProcessSecurity = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'Security'
 	$Logger.AddInfoRecord('Preparing System Events list to be processed')
-	$EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
+    $EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
 
-	$Events = @()
+    # Summary of events to process
+    $Logger.AddInfoRecord("Found security events to process: $($EventsToProcessSecurity -join ', ')")
+    $Logger.AddInfoRecord("Found system events to process: $($EventsToProcessSystem -join ', ')")
+
+	$Events = New-ArrayList
 	if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
 		$Logger.AddInfoRecord("Preparing Forwarded Events on forwarding servers: $($ReportDefinitions.ReportsAD.Servers.ForwardServer -join ', ')")
 		foreach ($ForwardedServer in $ReportDefinitions.ReportsAD.Servers.ForwardServer) {
 			#$Events += Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog
-			$Events += Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
-			$Events += Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
-		}
+			$FoundEvents = Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
+            Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull
+            $FoundEvents = Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
+            Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull
+        }
 	}
 	if ($ReportDefinitions.ReportsAD.Servers.UseDirectScan) {
 		$Logger.AddInfoRecord("Processing Security Events from directly scanned servers: $($Servers -Join ', ')")
-		$Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
+        $FoundEvents = Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
+        Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull
 		$Logger.AddInfoRecord("Processing System Events from directly scanned servers: $($Servers -Join ', ')")
-		$Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
+        $FoundEvents = Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
+        Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull
 	}
 	if ($ReportDefinitions.ReportsAD.ArchiveProcessing.Use) {
 		$EventLogFiles = Get-CongfigurationEvents -Sections $ReportDefinitions.ReportsAD.ArchiveProcessing
 		foreach ($File in $EventLogFiles) {
 			$TableEventLogFiles += Get-FileInformation -File $File
 			$Logger.AddInfoRecord("Processing Security Events on file: $File")
-			$Events += Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
+            $FoundEvents = Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
+            Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull
 			$Logger.AddInfoRecord("Processing System Events on file: $File")
-			$Events += Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
+            $FoundEvents = Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
+            Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull
 		}
 	}
 
@@ -79,9 +89,9 @@ function Start-Report {
 	$Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
 
 	if ($ReportOptions.RemoveDuplicates) {
-		$Logger.AddInfoRecord("Removing Duplicates from all events. Current list contains  $($Events.Count) events")
-		$Events = Remove-DuplicateObjects -Object $Events -Property 'RecordID'
-		$Logger.AddInfoRecord("Removed Duplicates Following $($Events.Count) events will be analyzed further")
+        $Logger.AddInfoRecord("Removing Duplicates from all events. Current list contains $(Get-ObjectCount -Object $Events) events")
+        $Events = Remove-DuplicateObjects -Object $Events -Property 'RecordID'
+		$Logger.AddInfoRecord("Removed Duplicates Following $(Get-ObjectCount -Object $Events) events will be analyzed further")
 	}
 
 	$Logger.AddInfoRecord('Processing User Events')
@@ -214,7 +224,7 @@ function Start-Report {
 	}
 
     # Prepare email body
-    $Logger.AddInfoRecord('Prepare email body')
+    $Logger.AddInfoRecord('Prepare email head and body')
 	$EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
 	$EmailBody += Set-EmailReportBranding -FormattingParameters $FormattingParameters
     $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
@@ -240,8 +250,10 @@ function Start-Report {
 		$EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -ReportTable $RebootEventsTable -ReportTableText 'Following reboot related events happened'
 	}
 	$Reports = @()
-	if ($ReportOptions.AsExcel) {
-		$ReportFilePathXLSX = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension "xlsx"
+
+    if ($ReportOptions.AsExcel) {
+        $Logger.AddInfoRecord('Prepare XLSX files with Events')
+        $ReportFilePathXLSX = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension "xlsx"
 		Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersAD
 		Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Event log sizes" -ReportTable $EventLogTable
 		Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName  "User Changes" -ReportTable $UsersEventsTable
@@ -260,6 +272,7 @@ function Start-Report {
 		$Reports += $ReportFilePathXLSX
 	}
 	if ($ReportOptions.AsCSV) {
+        $Logger.AddInfoRecord('Prepare CSV files with Events')
 		$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportServers" -ReportTable $ServersAD
 		$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportEventLogSize" -ReportTable $EventLogTable
 		$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserEvents" -ReportTable $UsersEventsTable
@@ -276,18 +289,17 @@ function Start-Report {
 		$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "IncludeClearedLogsOther" -ReportTable $TableEventLogClearedLogs
 		$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportReboots" -ReportTable $RebootEventsTable
 
-
-
 	}
-	$Reports = $Reports |  Where-Object { $_ } | Sort-Object -Uniq
+	$Reports = $Reports |  Where-Object { $_ } | Sort-Object -Unique
 
+    $Logger.AddInfoRecord('Prepare Email replacements and formatting')
 	# Do Cleanup of Emails
 	$EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
 	$EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
 	$EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
 	$EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
 	$EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
-	$EmailBody = Set-EmailFormatting -Template $EmailBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions
+	$EmailBody = Set-EmailFormatting -Template $EmailBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions -Logger $Logger
 	$Time.Stop()
 
     #$script:TimeToGenerateReports | ConvertTo-Json
