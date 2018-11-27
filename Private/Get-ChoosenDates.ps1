@@ -5,26 +5,26 @@ function Get-ChoosenDates {
     $Dates = @()
 
     # Report Per Hour
-    if ($ReportTimes.PastHour -eq $true) {
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'PastHour' -Key 'Enabled') {
         $DatesPastHour = Find-DatesPastHour
         if ($DatesPastHour -ne $null) {
             $Dates += $DatesPastHour
         }
     }
-    if ($ReportTimes.CurrentHour -eq $true) {
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'CurrentHour' -Key 'Enabled') {
         $DatesCurrentHour = Find-DatesCurrentHour
         if ($DatesCurrentHour -ne $null) {
             $Dates += $DatesCurrentHour
         }
     }
     # Report Per Day
-    if ($ReportTimes.PastDay -eq $true) {
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'PastDay' -Key 'Enabled') {
         $DatesDayPrevious = Find-DatesDayPrevious
         if ($DatesDayPrevious -ne $null) {
             $Dates += $DatesDayPrevious
         }
     }
-    if ($ReportTimes.CurrentDay -eq $true) {
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'CurrentDay' -Key 'Enabled') {
         $DatesDayToday = Find-DatesDayToday
         if ($DatesDayToday -ne $null) {
             $Dates += $DatesDayToday
@@ -40,26 +40,26 @@ function Get-ChoosenDates {
         }
     }
     # Report Per Month
-    if ($ReportTimes.PastMonth.Enabled -eq $true -or $ReportTimes.PastMonth.Force -eq $true) {
+    if ($ReportTimes.PastMonth.Enabled -eq $true) {
         $DatesMonthPrevious = Find-DatesMonthPast -Force $ReportTimes.PastMonth.Force     # Find-DatesMonthPast runs only on 1st of the month unless -Force is used
         if ($DatesMonthPrevious -ne $null) {
             $Dates += $DatesMonthPrevious
         }
     }
-    if ($ReportTimes.CurrentMonth -eq $true) {
+    if (Test-KeyVerifyBoth -Object $ReportTimes.CurrentMonth -Key 'Enabled') {
         $DatesMonthCurrent = Find-DatesMonthCurrent
         if ($DatesMonthCurrent -ne $null) {
             $Dates += $DatesMonthCurrent
         }
     }
     # Report Per Quarter
-    if ($ReportTimes.PastQuarter.Enabled -eq $true -or $ReportTimes.PastQuarter.Force -eq $true) {
+    if ($ReportTimes.PastQuarter.Enabled -eq $true) {
         $DatesQuarterLast = Find-DatesQuarterLast -Force $ReportTimes.PastQuarter.Force  # Find-DatesMonthPast runs only on 1st of the quarter unless -Force is used
         if ($DatesQuarterLast -ne $null) {
             $Dates += $DatesQuarterLast
         }
     }
-    if ($ReportTimes.CurrentQuarter -eq $true) {
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'CurrentQuarter' -Key 'Enabled') {
         $DatesQuarterCurrent = Find-DatesQuarterCurrent
         if ($DatesQuarterCurrent -ne $null) {
             $Dates += $DatesQuarterCurrent
@@ -87,12 +87,30 @@ function Get-ChoosenDates {
             $Dates += $DatesCustom
         }
     }
-    if ($ReportTimes.Everything -eq $true) {
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Everything' -Key 'Enabled') {
         $DatesEverything = @{
             DateFrom = Get-Date -Year 1600 -Month 1 -Day 1
             DateTo   = Get-Date -Year 2300 -Month 1 -Day 1
         }
         $Dates += $DatesEverything
+    }
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Last3days' -Key 'Enabled') {
+        $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 3
+        if ($DatesCurrentDayMinusDaysX -ne $null) {
+            $Dates += $DatesCurrentDayMinusDaysX
+        }
+    }
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Last7days' -Key 'Enabled') {
+        $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 7
+        if ($DatesCurrentDayMinusDaysX -ne $null) {
+            $Dates += $DatesCurrentDayMinusDaysX
+        }
+    }
+    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Last14days' -Key 'Enabled') {
+        $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 14
+        if ($DatesCurrentDayMinusDaysX -ne $null) {
+            $Dates += $DatesCurrentDayMinusDaysX
+        }
     }
     return  $Dates
 }

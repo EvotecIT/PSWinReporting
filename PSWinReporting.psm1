@@ -13,7 +13,7 @@ Foreach ($import in @($Public + $Private)) {
 
 #Export-ModuleMember -Function $Public.Basename -Verbose
 #Export-ModuleMember -Function * #-Verbose # 'Start-ADReporting', 'Get-KerberosLogonEvents', 'Get-GroupPolicyChanges', 'Get-EventLogClearedLogs'
-Export-ModuleMember -Function 'Start-ADReporting', 'Start-Notifications', 'New-SubscriptionTemplates', 'Set-SubscriptionTemplates', 'Remove-TaskScheduledForwarder', 'Add-TaskScheduledForwarder', 'Start-SubscriptionService', 'Start-RescanEvents'
+Export-ModuleMember -Function 'Start-ADReporting', 'Start-Notifications', 'New-SubscriptionTemplates', 'Set-SubscriptionTemplates', 'Remove-TaskScheduledForwarder', 'Add-TaskScheduledForwarder', 'Start-SubscriptionService', 'Find-ADEvents'
 
 [string] $ManifestFile = '{0}.psd1' -f (Get-Item $PSCommandPath).BaseName;
 $ManifestPathAndFile = Join-Path -Path $PSScriptRoot -ChildPath $ManifestFile;
