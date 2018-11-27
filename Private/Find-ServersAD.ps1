@@ -4,10 +4,14 @@ function Find-ServersAD {
         $ReportDefinitions
     )
     $Servers = @()
-    #if ($ReportDefinitions.ReportsAD.UseDirectScan) {
+
+    # Cleans up empty HostName for failed domain
+    $DC = $DC | Where-Object { $_.'Host Name' -ne '' }
+
+
     if ($ReportDefinitions.ReportsAD.Servers.Automatic -eq $true) {
         if ($ReportDefinitions.ReportsAD.Servers.OnlyPDC -eq $true) {
-            $Servers += ($DC | Where { $_.'Is PDC' -eq 'Yes' }).'Host Name'
+            $Servers += ($DC | Where-Object { $_.'Is PDC' -eq 'Yes' }).'Host Name'
         } else {
             $Servers += $DC.'Host Name'
         }

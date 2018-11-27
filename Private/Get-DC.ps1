@@ -28,7 +28,7 @@ function Get-DC {
             $DCs += [PsCustomObject][ordered] @{
                 'Name'             = $DomainName
                 'Domain'           = $DomainName
-                'Host Name'        = $DomainName
+                'Host Name'        = ''
                 'Operating System' = 'N/A'
                 'Site'             = 'N/A'
                 'Ipv4'             = 'N/A'
