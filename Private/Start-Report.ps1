@@ -28,19 +28,19 @@ function Start-Report {
 	$TableEventLogFiles = @()
 
 	$Logger.AddInfoRecord("Processing report for dates from: $($Dates.DateFrom) to $($Dates.DateTo)")
-	$Logger.AddRecord('Establishing servers list to process...')
+	$Logger.AddInfoRecord('Establishing servers list to process...')
 
 	$ServersAD = Get-DC
 	$Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions -DC $ServersAD
 
-	$Logger.AddRecord('Preparing Security Events list to be processed')
+	$Logger.AddInfoRecord('Preparing Security Events list to be processed')
 	$EventsToProcessSecurity = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'Security'
-	$Logger.AddRecord('Preparing System Events list to be processed')
+	$Logger.AddInfoRecord('Preparing System Events list to be processed')
 	$EventsToProcessSystem = Find-AllEvents -ReportDefinitions $ReportDefinitions -LogNameSearch 'System'
 
 	$Events = @()
 	if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
-		$Logger.AddRecord("Preparing Forwarded Events on forwarding servers: $($ReportDefinitions.ReportsAD.Servers.ForwardServer -join ', ')")
+		$Logger.AddInfoRecord("Preparing Forwarded Events on forwarding servers: $($ReportDefinitions.ReportsAD.Servers.ForwardServer -join ', ')")
 		foreach ($ForwardedServer in $ReportDefinitions.ReportsAD.Servers.ForwardServer) {
 			#$Events += Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog
 			$Events += Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
@@ -48,18 +48,18 @@ function Start-Report {
 		}
 	}
 	if ($ReportDefinitions.ReportsAD.Servers.UseDirectScan) {
-		$Logger.AddRecord("Processing Security Events from directly scanned servers: $($Servers -Join ', ')")
+		$Logger.AddInfoRecord("Processing Security Events from directly scanned servers: $($Servers -Join ', ')")
 		$Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
-		$Logger.AddRecord("Processing System Events from directly scanned servers: $($Servers -Join ', ')")
+		$Logger.AddInfoRecord("Processing System Events from directly scanned servers: $($Servers -Join ', ')")
 		$Events += Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
 	}
 	if ($ReportDefinitions.ReportsAD.ArchiveProcessing.Use) {
 		$EventLogFiles = Get-CongfigurationEvents -Sections $ReportDefinitions.ReportsAD.ArchiveProcessing
 		foreach ($File in $EventLogFiles) {
 			$TableEventLogFiles += Get-FileInformation -File $File
-			$Logger.AddRecord("Processing Security Events on file: $File")
+			$Logger.AddInfoRecord("Processing Security Events on file: $File")
 			$Events += Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
-			$Logger.AddRecord("Processing System Events on file: $File")
+			$Logger.AddInfoRecord("Processing System Events on file: $File")
 			$Events += Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
 		}
 	}
@@ -67,133 +67,133 @@ function Start-Report {
 	$Logger.AddInfoRecord('Processing Event Log Sizes on defined servers for warnings')
 	$EventLogDatesSummary = @()
 	if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
-		$Logger.AddRecord("Processing Event Log Sizes on $($ReportDefinitions.ReportsAD.Servers.ForwardServer) for warnings")
+		$Logger.AddInfoRecord("Processing Event Log Sizes on $($ReportDefinitions.ReportsAD.Servers.ForwardServer) for warnings")
 		$EventLogDatesSummary += Get-EventLogSize -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
 	}
 	if ($ReportDefinitions.ReportsAD.Servers.UseDirectScan) {
-		$Logger.AddRecord("Processing Event Log Sizes on $($Servers -Join ', ') for warnings")
+		$Logger.AddInfoRecord("Processing Event Log Sizes on $($Servers -Join ', ') for warnings")
 		$EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'Security'
 		$EventLogDatesSummary += Get-EventLogSize -Servers $Servers -LogName 'System'
 	}
-	$Logger.AddRecord('Verifying Warnings reported earlier')
+	$Logger.AddInfoRecord('Verifying Warnings reported earlier')
 	$Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
 
 	if ($ReportOptions.RemoveDuplicates) {
-		$Logger.AddRecord("Removing Duplicates from all events. Current list contains  $($Events.Count) events")
+		$Logger.AddInfoRecord("Removing Duplicates from all events. Current list contains  $($Events.Count) events")
 		$Events = Remove-DuplicateObjects -Object $Events -Property 'RecordID'
-		$Logger.AddRecord("Removed Duplicates Following $($Events.Count) events will be analyzed further")
+		$Logger.AddInfoRecord("Removed Duplicates Following $($Events.Count) events will be analyzed further")
 	}
 
 	$Logger.AddInfoRecord('Processing User Events')
 	if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
-		$Logger.AddRecord('Running User Changes Report')
+		$Logger.AddInfoRecord('Running User Changes Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$UsersEventsTable = Get-UserChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserChanges.IgnoreWords
 		$script:TimeToGenerateReports.Reports.UserChanges.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending User Changes Report')
+		$Logger.AddInfoRecord('Ending User Changes Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -eq $true) {
-		$Logger.AddRecord('Running User Statuses Report')
+		$Logger.AddInfoRecord('Running User Statuses Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$UsersEventsStatusesTable = Get-UserStatuses -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserStatus.IgnoreWords
 		$script:TimeToGenerateReports.Reports.UserStatus.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending User Statuses Report')
+		$Logger.AddInfoRecord('Ending User Statuses Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.Enabled -eq $true) {
-		$Logger.AddRecord('Running Computer Created / Changed Report')
+		$Logger.AddInfoRecord('Running Computer Created / Changed Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$ComputerChanges = Get-ComputerChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.IgnoreWords
 		$script:TimeToGenerateReports.Reports.ComputerCreatedChanged.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Computer Created / Changed Report')
+		$Logger.AddInfoRecord('Ending Computer Created / Changed Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.Enabled -eq $true) {
-		$Logger.AddRecord('Running Computer Deleted Report')
+		$Logger.AddInfoRecord('Running Computer Deleted Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$ComputerDeleted = Get-ComputerStatus -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.IgnoreWords
 		$script:TimeToGenerateReports.Reports.ComputerDeleted.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Computer Deleted Report')
+		$Logger.AddInfoRecord('Ending Computer Deleted Report')
 	}
 	If ($ReportDefinitions.ReportsAD.EventBased.UserLockouts.Enabled -eq $true) {
-		$Logger.AddRecord('Running User Lockouts Report')
+		$Logger.AddInfoRecord('Running User Lockouts Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$UsersLockoutsTable = Get-UserLockouts -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLockouts.IgnoreWords
 		$script:TimeToGenerateReports.Reports.UserLockouts.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending User Lockouts Report')
+		$Logger.AddInfoRecord('Ending User Lockouts Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.UserLogon.Enabled -eq $true) {
-		$Logger.AddRecord('Running Logon Events Report')
+		$Logger.AddInfoRecord('Running Logon Events Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$LogonEvents = Get-LogonEvents -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLogon.IgnoreWords
 		$script:TimeToGenerateReports.Reports.UserLogon.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Logon Events Report')
+		$Logger.AddInfoRecord('Ending Logon Events Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.Enabled -eq $true) {
-		$Logger.AddRecord('Running Logon Events (Kerberos) Report')
+		$Logger.AddInfoRecord('Running Logon Events (Kerberos) Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$LogonEventsKerberos = Get-LogonEventsKerberos -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.IgnoreWords
 		$script:TimeToGenerateReports.Reports.UserLogonKerberos.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Logon Events (Kerberos) Report')
+		$Logger.AddInfoRecord('Ending Logon Events (Kerberos) Report')
 	}
 
     $Logger.AddInfoRecord('Processing Group Events')
 	if ($ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -eq $true) {
-		$Logger.AddRecord('Running Group Membership Changes Report')
+		$Logger.AddInfoRecord('Running Group Membership Changes Report')
 		$ExecutionTime = Start-TimeLog # Timer St
 		$GroupsEventsTable = Get-GroupMembershipChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.IgnoreWords
 		$script:TimeToGenerateReports.Reports.GroupMembershipChanges.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Group Membership Changes Report')
+		$Logger.AddInfoRecord('Ending Group Membership Changes Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -eq $true) {
-		$Logger.AddRecord('Running Group Create/Delete Report')
+		$Logger.AddInfoRecord('Running Group Create/Delete Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$GroupCreateDeleteTable = Get-GroupCreateDelete -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.IgnoreWords
 		$script:TimeToGenerateReports.Reports.GroupCreateDelete.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Group Create/Delete Report')
+		$Logger.AddInfoRecord('Ending Group Create/Delete Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -eq $true) {
-		$Logger.AddRecord('Running Reboot Events Report (Troubleshooting Only)')
+		$Logger.AddInfoRecord('Running Reboot Events Report (Troubleshooting Only)')
 		$ExecutionTime = Start-TimeLog # Timer
 		$RebootEventsTable = Get-RebootEvents -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.EventsReboots.IgnoreWords
 		$script:TimeToGenerateReports.Reports.EventsReboots.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Reboot Events Report (Troubleshooting Only)')
+		$Logger.AddInfoRecord('Ending Reboot Events Report (Troubleshooting Only)')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -eq $true) {
-		$Logger.AddRecord('Running Group Policy Changes Report')
+		$Logger.AddInfoRecord('Running Group Policy Changes Report')
 		$ExecutionTime = Start-TimeLog # Timer
 		$TableGroupPolicyChanges = Get-GroupPolicyChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.IgnoreWords
 		$script:TimeToGenerateReports.Reports.GroupPolicyChanges.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Group Policy Changes Report')
+		$Logger.AddInfoRecord('Ending Group Policy Changes Report')
     }
 
     $Logger.AddInfoRecord('Processing log clearing events')
 	if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -eq $true) {
-		$Logger.AddRecord('Running Who Cleared Logs Report')
+		$Logger.AddInfoRecord('Running Who Cleared Logs Report')
 		$ExecutionTime = Start-TimeLog # Timer Start
 		$TableEventLogClearedLogs = Get-EventLogClearedLogs -Events $Events -Type 'Security' -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.IgnoreWords
 		$script:TimeToGenerateReports.Reports.LogsClearedSecurity.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Who Cleared Logs Report')
+		$Logger.AddInfoRecord('Ending Who Cleared Logs Report')
 	}
 	if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -eq $true) {
-		$Logger.AddRecord('Running Who Cleared Logs Report')
+		$Logger.AddInfoRecord('Running Who Cleared Logs Report')
 		$ExecutionTime = Start-TimeLog # Timer Start
 		$TableEventLogClearedLogsOther = Get-EventLogClearedLogs -Events $Events -Type 'Other' -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.IgnoreWords
 		$script:TimeToGenerateReports.Reports.LogsClearedOther.Total = Stop-TimeLog -Time $ExecutionTime
-		$Logger.AddRecord('Ending Who Cleared Logs Report')
+		$Logger.AddInfoRecord('Ending Who Cleared Logs Report')
     }
 
 	if ($ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -eq $true) {
 		$ExecutionTime = Start-TimeLog # Timer St
 		if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
 			foreach ($LogName in $ReportDefinitions.ReportsAD.Servers.ForwardEventLog) {
-				$Logger.AddRecord("Running Event Log Size Report for $LogName log")
+				$Logger.AddInfoRecord("Running Event Log Size Report for $LogName log")
 				$EventLogTable += Get-EventLogSize -Servers $ReportDefinitions.ReportsAD.Servers.ForwardServer  -LogName $LogName
-				$Logger.AddRecord("Ending Event Log Size Report for $LogName log")
+				$Logger.AddInfoRecord("Ending Event Log Size Report for $LogName log")
 			}
 		}
 		foreach ($LogName in $ReportDefinitions.ReportsAD.Custom.EventLogSize.Logs) {
-			$Logger.AddRecord("Running Event Log Size Report for $LogName log")
+			$Logger.AddInfoRecord("Running Event Log Size Report for $LogName log")
 			$EventLogTable += Get-EventLogSize -Servers $Servers -LogName $LogName
-			$Logger.AddRecord("Ending Event Log Size Report for $LogName log")
+			$Logger.AddInfoRecord("Ending Event Log Size Report for $LogName log")
 		}
 		if ($ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy -ne "") { $EventLogTable = $EventLogTable | Sort-Object $ReportDefinitions.ReportsAD.Custom.EventLogSize.SortBy }
 		$script:TimeToGenerateReports.Reports.EventLogSize.Total = Stop-TimeLog -Time $ExecutionTime
