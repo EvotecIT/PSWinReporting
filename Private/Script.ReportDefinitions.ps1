@@ -1,5 +1,5 @@
 ## Define reports
-$ReportDefinitions = @{
+$Script:ReportDefinitions = @{
     ReportsAD = @{
         EventBased = @{
             UserChanges            = @{
@@ -7,18 +7,48 @@ $ReportDefinitions = @{
                 Events      = 4720, 4738
                 LogName     = 'Security'
                 IgnoreWords = ''
+                Fields      = ''
             }
             UserStatus             = @{
                 Enabled     = $false
                 Events      = 4722, 4725, 4767, 4723, 4724, 4726
                 LogName     = 'Security'
                 IgnoreWords = ''
+                Fields      = [ordered] @{
+                    'Computer'        = 'Domain Controller'
+                    'Action'          = 'Action'
+                    'Who'             = 'Who'
+                    'Date'            = 'When'
+                    'ObjectAffected'  = 'User Affected'
+
+                    # Common Fields, Usually not important for reporting
+                    'ID'              = 'Event ID'
+                    'RecordID'        = 'Record ID'
+                    'GatheredFrom'    = 'Gathered From'
+                    'GatheredLogName' = 'Gathered LogName'
+                }
+                SortBy      = 'When'
             }
             UserLockouts           = @{
                 Enabled     = $false
                 Events      = 4740
                 LogName     = 'Security'
                 IgnoreWords = ''
+                Fields      = [ordered] @{
+                    'Computer'         = 'Domain Controller'
+                    'Action'           = 'Action'
+                    'TargetDomainName' = 'Computer Lockout On'
+                    'ObjectAffected'   = 'User Affected'
+                    'Who'              = 'Reported By'
+                    'Date'             = 'When'
+
+                    # Common Fields, Usually not important for reporting
+                    'ID'               = 'Event ID'
+                    'RecordID'         = 'Record ID'
+                    'GatheredFrom'     = 'Gathered From'
+                    'GatheredLogName'  = 'Gathered LogName'
+                }
+                SortBy      = 'When'
             }
             UserLogon              = @{
                 Enabled     = $false
