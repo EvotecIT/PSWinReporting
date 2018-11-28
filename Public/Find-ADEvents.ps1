@@ -94,6 +94,7 @@ function Find-ADEvents {
         Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
         $Logger.AddInfoRecord("Events found $(Get-ObjectCount -Object $FoundEvents)")
     }
+
     if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
         $Logger.AddInfoRecord("Running User Changes Report")
         $ExecutionTime = Start-TimeLog # Timer
