@@ -1,10 +1,3 @@
-$Script:ProgramWecutil = "wecutil.exe"
-$Script:ProgramWevtutil = 'wevtutil.exe'
-$script:WriteParameters = @{
-    ShowTime   = $true
-    LogFile    = ""
-    TimeFormat = "yyyy-MM-dd HH:mm:ss"
-}
 $script:TimeToGenerateReports = [ordered]@{
     Reports = [ordered] @{
         UserChanges            = @{

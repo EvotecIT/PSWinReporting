@@ -17,6 +17,8 @@ function Find-ADEvents {
             'EventsReboots'
         )]
         [string] $Report,
+
+        [parameter(ParameterSetName = "DateRange")]
         [ValidateSet(
             'PastHour',
             'CurrentHour',
@@ -32,112 +34,21 @@ function Find-ADEvents {
             'Everything'
         )]
         [string] $DatesRange,
-        [DateTime] $DatesFrom,
-        [DateTime] $DatesTo
+
+        [parameter(ParameterSetName = "DateManual")]
+        [DateTime] $DateFrom,
+
+        [parameter(ParameterSetName = "DateManual")]
+        [DateTime] $DateTo
 
     )
+    # Bring defaults
+    $ReportTimes = $Script:ReportTimes
+    $ReportDefinitions = $Script:ReportDefinitions
+    $DefineReports = $Script:DefineReports
+    $DefineDates = $Script:DefineDates
 
-    $DefineReports = @(
-        'UserChanges',
-        'UserStatus',
-        'UserLockouts',
-        'UserLogon',
-        'UserLogonKerberos',
-        'ComputerCreatedChanged',
-        'ComputerDeleted',
-        'GroupMembershipChanges',
-        'GroupCreateDelete',
-        'GroupPolicyChanges',
-        'LogsClearedSecurity',
-        'LogsClearedOther',
-        'EventsReboots'
-    )
-
-    $DefineDates = (
-        'PastHour',
-        'CurrentHour',
-        'PastDay',
-        'CurrentDay',
-        'PastMonth',
-        'CurrentMonth',
-        'PastQuarter',
-        'CurrentQuarter',
-        'Last3days',
-        'Last7days',
-        'Last14days',
-        'Everything'
-    )
-
-    $ReportTimes = @{
-        # Report Per Hour
-        PastHour             = @{
-            Enabled = $false # if it's 23:22 it will report 22:00 till 23:00
-        }
-        CurrentHour          = @{
-            Enabled = $false # if it's 23:22 it will report 23:00 till 00:00
-        }
-        # Report Per Day
-        PastDay              = @{
-            Enabled = $false # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
-        }
-        CurrentDay           = @{
-            Enabled = $false # if it's 1.04.2018 05:22 it will report 1.04.2018 00:00:00 till 01.04.2018 00:00:00
-        }
-        # Report Per Week
-        OnDay                = @{
-            Enabled = $false
-            Days    = 'Monday'#, 'Tuesday'
-        }
-        # Report Per Month
-        PastMonth            = @{
-            Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
-            Force   = $true  # if true - runs always ...
-        }
-        CurrentMonth         = @{
-            Enabled = $false
-        }
-
-        # Report Per Quarter
-        PastQuarter          = @{
-            Enabled = $false # checks for 1st day fo the quarter - won't run on any other day
-            Force   = $true
-        }
-        CurrentQuarter       = @{
-            Enabled = $false
-        }
-        # Report Custom
-        CurrentDayMinusDayX  = @{
-            Enabled = $false
-            Days    = 7    # goes back X days and shows just 1 day
-        }
-        CurrentDayMinuxDaysX = @{
-            Enabled = $false
-            Days    = 3 # goes back X days and shows X number of days till Today
-        }
-        CustomDate           = @{
-            Enabled  = $false
-            DateFrom = get-date -Year 2018 -Month 03 -Day 19
-            DateTo   = get-date -Year 2018 -Month 03 -Day 23
-        }
-        Last3days            = @{
-            Enabled = $false
-        }
-        Last7days            = @{
-            Enabled = $false
-        }
-        Last14days           = @{
-            Enabled = $false
-
-        }
-        Everything           = @{
-            Enabled = $false
-        }
-    }
-
-    $ReportTimes.$DatesRange.Enabled = $true
-
-
-    ## Logging
+    ## Logging / Display to screen
     $LoggerParameters = @{
         ShowTime   = $false
         LogsDir    = ''
@@ -151,104 +62,25 @@ function Find-ADEvents {
     $Logger = Get-Logger @Params
     ##
 
-
     if (-not $Report) {
         $Logger.AddWarningRecord("You need to choose report type: $($DefineReports -join ', ')")
         return
     }
 
-    ## Define reports
-    $ReportDefinitions = @{
-        ReportsAD = @{
-            EventBased = @{
-                UserChanges            = @{
-                    Enabled     = $false
-                    Events      = 4720, 4738
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                UserStatus             = @{
-                    Enabled     = $false
-                    Events      = 4722, 4725, 4767, 4723, 4724, 4726
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                UserLockouts           = @{
-                    Enabled     = $false
-                    Events      = 4740
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                UserLogon              = @{
-                    Enabled     = $false
-                    Events      = 4624
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                ComputerCreatedChanged = @{
-                    Enabled     = $false
-                    Events      = 4741, 4742 # created, changed
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                ComputerDeleted        = @{
-                    Enabled     = $false
-                    Events      = 4743 # deleted
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                UserLogonKerberos      = @{
-                    Enabled     = $false
-                    Events      = 4768
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                GroupMembershipChanges = @{
-                    Enabled     = $false
-                    Events      = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
-                    LogName     = 'Security'
-                    IgnoreWords = @{
-                        'Who' = '*ANONYMOUS*'
-                    }
-                }
-                GroupCreateDelete      = @{
-                    Enabled     = $false
-                    Events      = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
-                    LogName     = 'Security'
-                    IgnoreWords = @{
-                        'Who' = '*ANONYMOUS*'
-                    }
-                }
-                GroupPolicyChanges     = @{
-                    Enabled     = $false
-                    Events      = 5136, 5137, 5141
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                LogsClearedSecurity    = @{
-                    Enabled     = $false
-                    Events      = 1102, 1105
-                    LogName     = 'Security'
-                    IgnoreWords = ''
-                }
-                LogsClearedOther       = @{
-                    Enabled     = $false
-                    Events      = 104
-                    LogName     = 'System'
-                    IgnoreWords = ''
-                }
-                EventsReboots          = @{
-                    Enabled     = $false
-                    Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
-                    LogName     = 'System'
-                    IgnoreWords = ''
-                }
+    switch ($PSCmdlet.ParameterSetName) {
+        DateRange {
+            $ReportTimes.$DatesRange.Enabled = $true
+        }
+        DateManual {
+            if ($DateFrom -and $DateTo) {
+                $ReportTimes.CustomDate.Enabled = $true
+                $ReportTimes.CustomDate.DateFrom = $DateFrom
+                $ReportTimes.CustomDate.DateTo = $DateTo
+            } else {
+                return
             }
         }
     }
-
-
-
 
     $LogName = $ReportDefinitions.ReportsAD.EventBased.$Report.LogName
     $EventID = $ReportDefinitions.ReportsAD.EventBased.$Report.Events
