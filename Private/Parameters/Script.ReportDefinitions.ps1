@@ -67,6 +67,20 @@ $Script:ReportDefinitions = @{
                 Events      = 4743 # deleted
                 LogName     = 'Security'
                 IgnoreWords = ''
+                Fields      = [ordered] @{
+                    'Computer'        = 'Domain Controller'
+                    'Action'          = 'Action'
+                    'ObjectAffected'  = 'Computer Affected'
+                    'Who'             = 'Who'
+                    'Date'            = 'When'
+
+                    # Common Fields, Usually not important for reporting
+                    'ID'              = 'Event ID'
+                    'RecordID'        = 'Record ID'
+                    'GatheredFrom'    = 'Gathered From'
+                    'GatheredLogName' = 'Gathered LogName'
+                }
+                SortBy      = 'When'
             }
             UserLogonKerberos      = @{
                 Enabled     = $false
