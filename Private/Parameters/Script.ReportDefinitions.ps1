@@ -21,7 +21,7 @@ $Script:ReportDefinitions = @{
                     'Date'            = 'When'
                     'ObjectAffected'  = 'User Affected'
 
-                    # Common Fields, Usually not important for reporting
+                    # Common Fields
                     'ID'              = 'Event ID'
                     'RecordID'        = 'Record ID'
                     'GatheredFrom'    = 'Gathered From'
@@ -42,7 +42,7 @@ $Script:ReportDefinitions = @{
                     'Who'              = 'Reported By'
                     'Date'             = 'When'
 
-                    # Common Fields, Usually not important for reporting
+                    # Common Fields
                     'ID'               = 'Event ID'
                     'RecordID'         = 'Record ID'
                     'GatheredFrom'     = 'Gathered From'
@@ -74,7 +74,7 @@ $Script:ReportDefinitions = @{
                     'Who'             = 'Who'
                     'Date'            = 'When'
 
-                    # Common Fields, Usually not important for reporting
+                    # Common Fields
                     'ID'              = 'Event ID'
                     'RecordID'        = 'Record ID'
                     'GatheredFrom'    = 'Gathered From'
@@ -95,6 +95,21 @@ $Script:ReportDefinitions = @{
                 IgnoreWords = @{
                     'Who' = '*ANONYMOUS*'
                 }
+                Fields      = [ordered] @{
+                    'Computer'            = 'Domain Controller'
+                    'Action'              = 'Action'
+                    'TargetUserName'      = 'Group Name'
+                    'MemberNameWithoutCN' = 'Member Name' # Required work {$_.MemberName -replace '^CN=|,.*$' }}, fixed in PSEventViewer
+                    'Who'                 = 'Who'
+                    'Date'                = 'When'
+
+                    # Common Fields
+                    'ID'                  = 'Event ID'
+                    'RecordID'            = 'Record ID'
+                    'GatheredFrom'        = 'Gathered From'
+                    'GatheredLogName'     = 'Gathered LogName'
+                }
+                SortBy      = 'When'
             }
             GroupCreateDelete      = @{
                 Enabled     = $false
@@ -103,6 +118,20 @@ $Script:ReportDefinitions = @{
                 IgnoreWords = @{
                     'Who' = '*ANONYMOUS*'
                 }
+                Fields      = [ordered] @{
+                    'Computer'        = 'Domain Controller'
+                    'Action'          = 'Action'
+                    'TargetUserName'  = 'Group Name'
+                    'Who'             = 'Who'
+                    'Date'            = 'When'
+
+                    # Common Fields
+                    'ID'              = 'Event ID'
+                    'RecordID'        = 'Record ID'
+                    'GatheredFrom'    = 'Gathered From'
+                    'GatheredLogName' = 'Gathered LogName'
+                }
+                SortBy      = 'When'
             }
             GroupPolicyChanges     = @{
                 Enabled     = $false

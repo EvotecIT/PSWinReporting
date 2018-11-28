@@ -1,17 +1,11 @@
-function Get-GroupCreateDelete($Events, $IgnoreWords = '') {
-    $EventsType = 'Security'
-    $EventsNeeded = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
+function Get-GroupCreateDelete {
+    param(
+        $Events,
+        $IgnoreWords = ''
+    )
+    $EventsType = $Script:ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.LogName
+    $EventsNeeded = $Script:ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Events
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
-    $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
-    @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
-    @{label = 'Group Name'; expression = { $_.TargetUserName }},
-    @{label = 'Who'; expression = { "$($_.SubjectDomainName)\$($_.SubjectUserName)" }},
-    @{label = 'When'; expression = { $_.Date }},
-    @{label = 'Event ID'; expression = { $_.ID }},
-    @{label = 'Record ID'; expression = { $_.RecordId }},
-    @{label = 'Gathered From'; expression = { $_.GatheredFrom }},
-    @{label = 'Gathered LogName'; expression = { $_.GatheredLogName }} | Sort-Object When
-    $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
-    return $EventsFound
-    # 'Domain Controller', 'Action', 'Group Name', Who', 'When', 'Event ID', 'Record ID'
+    $EventsFound = Get-EventsTranslation -Events $EventsFound -Fields $Script:ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Fields
+    return Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords | Sort-Object $Script:ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.SortBy
 }
