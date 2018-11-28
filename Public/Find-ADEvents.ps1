@@ -49,15 +49,10 @@ function Find-ADEvents {
     $DefineDates = $Script:DefineDates
 
     ## Logging / Display to screen
-    $LoggerParameters = @{
-        ShowTime   = $false
-        LogsDir    = ''
-        TimeFormat = 'yyyy-MM-dd HH:mm:ss'
-    }
     $Params = @{
-        LogPath    = if ([string]::IsNullOrWhiteSpace($LoggerParameters.LogsDir)) { '' } else { Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log" }
-        ShowTime   = $LoggerParameters.ShowTime
-        TimeFormat = $LoggerParameters.TimeFormat
+        LogPath    = if ([string]::IsNullOrWhiteSpace($Script:LoggerParameters.LogsDir)) { '' } else { Join-Path $Script:LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log" }
+        ShowTime   = $Script:LoggerParameters.ShowTime
+        TimeFormat = $Script:LoggerParameters.TimeFormat
     }
     $Logger = Get-Logger @Params
     ##
