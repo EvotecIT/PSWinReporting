@@ -11,7 +11,7 @@ function Get-GroupPolicyChanges ($Events, $IgnoreWords = '') {
     @{label = 'When'; expression = { $_.Date }},
     @{label = 'Event ID'; expression = { $_.ID }},
     @{label = 'Record ID'; expression = { $_.RecordId }},
-    @{label = 'OperationType'; expression = { Convert-FromGPO -OperationType $_.OperationType }},
+    @{label = 'OperationType'; expression = { ConvertFrom-OperationType -OperationType $_.OperationType }},
     DSName, DSType, ObjectDN, ObjectGUID, ObjectClass, AttributeLDAPDisplayName, AttributeSyntaxOID,
     AttributeValue, Id, Task,
     @{label = 'Gathered From'; expression = { $_.GatheredFrom }},
