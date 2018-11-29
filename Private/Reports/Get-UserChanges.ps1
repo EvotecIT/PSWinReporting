@@ -20,20 +20,15 @@ function Get-UserChanges($Events, $IgnoreWords = '') {
     @{label = 'Home Directory'; expression = { $_.HomeDirectory }},
     @{label = 'Home Path'; expression = { $_.HomePath }},
     @{label = 'Script Path'; expression = { $_.ScriptPath }},
-    @{label = 'Profile Path'; expression = { $_.ProfilePath }},
+    @{label = 'Profile Path'; expression = {  Convert-UAC -UAC $_.ProfilePath }},
     @{label = 'User Workstations'; expression = { $_.UserWorkstations }},
     @{label = 'Password Last Set'; expression = { $_.PasswordLastSet }},
     @{label = 'Account Expires'; expression = { $_.AccountExpires }},
     @{label = 'Primary Group Id'; expression = { $_.PrimaryGroupId }},
     @{label = 'Allowed To Delegate To'; expression = { $_.AllowedToDelegateTo }},
-    @{label = 'Old Uac Value'; expression = { Convert-UAC $_.OldUacValue }},
-    @{label = 'New Uac Value'; expression = { Convert-UAC $_.NewUacValue }},
-    @{label = 'User Account Control'; expression = {
-            foreach ($u in $_.UserAccountControl) {
-                Convert-UAC ($u -replace "%%", "")
-            }
-        }
-    },
+    @{label = 'Old Uac Value'; expression = { Convert-UAC -UAC $_.OldUacValue -Separator ', ' }},
+    @{label = 'New Uac Value'; expression = { Convert-UAC -UAC $_.NewUacValue -Separator ', ' }},
+    @{label = 'User Account Control'; expression = { Convert-UAC -UAC ((Remove-WhiteSpace -Text $_.UserAccountControl) -split ' ') -Separator ', ' }},
     @{label = 'User Parameters'; expression = { $_.UserParameters }},
     @{label = 'Sid History'; expression = { $_.SidHistory }},
     @{label = 'Logon Hours'; expression = { $_.LogonHours }},
@@ -51,3 +46,10 @@ function Get-UserChanges($Events, $IgnoreWords = '') {
     # 'Primary Group Id','Allowed To Delegate To','Old Uac Value','User Account Control','User Parameters', 'Sid History'
     # 'Logon Hours', 'Who, 'When', 'Event ID', 'Record ID'
 }
+
+  #  @{label = 'User Account Control'; expression = {
+   #         foreach ($U in $_.UserAccountControl) {
+   #             Convert-UAC -UAC $U
+   #         }
+   #     }
+   # },
