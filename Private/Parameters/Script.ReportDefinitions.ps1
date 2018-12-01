@@ -223,12 +223,45 @@ $Script:ReportDefinitions = @{
                 Events      = 1102, 1105
                 LogName     = 'Security'
                 IgnoreWords = ''
+                Fields      = [ordered] @{
+                    'Computer'        = 'Domain Controller'
+                    'Action'          = 'Action'
+                    'BackupPath'      = 'Backup Path'
+                    'Channel'         = 'Log Type'
+
+                    'Who'             = 'Who'
+                    'Date'            = 'When'
+
+                    # Common Fields
+                    'ID'              = 'Event ID'
+                    'RecordID'        = 'Record ID'
+                    'GatheredFrom'    = 'Gathered From'
+                    'GatheredLogName' = 'Gathered LogName'
+                }
+                SortBy      = 'When'
+                Overwrite   = @{
+                    'Who' = 'ID', 1105, 'Automatic Backup'  # if event id 1105 set field to Automatic Backup
+                }
             }
             LogsClearedOther       = @{
                 Enabled     = $false
                 Events      = 104
                 LogName     = 'System'
                 IgnoreWords = ''
+                Fields      = [ordered] @{
+                    'Computer'        = 'Domain Controller'
+                    'Action'          = 'Action'
+                    'TargetUserName'  = 'Group Name'
+                    'Who'             = 'Who'
+                    'Date'            = 'When'
+
+                    # Common Fields
+                    'ID'              = 'Event ID'
+                    'RecordID'        = 'Record ID'
+                    'GatheredFrom'    = 'Gathered From'
+                    'GatheredLogName' = 'Gathered LogName'
+                }
+                SortBy      = 'When'
             }
             EventsReboots          = @{
                 Enabled     = $false

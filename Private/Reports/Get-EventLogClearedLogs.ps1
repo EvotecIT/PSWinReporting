@@ -1,4 +1,15 @@
 function Get-EventLogClearedLogs($Events, $Type, $IgnoreWords = '') {
+
+
+    $EventsType = $Script:ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.LogName
+    $EventsNeeded = $Script:ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Events
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
+    $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $Script:ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity
+    return Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords | Sort-Object $Script:ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.SortBy
+
+
+    return
+
     if ($Type -eq 'Security') {
         $EventsNeeded = 1102, 1105
         $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType 'Security'
@@ -6,7 +17,6 @@ function Get-EventLogClearedLogs($Events, $Type, $IgnoreWords = '') {
         $EventsNeeded = 104
         $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType 'System'
     }
-    #return $EventsFound
     $EventsFound = $EventsFound | Select-Object @{label = 'Domain Controller'; expression = { $_.Computer}} ,
     @{label = 'Action'; expression = { (($_.Message -split '\n')[0]).Trim() }},
     @{label = 'Backup Path'; expression = { if ($_.BackupPath -eq $null) { 'N/A' } else { $_.BackupPath} }},

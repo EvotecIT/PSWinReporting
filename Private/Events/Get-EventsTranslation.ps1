@@ -21,26 +21,23 @@ function Get-EventsTranslation {
                     }
                 }
             }
-            if ($EventsDefinition.Fields.Contains($EventProperty.Name)) {
-                # Replaces Field with new Field according to schema
-                # Check if field requires functions
-                if ($null -ne $EventsDefinition.Functions) {
-                    if ($EventsDefinition.Functions.Contains($EventProperty.Name)) {
-                        if ($EventsDefinition.Functions[$EventProperty.name] -contains 'Remove-WhiteSpace') {
-                            $EventProperty.Value = Remove-WhiteSpace -Text $EventProperty.Value
-                        }
-                        if ($EventsDefinition.Functions[$EventProperty.name] -contains 'SplitOnSpace') {
-                            $EventProperty.Value = $EventProperty.Value -Split ' '
-                        }
-                        if ($EventsDefinition.Functions[$EventProperty.name] -contains 'Convert-UAC') {
-                            $EventProperty.Value = Convert-UAC -UAC $EventProperty.Value -Separator ', '
-                        }
+            # Check if field requires functions
+            if ($null -ne $EventsDefinition.Functions) {
+                if ($EventsDefinition.Functions.Contains($EventProperty.Name)) {
+                    if ($EventsDefinition.Functions[$EventProperty.name] -contains 'Remove-WhiteSpace') {
+                        $EventProperty.Value = Remove-WhiteSpace -Text $EventProperty.Value
+                    }
+                    if ($EventsDefinition.Functions[$EventProperty.name] -contains 'SplitOnSpace') {
+                        $EventProperty.Value = $EventProperty.Value -Split ' '
+                    }
+                    if ($EventsDefinition.Functions[$EventProperty.name] -contains 'Convert-UAC') {
+                        $EventProperty.Value = Convert-UAC -UAC $EventProperty.Value -Separator ', '
                     }
                 }
-
-                # Assign value - Finally
+            }
+            if ($EventsDefinition.Fields.Contains($EventProperty.Name)) {
+                # Replaces Field with new Field according to schema
                 $HashTable[$EventsDefinition.Fields[$EventProperty.Name]] = $EventProperty.Value
-
             } else {
                 # This is your standard event field, we won't be using it for display most of the time
                 # May need to be totally ignored if not needed. To be decided
@@ -48,6 +45,25 @@ function Get-EventsTranslation {
                 $HashTable[$EventProperty.Name] = $EventProperty.Value
             }
         }
+<#
+        if ($null -ne $EventsDefinition.Overwrite) {
+            if ($EventsDefinition.Overwrite.Contains($EventProperty.Name)) {
+                Write-Color 'Test2' -Color Red
+                $TemporaryValue = ($EventsDefinition.Overwrite[$EventProperty.Name])
+                if ($TemporaryValue.Count -eq 3) {
+                    Write-Color 'Test3' -Color Red
+                    if ($TemporaryValue[0] -eq $EventsDefinition.Fields[$EventProperty.Name]) {
+                        if ($TemporaryValue[1] -eq $EventProperty[$TemporaryValue[1]].Value) {
+                            Write-Color $EventProperty[$TemporaryValue[1]].Value -Color Yellow
+                        }
+                    }
+
+                }
+            } else {
+                Write-Color 'Test2 - eh', $EventProperty.Name -Color Green
+            }
+        }
+#>
         [PsCustomObject]$HashTable
 
     }
