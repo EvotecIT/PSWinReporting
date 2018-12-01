@@ -58,7 +58,7 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 4722, 4725, 4767, 4723, 4724, 4726
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
                 Fields      = [ordered] @{
                     'Computer'        = 'Domain Controller'
                     'Action'          = 'Action'
@@ -78,7 +78,7 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 4740
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
                 Fields      = [ordered] @{
                     'Computer'         = 'Domain Controller'
                     'Action'           = 'Action'
@@ -105,7 +105,11 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 4741, 4742 # created, changed
                 LogName     = 'Security'
-                IgnoreWords = ''
+                Ignore      = @{
+                    # Cleanup Anonymous LOGON (usually related to password events)
+                    # https://social.technet.microsoft.com/Forums/en-US/5b2a93f7-7101-43c1-ab53-3a51b2e05693/eventid-4738-user-account-was-changed-by-anonymous?forum=winserverDS
+                    SubjectUserName = "ANONYMOUS LOGON"
+                }
                 Fields      = [ordered] @{
                     'Computer'            = 'Domain Controller'
                     'Action'              = 'Action'
@@ -135,17 +139,13 @@ $Script:ReportDefinitions = @{
                     'GatheredFrom'        = 'Gathered From'
                     'GatheredLogName'     = 'Gathered LogName'
                 }
-                Ignore      = @{
-                    # Cleanup Anonymous LOGON (usually related to password events)
-                    # https://social.technet.microsoft.com/Forums/en-US/5b2a93f7-7101-43c1-ab53-3a51b2e05693/eventid-4738-user-account-was-changed-by-anonymous?forum=winserverDS
-                    SubjectUserName = "ANONYMOUS LOGON"
-                }
+                IgnoreWords = @{}
             }
             ComputerDeleted        = @{
                 Enabled     = $false
                 Events      = 4743 # deleted
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
                 Fields      = [ordered] @{
                     'Computer'        = 'Domain Controller'
                     'Action'          = 'Action'
@@ -165,7 +165,7 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 4768
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             GroupMembershipChanges = @{
                 Enabled     = $false
@@ -222,7 +222,7 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 1102, 1105
                 LogName     = 'Security'
-                IgnoreWords = ''
+
                 Fields      = [ordered] @{
                     'Computer'        = 'Domain Controller'
                     'Action'          = 'Action'
@@ -237,21 +237,33 @@ $Script:ReportDefinitions = @{
                     'RecordID'        = 'Record ID'
                     'GatheredFrom'    = 'Gathered From'
                     'GatheredLogName' = 'Gathered LogName'
+                    #'Test' = 'Test'
                 }
                 SortBy      = 'When'
+                IgnoreWords = @{}
                 Overwrite   = @{
-                    'Who' = 'ID', 1105, 'Automatic Backup'  # if event id 1105 set field to Automatic Backup
+                    # Allows to overwrite field content on the fly, either only on IF or IF ELSE
+                    # IF <VALUE> -eq <VALUE> THEN <VALUE> (3 VALUES)
+                    # IF <VALUE> -eq <VALUE> THEN <VALUE> ELSE <VALUE> (4 VALUES)
+                    # If you need to use IF multiple times for same field use spaces to distinguish HashTable Key.
+
+                    'Backup Path' = 'Backup Path', '', 'N/A'
+                    #'Backup Path ' = 'Backup Path', 'C:\Windows\System32\Winevt\Logs\Archive-Security-2018-11-24-09-25-36-988.evtx', 'MMMM'
+                    'Who'         = 'Event ID', 1105, 'Automatic Backup'  # if event id 1105 set field to Automatic Backup
+                    #'Test' = 'Event ID', 1106, 'Test', 'Mama mia'
                 }
             }
             LogsClearedOther       = @{
                 Enabled     = $false
                 Events      = 104
                 LogName     = 'System'
-                IgnoreWords = ''
+                IgnoreWords = @{}
                 Fields      = [ordered] @{
                     'Computer'        = 'Domain Controller'
                     'Action'          = 'Action'
-                    'TargetUserName'  = 'Group Name'
+                    'BackupPath'      = 'Backup Path'
+                    'Channel'         = 'Log Type'
+
                     'Who'             = 'Who'
                     'Date'            = 'When'
 
@@ -259,9 +271,16 @@ $Script:ReportDefinitions = @{
                     'ID'              = 'Event ID'
                     'RecordID'        = 'Record ID'
                     'GatheredFrom'    = 'Gathered From'
-                    'GatheredLogName' = 'Gathered LogName'
                 }
                 SortBy      = 'When'
+                Overwrite   = @{
+                    # Allows to overwrite field content on the fly, either only on IF or IF ELSE
+                    # IF <VALUE> -eq <VALUE> THEN <VALUE> (3 VALUES)
+                    # IF <VALUE> -eq <VALUE> THEN <VALUE> ELSE <VALUE> (4 VALUES)
+                    # If you need to use IF multiple times for same field use spaces to distinguish HashTable Key.
+
+                    'Backup Path' = 'Backup Path', '', 'N/A'
+                }
             }
             EventsReboots          = @{
                 Enabled     = $false
