@@ -1,7 +1,7 @@
 
 function Export-ReportToXLSX {
     param(
-        [System.Collections.IDictionary] $Report,
+        [bool] $Report,
         [System.Collections.IDictionary] $ReportOptions,
         [string] $ReportFilePath,
         [string] $ReportName,
