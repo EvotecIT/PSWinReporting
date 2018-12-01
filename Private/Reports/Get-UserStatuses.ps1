@@ -1,6 +1,6 @@
 function Get-UserStatuses {
     param (
-        $Events,
+        [Array] $Events,
         $IgnoreWords = ''
     )
 

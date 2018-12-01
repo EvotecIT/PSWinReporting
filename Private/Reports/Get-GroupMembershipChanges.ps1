@@ -1,6 +1,6 @@
 function Get-GroupMembershipChanges {
     param(
-        $Events,
+        [Array] $Events,
         $IgnoreWords = ''
     )
     $EventsType = $Script:ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.LogName

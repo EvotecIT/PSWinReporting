@@ -36,9 +36,13 @@ function Get-EventsTranslation {
                     if ($EventsDefinition.Functions[$EventProperty.Name] -contains 'ConvertFrom-OperationType') {
                         $EventProperty.Value = ConvertFrom-OperationType -OperationType $EventProperty.Value
                     }
+                    if ($EventsDefinition.Functions[$EventProperty.Name] -contains 'Clean-IpAddress') {
+                        $EventProperty.Value = if ($EventProperty.Value -match "::1") { 'localhost' } else { $EventProperty.Value }
+                    }
                 }
             }
-            if ($EventsDefinition.Fields.Contains($EventProperty.Name)) {
+
+            if ($null -ne $EventsDefinition.Fields -and $EventsDefinition.Fields.Contains($EventProperty.Name)) {
                 # Replaces Field with new Field according to schema
                 $HashTable[$EventsDefinition.Fields[$EventProperty.Name]] = $EventProperty.Value
             } else {
@@ -74,5 +78,9 @@ function Get-EventsTranslation {
         [PsCustomObject]$HashTable
 
     }
-    return $MyValue | Select-Object @($EventsDefinition.Fields.Values)
+    if ($null -eq $EventsDefinition.Fields) {
+        return $MyValue #| Select-Object
+    } else {
+        return $MyValue | Select-Object @($EventsDefinition.Fields.Values)
+    }
 }

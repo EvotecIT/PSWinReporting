@@ -1,6 +1,6 @@
 function Get-UserLockouts {
     param(
-        $Events,
+        [Array] $Events,
         $IgnoreWords = ''
     )
     $EventsType = $Script:ReportDefinitions.ReportsAD.EventBased.UserLockouts.LogName

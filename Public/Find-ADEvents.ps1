@@ -39,7 +39,9 @@ function Find-ADEvents {
         [DateTime] $DateFrom,
 
         [parameter(ParameterSetName = "DateManual")]
-        [DateTime] $DateTo
+        [DateTime] $DateTo,
+
+        [alias('Server', 'ComputerName')][string[]] $Servers
 
     )
     # Bring defaults
@@ -82,8 +84,11 @@ function Find-ADEvents {
     $ReportDefinitions.ReportsAD.EventBased.$Report.Enabled = $true
 
     ##
-    $ServersAD = Get-DC
-    $Servers = ($ServersAD | Where-Object { $_.'Host Name' -ne 'N/A' }).'Host Name'
+    if (-not $Servers) {
+        $ServersAD = Get-DC
+        $Servers = ($ServersAD | Where-Object { $_.'Host Name' -ne 'N/A' }).'Host Name'
+    }
+
 
     $Events = New-ArrayList
     $Dates = Get-ChoosenDates -ReportTimes $ReportTimes

@@ -1,4 +1,6 @@
 Import-Module PSWinReporting -Force
 Import-Module PSSharedGoods -Force
 
-Find-ADEvents -Report UserStatus -DatesRange PastDay | Format-Table -AutoSize
+$Events = Find-ADEvents -Report EventsReboots -DatesRange CurrentDay -Server AD1, AD2
+$Events | Format-Table -Property *
+#$Events[0] | Format-List -Property *

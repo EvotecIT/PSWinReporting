@@ -166,6 +166,33 @@ $Script:ReportDefinitions = @{
                 Events      = 4768
                 LogName     = 'Security'
                 IgnoreWords = @{}
+                Functions   = @{
+                    #'ProfilePath'        = 'Convert-UAC'
+                    #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                    #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                    #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
+                    #'DSType'        = 'ConvertFrom-OperationType'
+                    'IpAddress' = 'Clean-IpAddress'
+                }
+                Fields      = [ordered] @{
+                    'Computer'             = 'Domain Controller'
+                    'Action'               = 'Action'
+                    'ObjectAffected'       = 'Computer/User Affected'
+                    'IpAddress'            = 'IpAddress'
+                    'IpPort'               = 'Port'
+                    'TicketOptions'        = 'TicketOptions'
+                    'Status'               = 'Status'
+                    'TicketEncryptionType' = 'TicketEncryptionType'
+                    'PreAuthType'          = 'PreAuthType'
+                    'Date'                 = 'When'
+
+                    # Common Fields
+                    'ID'                   = 'Event ID'
+                    'RecordID'             = 'Record ID'
+                    'GatheredFrom'         = 'Gathered From'
+                    'GatheredLogName'      = 'Gathered LogName'
+                }
+                SortBy      = 'When'
             }
             GroupMembershipChanges = @{
                 Enabled     = $false
@@ -318,7 +345,10 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
                 LogName     = 'System'
-                IgnoreWords = ''
+                IgnoreWords = @{
+
+                }
+                #SortBy      = 'When'
             }
         }
     }

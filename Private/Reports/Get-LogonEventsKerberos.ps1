@@ -1,4 +1,15 @@
-function Get-LogonEventsKerberos($Events, $IgnoreWords = '') {
+function Get-LogonEventsKerberos {
+    param(
+        [Array] $Events,
+        $IgnoreWords = ''
+    )
+    $EventsType = $Script:ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.LogName
+    $EventsNeeded = $Script:ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.Events
+    $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
+    $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $Script:ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos
+    return Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords | Sort-Object $Script:ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.SortBy
+
+    <#
     $EventsType = 'Security'
     $EventsNeeded = 4768
     $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
@@ -21,4 +32,5 @@ function Get-LogonEventsKerberos($Events, $IgnoreWords = '') {
     @{label = 'Gathered LogName'; expression = { $_.GatheredLogName }} | Sort-Object When
     $EventsFound = Find-EventsIgnored -Events $EventsFound -IgnoreWords $IgnoreWords
     return $EventsFound
+    #>
 }
