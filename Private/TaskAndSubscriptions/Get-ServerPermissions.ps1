@@ -1,7 +1,7 @@
 function Get-ServersPermissions {
     param (
-        $ProgramWevtutil,
-        $Servers,
+        [string] $ProgramWevtutil,
+        [string[]] $Servers,
         [string]$LogName = 'security'
     )
 

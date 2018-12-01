@@ -1,11 +1,11 @@
 function Start-Report {
     [CmdletBinding()]
     param (
-        [hashtable] $Dates,
-        [hashtable] $EmailParameters,
-        [hashtable] $FormattingParameters,
-        [hashtable] $ReportOptions,
-        [hashtable] $ReportDefinitions
+        [System.Collections.IDictionary] $Dates,
+        [System.Collections.IDictionary] $EmailParameters,
+        [System.Collections.IDictionary] $FormattingParameters,
+        [System.Collections.IDictionary] $ReportOptions,
+        [System.Collections.IDictionary] $ReportDefinitions
     )
 
 	$time = [System.Diagnostics.Stopwatch]::StartNew() # Timer Start

@@ -1,4 +1,9 @@
-function Find-EventsNeeded ($Events, $EventsNeeded, $EventsType = 'Security') {
+function Find-EventsNeeded {
+    param (
+        [Array] $Events,
+        $EventsNeeded,
+        [string] $EventsType = 'Security'
+    )
     $EventsFound = @()
     foreach ($Event in $Events) {
         if ($Event.LogName -eq $EventsType) {

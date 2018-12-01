@@ -1,4 +1,7 @@
-function Set-TimeReports ($HashTable) {
+function Set-TimeReports {
+    param(
+        [System.Collections.IDictionary] $HashTable
+    )
     # Get all report Names
     $Reports = @()
     foreach ($reportName in $($HashTable.GetEnumerator().Name)) {

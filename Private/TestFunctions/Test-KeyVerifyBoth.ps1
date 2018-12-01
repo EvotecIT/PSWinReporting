@@ -1,6 +1,6 @@
 function Test-KeyVerifyBoth() {
     param(
-        [Object] $Object,
+        [System.Collections.IDictionary] $Object,
         [string] $SubObject,
         [string] $Key
     )

@@ -1,8 +1,8 @@
 function Get-EventLogSize {
 	[CmdletBinding()]
 	param(
-		$Servers,
-		$LogName = "Security"
+		[string[]] $Servers,
+		[string] $LogName = "Security"
 	)
 	# $Verbose = ($PSCmdlet.MyInvocation.BoundParameters['Verbose'] -eq $true)
 	$results = @()

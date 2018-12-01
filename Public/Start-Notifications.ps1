@@ -1,12 +1,12 @@
 function Start-Notifications {
     [CmdletBinding()]
     param(
-        [hashtable] $ReportOptions,
-        [hashtable] $ReportDefinitions,
+        [System.Collections.IDictionary]$ReportOptions,
+        [System.Collections.IDictionary] $ReportDefinitions,
         [int] $EventID,
         [int64] $EventRecordID,
         [string] $EventChannel,
-        [hashtable] $LoggerParameters
+        [System.Collections.IDictionary] $LoggerParameters
     )
     <#
         Set logger

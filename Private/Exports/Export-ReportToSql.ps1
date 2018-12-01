@@ -1,7 +1,7 @@
 function Export-ReportToSQL {
     param (
-        [hashtable] $Report,
-        [hashtable] $ReportOptions,
+        [System.Collections.IDictionary] $Report,
+        [System.Collections.IDictionary] $ReportOptions,
         [string] $ReportName,
         $ReportTable
     )

@@ -1,6 +1,6 @@
 function Test-Modules () {
     param (
-        [hashtable] $ReportOptions
+        [System.Collections.IDictionary] $ReportOptions
     )
     $Logger.AddInfoRecord('Testing for prerequisite availability')
     $ImportPSEventViewer = Get-ModulesAvailability -Name "PSEventViewer"

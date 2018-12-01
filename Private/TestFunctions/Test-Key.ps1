@@ -1,7 +1,7 @@
 function Test-Key () {
     param (
         [Parameter(Mandatory = $true)]
-        [hashtable] $ConfigurationTable,
+        [System.Collections.IDictionary] $ConfigurationTable,
         [Parameter(Mandatory = $true)]
         [string] $ConfigurationSection,
         [Parameter(Mandatory = $true)]

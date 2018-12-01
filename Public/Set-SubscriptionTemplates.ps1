@@ -4,7 +4,7 @@ function Set-SubscriptionTemplates {
         [System.Array] $ListTemplates,
         [switch] $DeleteOwn,
         [switch] $DeleteAllOther,
-        $LoggerParameters
+        [System.Collections.IDictionary] $LoggerParameters
     )
 
     $Params = @{

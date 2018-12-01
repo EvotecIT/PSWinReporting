@@ -1,4 +1,10 @@
-function Export-ReportToHTML($Report, $ReportTable, $ReportTableText, [switch] $Special) {
+function Export-ReportToHTML {
+    param (
+        $Report,
+        $ReportTable,
+        $ReportTableText,
+        [switch] $Special
+    )
     if ($Report -eq $true) {
         if ($special) {
             return Set-EmailBodyPreparedTable -TableData $ReportTable -TableWelcomeMessage $ReportTableText

@@ -1,7 +1,7 @@
 function Test-KeyVerify() {
     param(
-        $Object,
-        $Key
+        [System.Collections.IDictionary] $Object,
+        [string] $Key
     )
     if ($Object.Contains($Key)) {
         if ($Object.$Key -eq $true) {

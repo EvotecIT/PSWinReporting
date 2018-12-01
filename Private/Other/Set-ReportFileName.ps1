@@ -1,4 +1,9 @@
-function Set-ReportFileName($ReportOptions, $ReportExtension, $ReportName = "") {
+function Set-ReportFileName {
+    param(
+        [System.Collections.IDictionary] $ReportOptions,
+        [string] $ReportExtension,
+        [string] $ReportName = ""
+    )
     $ReportTime = $(get-date -f $ReportOptions.FilePatternDateFormat)
     if ($ReportOptions.KeepReportsPath -ne "") { $Path = $ReportOptions.KeepReportsPath} else { $Path = $env:TEMP }
     $ReportPath = $Path + "\" + $ReportOptions.FilePattern

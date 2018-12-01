@@ -1,6 +1,6 @@
 function Get-ChoosenDates {
     param(
-        $ReportTimes
+        [System.Collections.IDictionary] $ReportTimes
     )
     $Dates = @()
 

@@ -1,17 +1,17 @@
 function Test-Configuration () {
     param (
         [Parameter(Mandatory = $true)]
-        [hashtable]$LoggerParameters,
+        [System.Collections.IDictionary]$LoggerParameters,
         [Parameter(Mandatory = $true)]
-        [hashtable]$EmailParameters,
+        [System.Collections.IDictionary]$EmailParameters,
         [Parameter(Mandatory = $true)]
-        [hashtable]$FormattingParameters,
+        [System.Collections.IDictionary]$FormattingParameters,
         [Parameter(Mandatory = $true)]
-        [hashtable]$ReportOptions,
+        [System.Collections.IDictionary]$ReportOptions,
         [Parameter(Mandatory = $true)]
-        [hashtable]$ReportTimes,
+        [System.Collections.IDictionary]$ReportTimes,
         [Parameter(Mandatory = $true)]
-        [hashtable]$ReportDefinitions
+        [System.Collections.IDictionary]$ReportDefinitions
     )
     $Logger.AddInfoRecord('Testing for configuration consistency. This is to make sure the script can be safely executed.')
     # Configuration successful check flag

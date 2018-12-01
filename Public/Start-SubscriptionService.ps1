@@ -1,7 +1,7 @@
 function Start-SubscriptionService {
     [CmdletBinding()]
     param(
-        $LoggerParameters
+        [System.Collections.IDictionary] $LoggerParameters
     )
 
     $Params = @{
