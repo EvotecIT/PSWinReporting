@@ -10,7 +10,6 @@ function Add-TaskScheduledForwarder {
 
     )
     $XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-ScheduledTask.xml"
-    #$xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-ScheduledTask.xml"
     if (Test-Path $xmlTemplate) {
         Write-Color 'Found Template ', $xmlTemplate -Color White, Yellow
         $ListTemplates = New-ArrayList
@@ -21,15 +20,22 @@ function Add-TaskScheduledForwarder {
             Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'RegistrationInfo' -Node 'Author' -Value $Author
             Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'Actions', 'Exec' -Node 'Command' -Value $Command
             Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'Actions', 'Exec' -Node 'Arguments' -Value ([string] $Argument)
-            #  Invoke-Item $ScheduledTaskXML
 
             $xml = (get-content $ScheduledTaskXML | out-string)
-            #  $xml
-
-            Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -xml $xml
-            Write-Color 'Loaded template ', $ScheduledTaskXML -Color White, Yellow
+            try {
+                $Output = Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -xml $xml
+            } catch {
+                $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+                switch ($ErrorMessage) {
+                    default {
+                        Write-Color -Text "Tasks adding error occured:" , $ErrorMessage -Color White, Red
+                    }
+                }
+                Exit
+            }
+            Write-Color -Text 'Loaded template ', $ScheduledTaskXML -Color White, Yellow
         }
     } else {
-        Write-Color 'Template not found ', $xmlTemplate -Color White, Yellow
+        Write-Color -Text 'Template not found ', $xmlTemplate -Color White, Yellow
     }
 }

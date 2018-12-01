@@ -1,5 +1,5 @@
-Import-Module PSWinReporting #-Force
-Import-Module PSSharedGoods #-Force
+Import-Module PSWinReporting
+Import-Module PSSharedGoods
 
 $TaskName = 'ForwardedEvents'
 $TaskPath = '\Event Viewer Tasks\'

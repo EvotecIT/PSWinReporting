@@ -46,7 +46,7 @@ function Get-ChoosenDates {
             $Dates += $DatesMonthPrevious
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes.CurrentMonth -Key 'Enabled') {
+    if (Test-KeyVerifyBoth -Object $ReportTimes.CurrentMonth -SubObject 'CurrentMonth' -Key 'Enabled') {
         $DatesMonthCurrent = Find-DatesMonthCurrent
         if ($DatesMonthCurrent -ne $null) {
             $Dates += $DatesMonthCurrent
