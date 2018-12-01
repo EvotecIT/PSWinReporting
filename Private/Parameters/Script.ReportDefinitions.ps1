@@ -6,8 +6,53 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 4720, 4738
                 LogName     = 'Security'
-                IgnoreWords = ''
-                Fields      = ''
+                Fields      = [ordered] @{
+                    'Computer'            = 'Domain Controller'
+                    'Action'              = 'Action'
+                    'ObjectAffected'      = 'User Affected'
+                    'SamAccountName'      = 'SamAccountName'
+                    'DisplayName'         = 'DisplayName'
+                    'UserPrincipalName'   = 'UserPrincipalName'
+                    'HomeDirectory'       = 'Home Directory'
+                    'HomePath'            = 'Home Path'
+                    'ScriptPath'          = 'Script Path'
+                    'ProfilePath'         = 'Profile Path'
+                    'UserWorkstations'    = 'User Workstations'
+                    'PasswordLastSet'     = 'Password Last Set'
+                    'AccountExpires'      = 'Account Expires'
+                    'PrimaryGroupId'      = 'Primary Group Id'
+                    'AllowedToDelegateTo' = 'Allowed To Delegate To'
+                    'OldUacValue'         = 'Old Uac Value'
+                    'NewUacValue'         = 'New Uac Value'
+                    'UserAccountControl'  = 'User Account Control'
+                    'UserParameters'      = 'User Parameters'
+                    'SidHistory'          = 'Sid History'
+                    'Who'                 = 'Who'
+                    'Date'                = 'When'
+                    # Common Fields
+                    'ID'                  = 'Event ID'
+                    'RecordID'            = 'Record ID'
+                    'GatheredFrom'        = 'Gathered From'
+                    'GatheredLogName'     = 'Gathered LogName'
+                }
+                Ignore      = @{
+                    # Cleanup Anonymous LOGON (usually related to password events)
+                    # https://social.technet.microsoft.com/Forums/en-US/5b2a93f7-7101-43c1-ab53-3a51b2e05693/eventid-4738-user-account-was-changed-by-anonymous?forum=winserverDS
+                    SubjectUserName = "ANONYMOUS LOGON"
+
+                    # Test value
+                    ProfilePath     = 'C*'
+                }
+                Functions   = @{
+                    'ProfilePath'        = 'Convert-UAC'
+                    'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                    'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                    'UserAccountControl' = 'Remove-WhiteSpace', 'SplitOnSpace', 'Convert-UAC'
+                }
+                IgnoreWords = @{
+                    'Profile Path' = 'TEMP*'
+                }
+                SortBy      = 'When'
             }
             UserStatus             = @{
                 Enabled     = $false
@@ -61,6 +106,40 @@ $Script:ReportDefinitions = @{
                 Events      = 4741, 4742 # created, changed
                 LogName     = 'Security'
                 IgnoreWords = ''
+                Fields      = [ordered] @{
+                    'Computer'            = 'Domain Controller'
+                    'Action'              = 'Action'
+                    'ObjectAffected'      = 'Computer Affected'
+                    'SamAccountName'      = 'SamAccountName'
+                    'DisplayName'         = 'DisplayName'
+                    'UserPrincipalName'   = 'UserPrincipalName'
+                    'HomeDirectory'       = 'Home Directory'
+                    'HomePath'            = 'Home Path'
+                    'ScriptPath'          = 'Script Path'
+                    'ProfilePath'         = 'Profile Path'
+                    'UserWorkstations'    = 'User Workstations'
+                    'PasswordLastSet'     = 'Password Last Set'
+                    'AccountExpires'      = 'Account Expires'
+                    'PrimaryGroupId'      = 'Primary Group Id'
+                    'AllowedToDelegateTo' = 'Allowed To Delegate To'
+                    'OldUacValue'         = 'Old Uac Value'
+                    'NewUacValue'         = 'New Uac Value'
+                    'UserAccountControl'  = 'User Account Control'
+                    'UserParameters'      = 'User Parameters'
+                    'SidHistory'          = 'Sid History'
+                    'Who'                 = 'Who'
+                    'Date'                = 'When'
+                    # Common Fields
+                    'ID'                  = 'Event ID'
+                    'RecordID'            = 'Record ID'
+                    'GatheredFrom'        = 'Gathered From'
+                    'GatheredLogName'     = 'Gathered LogName'
+                }
+                Ignore      = @{
+                    # Cleanup Anonymous LOGON (usually related to password events)
+                    # https://social.technet.microsoft.com/Forums/en-US/5b2a93f7-7101-43c1-ab53-3a51b2e05693/eventid-4738-user-account-was-changed-by-anonymous?forum=winserverDS
+                    SubjectUserName = "ANONYMOUS LOGON"
+                }
             }
             ComputerDeleted        = @{
                 Enabled     = $false

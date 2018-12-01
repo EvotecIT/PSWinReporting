@@ -1,7 +1,12 @@
-function Find-EventsIgnored($Events, $IgnoreWords = '') {
-    if ($IgnoreWords -eq $null) { return $Events }
-    $EventsToReturn = @()
-    foreach ($Event in $Events) {
+function Find-EventsIgnored {
+    [CmdletBinding()]
+    param (
+        [Array] $Events,
+        $IgnoreWords
+    )
+    if ((Get-ObjectCount -Object $IgnoreWords) -eq 0) { return $Events }
+
+    $EventsToReturn = foreach ($Event in $Events) {
         $Found = $false
         foreach ($Ignore in $IgnoreWords.GetEnumerator()) {
             if ($Ignore.Value -ne '') {
@@ -14,7 +19,7 @@ function Find-EventsIgnored($Events, $IgnoreWords = '') {
             }
         }
         if ($Found -eq $false) {
-            $EventsToReturn += $Event
+            $Event
         }
     }
     return $EventsToReturn
