@@ -24,14 +24,17 @@ function Get-EventsTranslation {
             # Check if field requires functions
             if ($null -ne $EventsDefinition.Functions) {
                 if ($EventsDefinition.Functions.Contains($EventProperty.Name)) {
-                    if ($EventsDefinition.Functions[$EventProperty.name] -contains 'Remove-WhiteSpace') {
+                    if ($EventsDefinition.Functions[$EventProperty.Name] -contains 'Remove-WhiteSpace') {
                         $EventProperty.Value = Remove-WhiteSpace -Text $EventProperty.Value
                     }
-                    if ($EventsDefinition.Functions[$EventProperty.name] -contains 'SplitOnSpace') {
+                    if ($EventsDefinition.Functions[$EventProperty.Name] -contains 'Split-OnSpace') {
                         $EventProperty.Value = $EventProperty.Value -Split ' '
                     }
-                    if ($EventsDefinition.Functions[$EventProperty.name] -contains 'Convert-UAC') {
+                    if ($EventsDefinition.Functions[$EventProperty.Name] -contains 'Convert-UAC') {
                         $EventProperty.Value = Convert-UAC -UAC $EventProperty.Value -Separator ', '
+                    }
+                    if ($EventsDefinition.Functions[$EventProperty.Name] -contains 'ConvertFrom-OperationType') {
+                        $EventProperty.Value = ConvertFrom-OperationType -OperationType $EventProperty.Value
                     }
                 }
             }

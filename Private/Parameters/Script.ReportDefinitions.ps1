@@ -47,7 +47,7 @@ $Script:ReportDefinitions = @{
                     'ProfilePath'        = 'Convert-UAC'
                     'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
                     'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                    'UserAccountControl' = 'Remove-WhiteSpace', 'SplitOnSpace', 'Convert-UAC'
+                    'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
                 }
                 IgnoreWords = @{
                     'Profile Path' = 'TEMP*'
@@ -216,7 +216,39 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
-                IgnoreWords = ''
+                Functions   = @{
+                    #'ProfilePath'        = 'Convert-UAC'
+                    #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                    #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                    #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
+                    #'DSType'        = 'ConvertFrom-OperationType'
+                    'OperationType' = 'ConvertFrom-OperationType'
+                }
+                Fields      = [ordered] @{
+                    'Computer'                 = 'Domain Controller'
+                    'Action'                   = 'Action'
+                    'Who'                      = 'Who'
+                    'Date'                     = 'When'
+
+                    # Common Fields
+                    'ID'                       = 'Event ID'
+                    'RecordID'                 = 'Record ID'
+                    'OperationType'            = 'OperationType'
+                    'DSName'                   = 'DSName'
+                    'DSType'                   = 'DSType'
+                    'ObjectDN'                 = 'OBjectDN'
+                    'ObjectGUID'               = 'ObjectGUID'
+                    'ObjectClass'              = 'ObjectClass'
+                    'AttributeLDAPDisplayName' = 'AttributeLDAPDisplayName'
+                    'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
+                    'AttributeValue'           = 'AttributeValue'
+                    'Task'                     = 'Task'
+                    'GatheredFrom'             = 'Gathered From'
+                    'GatheredLogName'          = 'Gathered LogName'
+                }
+                SortBy      = 'When'
+                IgnoreWords = @{}
+
             }
             LogsClearedSecurity    = @{
                 Enabled     = $false
@@ -259,18 +291,18 @@ $Script:ReportDefinitions = @{
                 LogName     = 'System'
                 IgnoreWords = @{}
                 Fields      = [ordered] @{
-                    'Computer'        = 'Domain Controller'
-                    'Action'          = 'Action'
-                    'BackupPath'      = 'Backup Path'
-                    'Channel'         = 'Log Type'
+                    'Computer'     = 'Domain Controller'
+                    'Action'       = 'Action'
+                    'BackupPath'   = 'Backup Path'
+                    'Channel'      = 'Log Type'
 
-                    'Who'             = 'Who'
-                    'Date'            = 'When'
+                    'Who'          = 'Who'
+                    'Date'         = 'When'
 
                     # Common Fields
-                    'ID'              = 'Event ID'
-                    'RecordID'        = 'Record ID'
-                    'GatheredFrom'    = 'Gathered From'
+                    'ID'           = 'Event ID'
+                    'RecordID'     = 'Record ID'
+                    'GatheredFrom' = 'Gathered From'
                 }
                 SortBy      = 'When'
                 Overwrite   = @{
