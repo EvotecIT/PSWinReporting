@@ -5,33 +5,33 @@ function Get-ChoosenDates {
     $Dates = @()
 
     # Report Per Hour
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'PastHour' -Key 'Enabled') {
+    if ($ReportTimes.PastHour) {
         $DatesPastHour = Find-DatesPastHour
         if ($DatesPastHour -ne $null) {
             $Dates += $DatesPastHour
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'CurrentHour' -Key 'Enabled') {
+    if ($ReportTimes.CurrentHour) {
         $DatesCurrentHour = Find-DatesCurrentHour
         if ($DatesCurrentHour -ne $null) {
             $Dates += $DatesCurrentHour
         }
     }
     # Report Per Day
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'PastDay' -Key 'Enabled') {
+    if ($ReportTimes.PastDay) {
         $DatesDayPrevious = Find-DatesDayPrevious
         if ($DatesDayPrevious -ne $null) {
             $Dates += $DatesDayPrevious
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'CurrentDay' -Key 'Enabled') {
+    if ($ReportTimes.CurrentDay) {
         $DatesDayToday = Find-DatesDayToday
         if ($DatesDayToday -ne $null) {
             $Dates += $DatesDayToday
         }
     }
     # Report Per Week
-    if ($ReportTimes.OnDay.Enabled -eq $true) {
+    if ($ReportTimes.OnDay.Enabled) {
         foreach ($Day in $ReportTimes.OnDay.Days) {
             $DatesReportOnDay = Find-DatesPastWeek $Day
             if ($DatesReportOnDay -ne $null) {
@@ -40,45 +40,47 @@ function Get-ChoosenDates {
         }
     }
     # Report Per Month
-    if ($ReportTimes.PastMonth.Enabled -eq $true) {
-        $DatesMonthPrevious = Find-DatesMonthPast -Force $ReportTimes.PastMonth.Force     # Find-DatesMonthPast runs only on 1st of the month unless -Force is used
+    if ($ReportTimes.PastMonth.Enabled) {
+        # Find-DatesMonthPast runs only on 1st of the month unless -Force is used
+        $DatesMonthPrevious = Find-DatesMonthPast -Force $ReportTimes.PastMonth.Force
         if ($DatesMonthPrevious -ne $null) {
             $Dates += $DatesMonthPrevious
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes.CurrentMonth -Key 'Enabled') {
+    if ($ReportTimes.CurrentMonth) {
         $DatesMonthCurrent = Find-DatesMonthCurrent
         if ($DatesMonthCurrent -ne $null) {
             $Dates += $DatesMonthCurrent
         }
     }
     # Report Per Quarter
-    if ($ReportTimes.PastQuarter.Enabled -eq $true) {
-        $DatesQuarterLast = Find-DatesQuarterLast -Force $ReportTimes.PastQuarter.Force  # Find-DatesMonthPast runs only on 1st of the quarter unless -Force is used
+    if ($ReportTimes.PastQuarter.Enabled) {
+        # Find-DatesMonthPast runs only on 1st of the quarter unless -Force is used
+        $DatesQuarterLast = Find-DatesQuarterLast -Force $ReportTimes.PastQuarter.Force
         if ($DatesQuarterLast -ne $null) {
             $Dates += $DatesQuarterLast
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'CurrentQuarter' -Key 'Enabled') {
+    if ($ReportTimes.CurrentQuarter) {
         $DatesQuarterCurrent = Find-DatesQuarterCurrent
         if ($DatesQuarterCurrent -ne $null) {
             $Dates += $DatesQuarterCurrent
         }
     }
     # Report Custom
-    if ($ReportTimes.CurrentDayMinusDayX.Enabled -eq $true) {
+    if ($ReportTimes.CurrentDayMinusDayX.Enabled) {
         $DatesCurrentDayMinusDayX = Find-DatesCurrentDayMinusDayX $ReportTimes.CurrentDayMinusDayX.Days
         if ($DatesCurrentDayMinusDayX -ne $null) {
             $Dates += $DatesCurrentDayMinusDayX
         }
     }
-    if ($ReportTimes.CurrentDayMinuxDaysX.Enabled -eq $true) {
+    if ($ReportTimes.CurrentDayMinuxDaysX.Enabled) {
         $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX $ReportTimes.CurrentDayMinuxDaysX.Days
         if ($DatesCurrentDayMinusDaysX -ne $null) {
             $Dates += $DatesCurrentDayMinusDaysX
         }
     }
-    if ($ReportTimes.CustomDate.Enabled -eq $true) {
+    if ($ReportTimes.CustomDate.Enabled) {
         $DatesCustom = @{
             DateFrom = $ReportTimes.CustomDate.DateFrom
             DateTo   = $ReportTimes.CustomDate.DateTo
@@ -87,26 +89,26 @@ function Get-ChoosenDates {
             $Dates += $DatesCustom
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Everything' -Key 'Enabled') {
+    if ($ReportTimes.Everything) {
         $DatesEverything = @{
             DateFrom = Get-Date -Year 1600 -Month 1 -Day 1
             DateTo   = Get-Date -Year 2300 -Month 1 -Day 1
         }
         $Dates += $DatesEverything
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Last3days' -Key 'Enabled') {
+    if ($ReportTimes.Contains('Last3days') -and $ReportTimes.Last3days.Enabled) {
         $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 3
         if ($DatesCurrentDayMinusDaysX -ne $null) {
             $Dates += $DatesCurrentDayMinusDaysX
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Last7days' -Key 'Enabled') {
+    if ($ReportTimes.Contains('Last7days') -and $ReportTimes.Last7days.Enabled) {
         $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 7
         if ($DatesCurrentDayMinusDaysX -ne $null) {
             $Dates += $DatesCurrentDayMinusDaysX
         }
     }
-    if (Test-KeyVerifyBoth -Object $ReportTimes -SubObject 'Last14days' -Key 'Enabled') {
+    if ($ReportTimes.Contains('Last14days') -and $ReportTimes.Last14days.Enabled) {
         $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 14
         if ($DatesCurrentDayMinusDaysX -ne $null) {
             $Dates += $DatesCurrentDayMinusDaysX
