@@ -1,6 +1,6 @@
 #Get public and private function definition files.
-$Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
-$Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
+$Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue -Recurse )
+$Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue -Recurse )
 
 #Dot source the files
 Foreach ($import in @($Public + $Private)) {
@@ -12,8 +12,8 @@ Foreach ($import in @($Public + $Private)) {
 }
 
 #Export-ModuleMember -Function $Public.Basename -Verbose
-#Export-ModuleMember -Function * #-Verbose # 'Start-ADReporting', 'Get-KerberosLogonEvents', 'Get-GroupPolicyChanges', 'Get-EventLogClearedLogs'
-Export-ModuleMember -Function 'Start-ADReporting', 'Start-Notifications', 'New-SubscriptionTemplates', 'Set-SubscriptionTemplates', 'Remove-TaskScheduledForwarder', 'Add-TaskScheduledForwarder', 'Start-SubscriptionService', 'Find-ADEvents'
+Export-ModuleMember -Function * #-Verbose # 'Start-ADReporting', 'Get-KerberosLogonEvents', 'Get-GroupPolicyChanges', 'Get-EventLogClearedLogs'
+#Export-ModuleMember -Function 'Start-ADReporting', 'Start-Notifications', 'New-SubscriptionTemplates', 'Set-SubscriptionTemplates', 'Remove-TaskScheduledForwarder', 'Add-TaskScheduledForwarder', 'Start-SubscriptionService', 'Find-ADEvents'
 
 [string] $ManifestFile = '{0}.psd1' -f (Get-Item $PSCommandPath).BaseName;
 $ManifestPathAndFile = Join-Path -Path $PSScriptRoot -ChildPath $ManifestFile;

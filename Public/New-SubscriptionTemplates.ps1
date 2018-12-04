@@ -1,8 +1,8 @@
 function New-SubscriptionTemplates {
 	[CmdletBinding()]
 	param (
-		$ReportDefinitions,
-        $LoggerParameters
+		[System.Collections.IDictionary] $ReportDefinitions,
+        [System.Collections.IDictionary] $LoggerParameters
     )
 
     $Params = @{

@@ -1,42 +1,51 @@
 function Start-ADReporting () {
     param (
+        [Parameter(Mandatory = $false)]
+        [System.Collections.IDictionary]$LoggerParameters,
         [Parameter(Mandatory = $true)]
-        [hashtable]$LoggerParameters,
+        [System.Collections.IDictionary]$EmailParameters,
         [Parameter(Mandatory = $true)]
-        [hashtable]$EmailParameters,
+        [System.Collections.IDictionary]$FormattingParameters,
         [Parameter(Mandatory = $true)]
-        [hashtable]$FormattingParameters,
+        [System.Collections.IDictionary]$ReportOptions,
         [Parameter(Mandatory = $true)]
-        [hashtable]$ReportOptions,
+        [System.Collections.IDictionary]$ReportTimes,
         [Parameter(Mandatory = $true)]
-        [hashtable]$ReportTimes,
-        [Parameter(Mandatory = $true)]
-        [hashtable]$ReportDefinitions
+        [System.Collections.IDictionary]$ReportDefinitions
     )
-
-    $ErrorActionPreference = 'Stop'
-    Set-StrictMode -Version Latest
+    [bool] $WarningNoLogger = $false
+    #$ErrorActionPreference = 'Stop'
+    #Set-StrictMode -Version Latest
 
     <#
         Set logger
     #>
+    if (-not $LoggerParameters) {
+        $LoggerParameters = $Script:LoggerParameters
+        $WarningNoLogger = $true
+    }
+
     $Params = @{
-        LogPath = Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log"
-        ShowTime = $LoggerParameters.ShowTime
+        LogPath    = if ([string]::IsNullOrWhiteSpace($LoggerParameters.LogsDir)) { '' } else { Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log" }
+        ShowTime   = $LoggerParameters.ShowTime
         TimeFormat = $LoggerParameters.TimeFormat
     }
     $Logger = Get-Logger @Params
+
+    if ($WarningNoLogger) {
+        $Logger.AddWarningRecord("New version of PSWinReporting requires Logger Parameter. Please read documentation. No logs will be written to disk.")
+    }
 
     <#
         Test Configuration
     #>
     $Params = @{
-        LoggerParameters    =$LoggerParameters
-        EmailParameters     =$EmailParameters
-        FormattingParameters =$FormattingParameters
-        ReportOptions       =$ReportOptions
-        ReportTimes         =$ReportTimes
-        ReportDefinitions   =$ReportDefinitions
+        LoggerParameters     = $LoggerParameters
+        EmailParameters      = $EmailParameters
+        FormattingParameters = $FormattingParameters
+        ReportOptions        = $ReportOptions
+        ReportTimes          = $ReportTimes
+        ReportDefinitions    = $ReportDefinitions
     }
     if (-not (Test-Configuration @Params)) {
         $Logger.AddErrorRecord("There are parameters missing in configuration file. Can't continue running.")
@@ -46,11 +55,11 @@ function Start-ADReporting () {
     <#
         Test Modules
     #>
-    if (-not (Test-Modules $ReportOptions)) {
+    if (-not (Test-Modules -ReportOptions $ReportOptions)) {
         $Logger.AddErrorRecord("Install the necessary modules. Can't continue running.")
     }
 
-    if ($ReportOptions.JustTestPrerequisite -and $ReportOptions.JustTestPrerequisite) {
+    if ($ReportOptions.JustTestPrerequisite) {
         exit
     }
 

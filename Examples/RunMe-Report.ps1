@@ -144,10 +144,10 @@ $ReportTimes = @{
     }
     # Report Per Month
     PastMonth            = @{
-        Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
-        Force   = $false  # if true - runs always ...
+        Enabled = $true # checks for 1st day of the month - won't run on any other day unless used force
+        Force   = $true  # if true - runs always ...
     }
-    CurrentMonth         = $true
+    CurrentMonth         = $false
 
     # Report Per Quarter
     PastQuarter          = @{
