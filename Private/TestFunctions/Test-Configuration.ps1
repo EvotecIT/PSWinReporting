@@ -180,8 +180,8 @@ function Test-Configuration () {
     #endregion Report Definions
 
     #region ReportOptions Per Hour
-    $Success = (Test-Key $ReportTimes "ReportTimes" "PastHour" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportTimes "ReportTimes" "CurrentHour" -DisplayProgress) -and $Success
+    $Success = (Test-Key $ReportTimes "ReportTimes" "PastHour" -DisplayProgress -ValueType 'Boolean') -and $Success
+    $Success = (Test-Key $ReportTimes "ReportTimes" "CurrentHour" -DisplayProgress -ValueType 'Boolean') -and $Success
     #endregion ReportTimes Per Hour
 
     #region ReportTimes Per Day
