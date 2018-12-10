@@ -83,7 +83,7 @@ function Test-Configuration () {
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableCreate" -DisplayProgress) -and $Success
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableAlterIfNeeded" -DisplayProgress) -and $Success
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlCheckBeforeInsert" -DisplayProgress) -and $Success
-            <# This is not required to exists. Only if SQL is needed, used. 
+            <# This is not required to exists. Only if SQL is needed, used.
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableMapping" -DisplayProgress) -and $Success
             if (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableMapping" ) {
                 $Success = (Test-Key $ReportOptions.AsSql.SqlTableMapping "ReportOptions.SqlTableMapping" "Event ID" -DisplayProgress) -and $Success
@@ -182,13 +182,25 @@ function Test-Configuration () {
     #endregion Report Definions
 
     #region ReportOptions Per Hour
-    $Success = (Test-Key $ReportTimes "ReportTimes" "PastHour" -DisplayProgress -ValueType 'Boolean') -and $Success
-    $Success = (Test-Key $ReportTimes "ReportTimes" "CurrentHour" -DisplayProgress -ValueType 'Boolean') -and $Success
+    $Success = (Test-Key $ReportTimes "ReportTimes" "PastHour" -DisplayProgress) -and $Success
+    if (Test-Key $ReportTimes "ReportTimes" "PastHour" ) {
+        $Success = (Test-Key $ReportTimes.PastHour "ReportTimes.PastHour" "Enabled" -DisplayProgress -ValueType 'Boolean') -and $Success
+    }
+    $Success = (Test-Key $ReportTimes "ReportTimes" "CurrentHour" -DisplayProgress) -and $Success
+    if (Test-Key $ReportTimes "ReportTimes" "CurrentHour" ) {
+        $Success = (Test-Key $ReportTimes.CurrentHour "ReportTimes.CurrentHour" "Enabled" -DisplayProgress -ValueType 'Boolean') -and $Success
+    }
     #endregion ReportTimes Per Hour
 
     #region ReportTimes Per Day
     $Success = (Test-Key $ReportTimes "ReportTimes" "PastDay" -DisplayProgress) -and $Success
+    if (Test-Key $ReportTimes "ReportTimes" "PastDay" ) {
+        $Success = (Test-Key $ReportTimes.PastDay "ReportTimes.PastDay" "Enabled" -DisplayProgress -ValueType 'Boolean') -and $Success
+    }
     $Success = (Test-Key $ReportTimes "ReportTimes" "CurrentDay" -DisplayProgress) -and $Success
+    if (Test-Key $ReportTimes "ReportTimes" "CurrentDay" ) {
+        $Success = (Test-Key $ReportTimes.CurrentDay "ReportTimes.CurrentDay" "Enabled" -DisplayProgress -ValueType 'Boolean') -and $Success
+    }
     $Success = (Test-Key $ReportTimes "ReportTimes" "OnDay" -DisplayProgress) -and $Success
     if (Test-Key $ReportTimes "ReportTimes" "OnDay" ) {
         $Success = (Test-Key $ReportTimes.OnDay "ReportTimes.OnDay" "Enabled" -DisplayProgress) -and $Success
@@ -230,6 +242,10 @@ function Test-Configuration () {
         $Success = (Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "Enabled" -DisplayProgress) -and $Success
         $Success = (Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "DateFrom" -DisplayProgress) -and $Success
         $Success = (Test-Key $ReportTimes.CustomDate "ReportTimes.CustomDate" "DateTo" -DisplayProgress) -and $Success
+    }
+    $Success = (Test-Key $ReportTimes "ReportTimes" "Everything" -DisplayProgress) -and $Success
+    if (Test-Key $ReportTimes "ReportTimes" "Everything" ) {
+        $Success = (Test-Key $ReportTimes.PastDay "ReportTimes.Everything" "Enabled" -DisplayProgress -ValueType 'Boolean') -and $Success
     }
     #endregion ReportTimes Custom Dates
 
