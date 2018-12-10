@@ -132,11 +132,19 @@ $ReportOptions = @{
 }
 $ReportTimes = @{
     # Report Per Hour
-    PastHour             = $false # if it's 23:22 it will report 22:00 till 23:00
-    CurrentHour          = $false # if it's 23:22 it will report 23:00 till 00:00
+    PastHour             = @{
+        Enabled = $false # if it's 23:22 it will report 22:00 till 23:00
+    }
+    CurrentHour          = @{
+        Enabled = $false # if it's 23:22 it will report 23:00 till 00:00
+    }
     # Report Per Day
-    PastDay              = $false # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
-    CurrentDay           = $false # if it's 1.04.2018 05:22 it will report 1.04.2018 00:00:00 till 01.04.2018 00:00:00
+    PastDay              = @{
+        Enabled = $false # if it's 1.04.2018 it will report 31.03.2018 00:00:00 till 01.04.2018 00:00:00
+    }
+    CurrentDay           = @{
+        Enabled = $false # if it's 1.04.2018 05:22 it will report 1.04.2018 00:00:00 till 01.04.2018 00:00:00
+    }
     # Report Per Week
     OnDay                = @{
         Enabled = $false
@@ -147,14 +155,17 @@ $ReportTimes = @{
         Enabled = $true # checks for 1st day of the month - won't run on any other day unless used force
         Force   = $true  # if true - runs always ...
     }
-    CurrentMonth         = $false
-
+    CurrentMonth         = @{
+        Enabled = $false
+    }
     # Report Per Quarter
     PastQuarter          = @{
         Enabled = $false # checks for 1st day fo the quarter - won't run on any other day
         Force   = $false
     }
-    CurrentQuarter       = $false
+    CurrentQuarter       = @{
+        Enabled = $false
+    }
     # Report Custom
     CurrentDayMinusDayX  = @{
         Enabled = $false
@@ -169,7 +180,9 @@ $ReportTimes = @{
         DateFrom = get-date -Year 2018 -Month 03 -Day 19
         DateTo   = get-date -Year 2018 -Month 03 -Day 23
     }
-    Everything           = $false
+    Everything           = @{
+        Enabled = $false
+    }
 }
 $ReportDefinitions = @{
     TimeToGenerate = $false
