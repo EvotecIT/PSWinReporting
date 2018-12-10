@@ -99,7 +99,27 @@ $Script:ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 4624
                 LogName     = 'Security'
-                IgnoreWords = ''
+                Fields      = [ordered] @{
+                    'Computer'           = 'Computer'
+                    'Action'             = 'Action'
+                    'IpAddress'          = 'IpAddress'
+                    'IpPort'             = 'IpPort'
+                    'ObjectAffected'     = 'User / Computer Affected'
+                    'Who'                = 'Who'
+                    'Date'               = 'When'
+                    'LogonProcessName'   = 'LogonProcessName'
+                    'ImpersonationLevel' = 'ImpersonationLevel' # %%1833 = Impersonation
+                    'VirtualAccount'     = 'VirtualAccount'  #  %%1843 = No
+                    'ElevatedToken'      = 'ElevatedToken' # %%1842 = Yes
+                    'LogonType'          = 'LogonType'
+                    # Common Fields
+                    'ID'                 = 'Event ID'
+                    'RecordID'           = 'Record ID'
+                    'GatheredFrom'       = 'Gathered From'
+                    'GatheredLogName'    = 'Gathered LogName'
+                }
+                IgnoreWords = @{}
+
             }
             ComputerCreatedChanged = @{
                 Enabled     = $false
@@ -251,29 +271,38 @@ $Script:ReportDefinitions = @{
                     #'DSType'        = 'ConvertFrom-OperationType'
                     'OperationType' = 'ConvertFrom-OperationType'
                 }
+
                 Fields      = [ordered] @{
                     'Computer'                 = 'Domain Controller'
                     'Action'                   = 'Action'
                     'Who'                      = 'Who'
                     'Date'                     = 'When'
 
-                    # Common Fields
-                    'ID'                       = 'Event ID'
-                    'RecordID'                 = 'Record ID'
-                    'OperationType'            = 'OperationType'
-                    'DSName'                   = 'DSName'
-                    'DSType'                   = 'DSType'
+
                     'ObjectDN'                 = 'OBjectDN'
                     'ObjectGUID'               = 'ObjectGUID'
                     'ObjectClass'              = 'ObjectClass'
                     'AttributeLDAPDisplayName' = 'AttributeLDAPDisplayName'
                     'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
                     'AttributeValue'           = 'AttributeValue'
+                    'OperationType'            = 'OperationType'
+                    'OpCorrelationID'          = 'OperationCorelationID'
+                    'AppCorrelationID'         = 'OperationApplicationCorrelationID'
+
+                    'DSName'                   = 'DSName'
+                    'DSType'                   = 'DSType'
                     'Task'                     = 'Task'
+                    'Version'                  = 'Version'
+
+                    # Common Fields
+                    'ID'                       = 'Event ID'
+                    'RecordID'                 = 'Record ID'
                     'GatheredFrom'             = 'Gathered From'
                     'GatheredLogName'          = 'Gathered LogName'
                 }
-                SortBy      = 'When'
+
+                SortBy      = 'Record ID'
+                Descending  = $false
                 IgnoreWords = @{}
 
             }
