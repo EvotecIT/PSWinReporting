@@ -83,6 +83,7 @@ function Test-Configuration () {
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableCreate" -DisplayProgress) -and $Success
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableAlterIfNeeded" -DisplayProgress) -and $Success
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlCheckBeforeInsert" -DisplayProgress) -and $Success
+            <# This is not required to exists. Only if SQL is needed, used. 
             $Success = (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableMapping" -DisplayProgress) -and $Success
             if (Test-Key $ReportOptions.AsSql "ReportOptions.AsSql" "SqlTableMapping" ) {
                 $Success = (Test-Key $ReportOptions.AsSql.SqlTableMapping "ReportOptions.SqlTableMapping" "Event ID" -DisplayProgress) -and $Success
@@ -123,6 +124,7 @@ function Test-Configuration () {
                 $Success = (Test-Key $ReportOptions.AsSql.SqlTableMapping "ReportOptions.SqlTableMapping" "Gathered From" -DisplayProgress) -and $Success
                 $Success = (Test-Key $ReportOptions.AsSql.SqlTableMapping "ReportOptions.SqlTableMapping" "Gathered LogName" -DisplayProgress) -and $Success
             }
+            #>
         }
     }
     #endregion ReportOptions
