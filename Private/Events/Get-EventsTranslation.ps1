@@ -4,6 +4,21 @@ function Get-EventsTranslation {
         [Array] $Events,
         [System.Collections.IDictionary] $EventsDefinition  # HashTable/OrderedDictionary
     )
+    if ($EventsDefinition.Filter) {
+        # Filter is special, if there is just one object on the right side
+        # If there are more objects filter will pick all values on the right side and display them as required
+        #Filter = @{
+        #    'ObjectClass' = 'groupPolicyContainer'
+        #    'AttributeLDAPDisplayName' = 'cn','displayName'
+        #}
+
+        foreach ($Filter in $EventsDefinition.Filter.Keys) {
+            $Value = $EventsDefinition.Filter[$Filter]
+            $Events = foreach ($V in $Value) {
+                $Events | Where-Object { $_.$Filter -eq $V }
+            }
+        }
+    }
     $MyValue = foreach ($Event in $Events) {
         $IgnoredFound = $false
         $HashTable = @{}
@@ -78,9 +93,11 @@ function Get-EventsTranslation {
         [PsCustomObject]$HashTable
 
     }
+    $MyValue = Find-EventsIgnored -Events $MyValue -IgnoreWords $EventsDefinition.IgnoreWords
+
     if ($null -eq $EventsDefinition.Fields) {
-        return $MyValue #| Select-Object
+        return $MyValue | Sort-Object $EventsDefinition.SortBy
     } else {
-        return $MyValue | Select-Object @($EventsDefinition.Fields.Values)
+        return $MyValue | Select-Object @($EventsDefinition.Fields.Values) | Sort-Object $EventsDefinition.SortBy
     }
 }

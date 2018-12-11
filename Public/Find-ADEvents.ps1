@@ -1,40 +1,6 @@
 function Find-ADEvents {
     [CmdLetBinding()]
     param(
-        [ValidateSet(
-            'UserChanges',
-            'UserStatus',
-            'UserLockouts',
-            'UserLogon',
-            'UserLogonKerberos',
-            'ComputerCreatedChanged',
-            'ComputerDeleted',
-            'GroupMembershipChanges',
-            'GroupCreateDelete',
-            'GroupPolicyChanges',
-            'LogsClearedSecurity',
-            'LogsClearedOther',
-            'EventsReboots'
-        )]
-        [string] $Report,
-
-        [parameter(ParameterSetName = "DateRange")]
-        [ValidateSet(
-            'PastHour',
-            'CurrentHour',
-            'PastDay',
-            'CurrentDay',
-            'PastMonth',
-            'CurrentMonth',
-            'PastQuarter',
-            'CurrentQuarter',
-            'Last3days',
-            'Last7days',
-            'Last14days',
-            'Everything'
-        )]
-        [string] $DatesRange,
-
         [parameter(ParameterSetName = "DateManual")]
         [DateTime] $DateFrom,
 
@@ -42,154 +8,96 @@ function Find-ADEvents {
         [DateTime] $DateTo,
 
         [alias('Server', 'ComputerName')][string[]] $Servers
-
     )
-    # Bring defaults
-    $ReportTimes = $Script:ReportTimes
-    $ReportDefinitions = $Script:ReportDefinitions
-    $DefineReports = $Script:DefineReports
-    $DefineDates = $Script:DefineDates
+    DynamicParam {
+        # Defines Report / Dates Range dynamically from HashTables
+        $Names = $Script:ReportDefinitions.Keys
+        $ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
+        $ParamAttrib.Mandatory = $true
+        $ParamAttrib.ParameterSetName = '__AllParameterSets'
+        $ReportAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
+        $ReportAttrib.Add($ParamAttrib)
+        $ReportAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($Names)))
+        $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('Report', [string], $ReportAttrib)
 
-    ## Logging / Display to screen
-    $Params = @{
-        LogPath    = if ([string]::IsNullOrWhiteSpace($Script:LoggerParameters.LogsDir)) { '' } else { Join-Path $Script:LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log" }
-        ShowTime   = $Script:LoggerParameters.ShowTime
-        TimeFormat = $Script:LoggerParameters.TimeFormat
+        $DatesRange = $Script:ReportTimes.Keys
+        $ParamAttribDatesRange = New-Object System.Management.Automation.ParameterAttribute
+        $ParamAttribDatesRange.Mandatory = $true
+        $ParamAttribDatesRange.ParameterSetName = 'DateRange'
+        $DatesRangeAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
+        $DatesRangeAttrib.Add($ParamAttribDatesRange)
+        $DatesRangeAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($DatesRange)))
+        $DatesRangeRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('DatesRange', [string], $DatesRangeAttrib)
+
+        $RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+        $RuntimeParamDic.Add('Report', $ReportRuntimeParam)
+        $RuntimeParamDic.Add('DatesRange', $DatesRangeRuntimeParam)
+        return $RuntimeParamDic
     }
-    $Logger = Get-Logger @Params
-    ##
 
-    if (-not $Report) {
-        $Logger.AddWarningRecord("You need to choose report type: $($DefineReports -join ', ')")
-        return
-    }
+    Process {
+        $Report = $PSBoundParameters.Report
+        $DatesRange = $PSBoundParameters.DatesRange
 
-    switch ($PSCmdlet.ParameterSetName) {
-        DateRange {
-            $ReportTimes.$DatesRange.Enabled = $true
+        # Bring defaults
+        $ReportTimes = $Script:ReportTimes
+        $ReportDefinitions = $Script:ReportDefinitions
+
+        ## Logging / Display to screen
+        $Params = @{
+            LogPath    = if ([string]::IsNullOrWhiteSpace($Script:LoggerParameters.LogsDir)) { '' } else { Join-Path $Script:LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log" }
+            ShowTime   = $Script:LoggerParameters.ShowTime
+            TimeFormat = $Script:LoggerParameters.TimeFormat
         }
-        DateManual {
-            if ($DateFrom -and $DateTo) {
-                $ReportTimes.CustomDate.Enabled = $true
-                $ReportTimes.CustomDate.DateFrom = $DateFrom
-                $ReportTimes.CustomDate.DateTo = $DateTo
-            } else {
-                return
+        $Logger = Get-Logger @Params
+
+        ##
+        if (-not $Servers) {
+            $ServersAD = Get-DC
+            $Servers = ($ServersAD | Where-Object { $_.'Host Name' -ne 'N/A' }).'Host Name'
+        }
+
+        switch ($PSCmdlet.ParameterSetName) {
+            DateRange {
+                $ReportTimes.$DatesRange.Enabled = $true
+            }
+            DateManual {
+                if ($DateFrom -and $DateTo) {
+                    $ReportTimes.CustomDate.Enabled = $true
+                    $ReportTimes.CustomDate.DateFrom = $DateFrom
+                    $ReportTimes.CustomDate.DateTo = $DateTo
+                } else {
+                    return
+                }
             }
         }
-    }
 
-    $LogName = $ReportDefinitions.ReportsAD.EventBased.$Report.LogName
-    $EventID = $ReportDefinitions.ReportsAD.EventBased.$Report.Events
-    $ReportDefinitions.ReportsAD.EventBased.$Report.Enabled = $true
+        $Events = New-ArrayList
+        $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
 
-    ##
-    if (-not $Servers) {
-        $ServersAD = Get-DC
-        $Servers = ($ServersAD | Where-Object { $_.'Host Name' -ne 'N/A' }).'Host Name'
-    }
+        $MyReport = $ReportDefinitions[$Report]
+        $LogNames = foreach ($SubReport in  $MyReport.Keys | Where-Object { $_ -ne 'Enabled' }) {
+            $MyReport[$SubReport].LogName
+        }
+        $LogNames = $LogNames | Sort-Object -Unique
 
 
-    $Events = New-ArrayList
-    $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
-
-    foreach ($Date in $Dates) {
-        $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)")
-        $FoundEvents = Get-Events -Server $Servers -LogName $LogName -EventID $EventID -DateFrom $Date.DateFrom -DateTo $Date.DateTo
-        Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
-        $Logger.AddInfoRecord("Events found $(Get-ObjectCount -Object $FoundEvents)")
+        foreach ($Log in $LogNames) {
+            $EventsID = foreach ($R in $MyReport.Values) {
+                if ($Log -eq $R.LogName) {
+                    $R.Events
+                }
+            }
+            foreach ($Date in $Dates) {
+                $ExecutionTime = Start-TimeLog
+                $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)")
+                $Logger.AddInfoRecord("Events scanning for Events ID: $EventsID ($Log)")
+                $FoundEvents = Get-Events -Server $Servers -LogName $Log -EventID $EventsID -DateFrom $Date.DateFrom -DateTo $Date.DateTo
+                Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
+                $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
+                $Logger.AddInfoRecord("Events scanned found $(Get-ObjectCount -Object $FoundEvents) - Time elapsed: $Elapsed")
+            }
+        }
+        return Get-MyEvents -Events $FoundEvents -ReportDefinition $MyReport -ReportName $Report
     }
-
-    if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running User Changes Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-UserChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserChanges.IgnoreWords
-        $script:TimeToGenerateReports.Reports.UserChanges.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending User Changes Report" )
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running User Statuses Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-UserStatuses -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserStatus.IgnoreWords
-        $script:TimeToGenerateReports.Reports.UserStatus.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending User Statuses Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Computer Created / Changed Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-ComputerChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.IgnoreWords
-        $script:TimeToGenerateReports.Reports.ComputerCreatedChanged.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Computer Created / Changed Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Computer Deleted Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-ComputerStatus -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.IgnoreWords
-        $script:TimeToGenerateReports.Reports.ComputerDeleted.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Computer Deleted Report")
-    }
-    If ($ReportDefinitions.ReportsAD.EventBased.UserLockouts.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running User Lockouts Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-UserLockouts -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLockouts.IgnoreWords
-        $script:TimeToGenerateReports.Reports.UserLockouts.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending User Lockouts Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.UserLogon.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Logon Events Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-LogonEvents -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLogon.IgnoreWords
-        $script:TimeToGenerateReports.Reports.UserLogon.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Logon Events Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Logon Events (Kerberos) Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-LogonEventsKerberos -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.IgnoreWords
-        $script:TimeToGenerateReports.Reports.UserLogonKerberos.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Logon Events (Kerberos) Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Group Membership Changes Report")
-        $ExecutionTime = Start-TimeLog # Timer St
-        $PreparedEvents = Get-GroupMembershipChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.IgnoreWords
-        $script:TimeToGenerateReports.Reports.GroupMembershipChanges.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Group Membership Changes Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Group Create/Delete Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-GroupCreateDelete -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.IgnoreWords
-        $script:TimeToGenerateReports.Reports.GroupCreateDelete.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Group Create/Delete Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Reboot Events Report (Troubleshooting Only)")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-RebootEvents -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.EventsReboots.IgnoreWords
-        $script:TimeToGenerateReports.Reports.EventsReboots.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Reboot Events Report (Troubleshooting Only)")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Group Policy Changes Report")
-        $ExecutionTime = Start-TimeLog # Timer
-        $PreparedEvents = Get-GroupPolicyChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.IgnoreWords
-        $script:TimeToGenerateReports.Reports.GroupPolicyChanges.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Group Policy Changes Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Who Cleared Logs Report")
-        $ExecutionTime = Start-TimeLog # Timer Start
-        $PreparedEvents = Get-EventLogClearedLogs -Events $Events -Type "Security" -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.IgnoreWords
-        $script:TimeToGenerateReports.Reports.LogsClearedSecurity.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Who Cleared Logs Report")
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -eq $true) {
-        $Logger.AddInfoRecord("Running Who Cleared Logs Report")
-        $ExecutionTime = Start-TimeLog # Timer Start
-        $PreparedEvents = Get-EventLogClearedLogs -Events $Events -Type "Other" -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.IgnoreWords
-        $script:TimeToGenerateReports.Reports.LogsClearedOther.Total = Stop-TimeLog -Time $ExecutionTime
-        $Logger.AddInfoRecord("Ending Who Cleared Logs Report")
-    }
-    return $PreparedEvents
 }
