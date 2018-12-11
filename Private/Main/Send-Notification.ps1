@@ -12,13 +12,13 @@ function Send-Notificaton {
                 $MessageTitle = 'Active Directory Changes'
                 [string] $ActivityTitle = $($Event.Action).Trim()
                 if ($ActivityTitle -like '*added*') {
-                    $Color = [System.Drawing.Color]::Green
+                    $Color = [RGBColors]::Green
                     $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
                 } elseif ($ActivityTitle -like '*remove*') {
-                    $Color = [System.Drawing.Color]::Red
+                    $Color = [RGBColors]::Red
                     $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
                 } else {
-                    $Color = [System.Drawing.Color]::Yellow
+                    $Color = [RGBColors]::Yellow
                     $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
                 }
 
