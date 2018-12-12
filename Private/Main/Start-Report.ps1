@@ -15,8 +15,8 @@ function Start-Report {
     $RebootEventsTable = @()
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
-    # $ServersTable = @()
-    $GroupCreateDeleteTable = @()
+    $TableEventLogClearedLogsOther = @()
+
 
     $TableEventLogFiles = @()
 
@@ -89,6 +89,7 @@ function Start-Report {
         $Logger.AddInfoRecord("Removed Duplicates Following $(Get-ObjectCount -Object $Events) events will be analyzed further")
     }
 
+    # Process events
     $Results = @{}
     foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
         if ($ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -eq $true) {

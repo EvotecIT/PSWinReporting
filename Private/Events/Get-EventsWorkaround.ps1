@@ -24,32 +24,17 @@ function Get-EventsWorkaround {
     }
     Process {
         [string] $ReportName = $PSBoundParameters.Report
-
         $MyReportDefinitions = $Script:ReportDefinitions.$ReportName
-
-
-
-        #$EventsType = $MyReportDefinitions.$ReportName.Events.LogName
-        #$EventsNeeded = $MyReportDefinitions.$ReportName.Events.Events
-
-
 
         foreach ($Report in $MyReportDefinitions.Keys | Where-Object { $_ -ne 'Enabled' }) {
 
             $MyReportDefinitions.$Report.IgnoreWords = $IgnoreWords
             $EventsType = $MyReportDefinitions[$Report].LogName
             $EventsNeeded = $MyReportDefinitions[$Report].Events
-
-
             $EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
-
-            Write-Color "Test ", $Report, ' ', $ReportName, ' ', $EventsType, " ", $EventsNeeded, " count ", $EventsFound.Count -Color Red
             $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $MyReportDefinitions[$Report]
-            Write-Color "Count " , $EventsFound.Count -Color Red
+            $Logger.AddInfoRecord("Events Processed: $($EventsFound.Count), EventsType: $EventsType EventsID: $EventsNeeded")
             $EventsFound
         }
-
-        #$EventsFound = Find-EventsNeeded -Events $Events -EventsNeeded $EventsNeeded -EventsType $EventsType
-        #return Get-EventsTranslation -Events $EventsFound -EventsDefinition $Script:ReportDefinitions.$ReportName
     }
 }
