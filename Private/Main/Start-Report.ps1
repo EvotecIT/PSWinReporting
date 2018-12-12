@@ -95,23 +95,6 @@ function Start-Report {
             $Logger.AddInfoRecord("Ending $ReportName Report - Elapsed time: $ElapsedTime")
         }
     }
-<#
-    $Logger.AddInfoRecord('Processing log clearing events')
-    if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Who Cleared Logs Report')
-
-        $TableEventLogClearedLogs = Get-EventLogClearedLogs -Events $Events -Type 'Security' -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Who Cleared Logs Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Who Cleared Logs Report')
-
-        $TableEventLogClearedLogsOther = Get-EventLogClearedLogs -Events $Events -Type 'Other' -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Who Cleared Logs Report')
-    }
-#>
 
     if ($ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -eq $true) {
 
