@@ -204,7 +204,7 @@ $ReportDefinitions = @{
 
 $LoggerParameters = @{
     ShowTime   = $true
-    LogsDir    = 'C:\temp\logs'
+    #LogsDir    = 'C:\temp\logs'
     TimeFormat = 'yyyy-MM-dd HH:mm:ss'
 }
 
