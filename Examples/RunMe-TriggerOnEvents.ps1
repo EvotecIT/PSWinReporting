@@ -5,15 +5,6 @@ param(
     $eventChannel,
     $eventSeverity
 )
-<#
-Update-Module PSTeams
-Update-Module PSEventViewer
-Update-Module PSWinReporting
-Update-Module PSWriteColor
-Update-Module PSWriteExcel
-Update-Module PSSlack
-Update-Module DBATools
-#>
 Import-Module PSTeams
 Import-Module PSEventViewer
 Import-Module PSWinReporting -Force
