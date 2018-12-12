@@ -11,13 +11,6 @@ function Start-Report {
     $time = [System.Diagnostics.Stopwatch]::StartNew() # Timer Start
     # Declare variables
     $EventLogTable = @()
-
-    $RebootEventsTable = @()
-    $TableGroupPolicyChanges = @()
-    $TableEventLogClearedLogs = @()
-    $TableEventLogClearedLogsOther = @()
-
-
     $TableEventLogFiles = @()
 
     $Logger.AddInfoRecord("Processing report for dates from: $($Dates.DateFrom) to $($Dates.DateTo)")
@@ -102,7 +95,7 @@ function Start-Report {
             $Logger.AddInfoRecord("Ending $ReportName Report - Elapsed time: $ElapsedTime")
         }
     }
-
+<#
     $Logger.AddInfoRecord('Processing log clearing events')
     if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -eq $true) {
         $Logger.AddInfoRecord('Running Who Cleared Logs Report')
@@ -118,7 +111,7 @@ function Start-Report {
 
         $Logger.AddInfoRecord('Ending Who Cleared Logs Report')
     }
-
+#>
 
     if ($ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -eq $true) {
 
