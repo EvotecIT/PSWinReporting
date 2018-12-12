@@ -88,9 +88,7 @@ function Start-Report {
         if ($ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -eq $true) {
             $Logger.AddInfoRecord("Running $ReportName Report")
             $TimeExecution = Start-TimeLog
-            $Results.$ReportName = Get-EventsWorkaround -Events $Events `
-                -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.$ReportName.IgnoreWords `
-                -Report $ReportName
+            $Results.$ReportName = Get-EventsWorkaround -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.$ReportName.IgnoreWords -Report $ReportName
             $ElapsedTime = Stop-TimeLog -Time $TimeExecution -Option OneLiner
             $Logger.AddInfoRecord("Ending $ReportName Report - Elapsed time: $ElapsedTime")
         }

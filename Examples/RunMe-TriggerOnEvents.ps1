@@ -112,7 +112,7 @@ $ReportDefinitions = @{
                 Enabled     = $true
                 Events      = 4720, 4738
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             UserStatus             = @{
                 Enabled     = $true
@@ -132,31 +132,31 @@ $ReportDefinitions = @{
                 Enabled     = $true
                 Events      = 4740
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             UserLogon              = @{
                 Enabled     = $false
                 Events      = 4624
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             ComputerCreatedChanged = @{
                 Enabled     = $true
                 Events      = 4741, 4742 # created, changed
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             ComputerDeleted        = @{
                 Enabled     = $true
                 Events      = 4743 # deleted
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             UserLogonKerberos      = @{
                 Enabled     = $false
                 Events      = 4768
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             GroupMembershipChanges = @{
                 Enabled     = $true
@@ -178,25 +178,25 @@ $ReportDefinitions = @{
                 Enabled     = $false
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             LogsClearedSecurity    = @{
                 Enabled     = $true
                 Events      = 1102, 1105
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             LogsClearedOther       = @{
                 Enabled     = $true
                 Events      = 104
                 LogName     = 'System'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             EventsReboots          = @{
                 Enabled     = $false
                 Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
                 LogName     = 'System'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
         }
     }
