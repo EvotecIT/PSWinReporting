@@ -11,20 +11,13 @@ function Start-Report {
     $time = [System.Diagnostics.Stopwatch]::StartNew() # Timer Start
     # Declare variables
     $EventLogTable = @()
-    $GroupsEventsTable = @()
-    $UsersEventsTable = @()
-    $UsersEventsStatusesTable = @()
-    $UsersLockoutsTable = @()
-    $ComputerChanges = @()
-    $ComputerDeleted = @()
-    $LogonEvents = @()
-    $LogonEventsKerberos = @()
+
     $RebootEventsTable = @()
     $TableGroupPolicyChanges = @()
     $TableEventLogClearedLogs = @()
     # $ServersTable = @()
     $GroupCreateDeleteTable = @()
-    $TableExecutionTimes = ''
+
     $TableEventLogFiles = @()
 
     $Logger.AddInfoRecord("Processing report for dates from: $($Dates.DateFrom) to $($Dates.DateTo)")
@@ -109,91 +102,6 @@ function Start-Report {
         }
     }
 
-
-
-    <#
-
-    $Logger.AddInfoRecord('Processing User Events')
-    if ($ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running User Changes Report')
-
-        $UsersEventsTable = Get-UserChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserChanges.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending User Changes Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running User Statuses Report')
-
-        $UsersEventsStatusesTable = Get-EventsWorkaround -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserStatus.IgnoreWords -Report UserStatus
-
-        $Logger.AddInfoRecord('Ending User Statuses Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Computer Created / Changed Report')
-
-        $ComputerChanges = Get-ComputerChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Computer Created / Changed Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Computer Deleted Report')
-
-        $ComputerDeleted = Get-ComputerStatus -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Computer Deleted Report')
-    }
-    If ($ReportDefinitions.ReportsAD.EventBased.UserLockouts.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running User Lockouts Report')
-
-        $UsersLockoutsTable = Get-UserLockouts -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLockouts.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending User Lockouts Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.UserLogon.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Logon Events Report')
-
-        $LogonEvents = Get-LogonEvents -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLogon.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Logon Events Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Logon Events (Kerberos) Report')
-
-        $LogonEventsKerberos = Get-LogonEventsKerberos -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Logon Events (Kerberos) Report')
-    }
-
-    $Logger.AddInfoRecord('Processing Group Events')
-    if ($ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Group Membership Changes Report')
-
-        $GroupsEventsTable = Get-GroupMembershipChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Group Membership Changes Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Group Create/Delete Report')
-
-        $GroupCreateDeleteTable = Get-GroupCreateDelete -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Group Create/Delete Report')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Reboot Events Report (Troubleshooting Only)')
-
-        $RebootEventsTable = Get-RebootEvents -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.EventsReboots.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Reboot Events Report (Troubleshooting Only)')
-    }
-    if ($ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -eq $true) {
-        $Logger.AddInfoRecord('Running Group Policy Changes Report')
-
-        $TableGroupPolicyChanges = Get-GroupPolicyChanges -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.IgnoreWords
-
-        $Logger.AddInfoRecord('Ending Group Policy Changes Report')
-    }
-    #>
     $Logger.AddInfoRecord('Processing log clearing events')
     if ($ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -eq $true) {
         $Logger.AddInfoRecord('Running Who Cleared Logs Report')
@@ -229,16 +137,6 @@ function Start-Report {
 
     }
 
-    if ($ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -eq $true) {
-
-        if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
-
-        } else {
-            #$ServersTable = Get-DomainControllers -Servers $Servers
-        }
-
-    }
-
     # Prepare email body
     $Logger.AddInfoRecord('Prepare email head and body')
     $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
@@ -255,23 +153,8 @@ function Start-Report {
             $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -ReportTable $Results.$ReportName -ReportTableText "Following $ReportNameTitle happened"
 
         }
-        <#
-
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportTable $UsersEventsTable -ReportTableText 'Following user changes happened'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -ReportTable $UsersEventsStatusesTable -ReportTableText 'Following user status happened'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserLockouts.Enabled -ReportTable $UsersLockoutsTable -ReportTableText 'Following user lockouts happened'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.Enabled -ReportTable $ComputerChanges -ReportTableText 'Following computer events happened'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.Enabled -ReportTable $ComputerDeleted -ReportTableText 'Following computer deleted events happened'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserLogon.Enabled -ReportTable $LogonEvents -ReportTableText 'Following logon events happened'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.Enabled -ReportTable $LogonEventsKerberos -ReportTableText 'Following logon (kerberos) events happened'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -ReportTable $GroupsEventsTable -ReportTableText 'The membership of those groups below has changed'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -ReportTable $GroupCreateDeleteTable -ReportTableText 'Following group creation/deletion occured'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -ReportTable $TableGroupPolicyChanges -ReportTableText 'Following GPOs were modified'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -ReportTable $TableEventLogClearedLogs -ReportTableText 'Following logs clearing (security) actions occured '
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -ReportTable $TableEventLogClearedLogsOther -ReportTableText 'Following logs clearing (other) actions occured'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -ReportTable $RebootEventsTable -ReportTableText 'Following reboot related events happened'
-        #>
     }
+
     $Reports = @()
 
     if ($ReportOptions.AsExcel) {
@@ -284,21 +167,6 @@ function Start-Report {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
             Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
         }
-        <#
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName  "User Changes" -ReportTable $UsersEventsTable
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName  "User Status Changes" -ReportTable $UsersEventsStatusesTable
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserLockouts.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "User Lockouts" -ReportTable $UsersLockoutsTable
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName  "Computer Status Changes" -ReportTable $ComputerChanges
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Computer Deleted" -ReportTable $ComputerDeleted
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserLogon.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "User Logon Events" -ReportTable $LogonEvents
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "User Logon Kerberos Events" -ReportTable $LogonEventsKerberos
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Group Membership Changes"  -ReportTable $GroupsEventsTable
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Group Creation Deletion Changes"  -ReportTable $GroupCreateDeleteTable
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Group Policy Changes" -ReportTable $TableGroupPolicyChanges
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Clear Log Events (Security)" -ReportTable $TableEventLogClearedLogs
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Clear Log Events (Other)" -ReportTable $TableEventLogClearedLogsOther
-        Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Troubleshooting Reboots" -ReportTable $RebootEventsTable
-        #>
         $Reports += $ReportFilePathXLSX
     }
     if ($ReportOptions.AsCSV) {
@@ -309,21 +177,6 @@ function Start-Report {
         foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
             $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName $ReportName -ReportTable $Results.$ReportName
         }
-        <#
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserEvents" -ReportTable $UsersEventsTable
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserStatuses" -ReportTable $UsersEventsStatusesTable
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserLockouts.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserLockouts" -ReportTable $UsersLockoutsTable
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportComputerChanged" -ReportTable $ComputerChanges
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportComputerDeleted" -ReportTable $ComputerDeleted
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserLogon.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserLogons" -ReportTable $LogonEvents
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportUserLogonsKerberos" -ReportTable $LogonEventsKerberos
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportGroupEvents" -ReportTable $GroupsEventsTable
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportGroupCreateDeleteEvents" -ReportTable $GroupCreateDeleteTable
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportGroupPolicyChanges" -ReportTable $TableGroupPolicyChanges
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "IncludeClearedLogsSecurity" -ReportTable $TableEventLogClearedLogs
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "IncludeClearedLogsOther" -ReportTable $TableEventLogClearedLogs
-        $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportReboots" -ReportTable $RebootEventsTable
-        #>
     }
     $Reports = $Reports |  Where-Object { $_ } | Sort-Object -Unique
 
@@ -336,8 +189,6 @@ function Start-Report {
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
     $EmailBody = Set-EmailFormatting -Template $EmailBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions -Logger $Logger
     $Time.Stop()
-
-    #$script:TimeToGenerateReports | ConvertTo-Json
 
     # Sending email - finalizing package
     if ($ReportOptions.SendMail) {
@@ -362,31 +213,9 @@ function Start-Report {
         if ($ReportOptions.OpenAsFile) { Invoke-Item $ReportHTMLPath }
     }
 
-
-    #Write-Color @script:WriteParameters -Text '[i] ', 'Sending events to SQL' -Color White, White, Yellow
-    #Export-ReportToSql -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -ReportName "Processed Servers" -ReportTable $ServersAD
-    #Export-ReportToSql -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -ReportName "Event log sizes" -ReportTable $EventLogTable
-
-
     foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
         $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
-       # $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName $ReportName -ReportTable $Results.$ReportName
         Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName -ReportOptions $ReportOptions -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
     }
-    <#
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserChanges -ReportOptions $ReportOptions -ReportName  "User Changes" -ReportTable $UsersEventsTable
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserStatus -ReportOptions $ReportOptions -ReportName  "User Status Changes" -ReportTable $UsersEventsStatusesTable
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserLockouts -ReportOptions $ReportOptions -ReportName "User Lockouts" -ReportTable $UsersLockoutsTable
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged -ReportOptions $ReportOptions -ReportName  "Computer Status Changes" -ReportTable $ComputerChanges
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted -ReportOptions $ReportOptions -ReportName "Computer Deleted" -ReportTable $ComputerDeleted
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserLogon -ReportOptions $ReportOptions -ReportName "User Logon Events" -ReportTable $LogonEvents
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos -ReportOptions $ReportOptions -ReportName "User Logon Kerberos Events" -ReportTable $LogonEventsKerberos
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges -ReportOptions $ReportOptions -ReportName "Group Membership Changes"  -ReportTable $GroupsEventsTable
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete -ReportOptions $ReportOptions -ReportName "Group Creation Deletion Changes"  -ReportTable $GroupCreateDeleteTable
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges -ReportOptions $ReportOptions -ReportName "Group Policy Changes" -ReportTable $TableGroupPolicyChanges
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity -ReportOptions $ReportOptions -ReportName "Clear Log Events (Security)" -ReportTable $TableEventLogClearedLogs
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther -ReportOptions $ReportOptions -ReportName "Clear Log Events (Other)" -ReportTable $TableEventLogClearedLogsOther
-    Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots -ReportOptions $ReportOptions -ReportName "Troubleshooting Reboots" -ReportTable $RebootEventsTable
-    #>
     Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
 }
