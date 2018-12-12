@@ -41,7 +41,7 @@ $Script:ReportDefinitions = @{
                 SubjectUserName = "ANONYMOUS LOGON"
 
                 # Test value
-                ProfilePath     = 'C*'
+                #ProfilePath     = 'C*'
             }
             Functions   = @{
                 'ProfilePath'        = 'Convert-UAC'
@@ -50,7 +50,7 @@ $Script:ReportDefinitions = @{
                 'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
             }
             IgnoreWords = @{
-                'Profile Path' = 'TEMP*'
+                #'Profile Path' = 'TEMP*'
             }
             SortBy      = 'When'
         }

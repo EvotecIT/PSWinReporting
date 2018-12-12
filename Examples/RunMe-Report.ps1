@@ -63,7 +63,7 @@ $ReportOptions = @{
     JustTestPrerequisite  = $false # runs testing without actually running script
 
     AsExcel               = $true # attaches Excel to email with all events, required PSWriteExcel module
-    AsCSV                 = $false # attaches CSV to email with all events,
+    AsCSV                 = $true # attaches CSV to email with all events,
     AsHTML                = $true # puts exported data into email directly with all events
     SendMail              = $false
     OpenAsFile            = $true # requires AsHTML set to $true
@@ -152,16 +152,17 @@ $ReportTimes = @{
     }
     # Report Per Month
     PastMonth            = @{
-        Enabled = $true # checks for 1st day of the month - won't run on any other day unless used force
-        Force   = $true  # if true - runs always ...
+        Enabled = $false # checks for 1st day of the month - won't run on any other day unless used force
+        Force   = $false  # if true - runs always ...
     }
     CurrentMonth         = @{
-        Enabled = $false
+        Enabled = $true
     }
+
     # Report Per Quarter
     PastQuarter          = @{
         Enabled = $false # checks for 1st day fo the quarter - won't run on any other day
-        Force   = $false
+        Force   = $false # if true - runs always ...
     }
     CurrentQuarter       = @{
         Enabled = $false
@@ -179,6 +180,16 @@ $ReportTimes = @{
         Enabled  = $false
         DateFrom = get-date -Year 2018 -Month 03 -Day 19
         DateTo   = get-date -Year 2018 -Month 03 -Day 23
+    }
+    Last3days            = @{
+        Enabled = $false
+    }
+    Last7days            = @{
+        Enabled = $false
+    }
+    Last14days           = @{
+        Enabled = $false
+
     }
     Everything           = @{
         Enabled = $false
@@ -214,7 +225,7 @@ $ReportDefinitions = @{
                 EnabledSqlGlobal = $true
                 Events           = 4720, 4738
                 LogName          = 'Security'
-                IgnoreWords      = ''
+                IgnoreWords      = @{}
             }
             UserStatus             = @{
                 Enabled          = $true
@@ -286,32 +297,32 @@ $ReportDefinitions = @{
                 EnabledSqlGlobal = $false
                 Events           = 4740
                 LogName          = 'Security'
-                IgnoreWords      = ''
+                IgnoreWords      = @{}
             }
             ComputerCreatedChanged = @{
                 Enabled          = $true
                 EnabledSqlGlobal = $false
                 Events           = 4741, 4742 # created, changed
                 LogName          = 'Security'
-                IgnoreWords      = ''
+                IgnoreWords      = @{}
             }
             ComputerDeleted        = @{
                 Enabled     = $true
                 Events      = 4743 # deleted
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             UserLogon              = @{
                 Enabled     = $false # do not set to TRUE (takes days to scan)
                 Events      = 4624
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             UserLogonKerberos      = @{
                 Enabled     = $false # do not set to TRUE. Didn't have any good results
                 Events      = 4768
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             GroupMembershipChanges = @{
                 Enabled     = $true
@@ -333,13 +344,13 @@ $ReportDefinitions = @{
                 Enabled     = $false # not ready
                 Events      = 5136, 5137, 5141
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             LogsClearedSecurity    = @{
                 Enabled     = $true
                 Events      = 1102, 1105
                 LogName     = 'Security'
-                IgnoreWords = ''
+                IgnoreWords = @{}
                 ExportToSql = @{
                     Use                   = $true
                     SqlServer             = 'EVO1'
@@ -354,13 +365,13 @@ $ReportDefinitions = @{
                 Enabled     = $true
                 Events      = 104
                 LogName     = 'System'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
             EventsReboots          = @{
                 Enabled     = $false
                 Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
                 LogName     = 'System'
-                IgnoreWords = ''
+                IgnoreWords = @{}
             }
         }
         Custom            = @{
