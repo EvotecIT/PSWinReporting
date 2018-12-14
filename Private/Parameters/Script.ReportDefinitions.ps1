@@ -55,6 +55,124 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
+    UserChangesDetailed    = [ordered] @{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $false
+            Events      = 5136, 5137, 5141
+            LogName     = 'Security'
+            Filter      = @{
+                # Filter is special, if there is just one object on the right side
+                # If there are more objects filter will pick all values on the right side and display them as required
+                'ObjectClass'              = 'user'
+                #'OperationType'            = 'Value Added'
+                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
+            }
+            Functions   = @{
+                #'ProfilePath'        = 'Convert-UAC'
+                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
+                #'DSType'        = 'ConvertFrom-OperationType'
+                'OperationType' = 'ConvertFrom-OperationType'
+            }
+            Fields      = [ordered] @{
+
+                'Computer'                 = 'Domain Controller'
+                'Action'                   = 'Action'
+                'OperationType'            = 'Action Detail'
+                'Who'                      = 'Who'
+                'Date'                     = 'When'
+
+
+                'ObjectDN'                 = 'User Object'
+                #'ObjectGUID'               = 'ObjectGUID'
+                #'ObjectClass'              = 'ObjectClass'
+                'AttributeLDAPDisplayName' = 'Field Changed'
+                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
+                'AttributeValue'           = 'Field Value'
+
+                #'OpCorrelationID'          = 'OperationCorelationID'
+                #'AppCorrelationID'         = 'OperationApplicationCorrelationID'
+
+                #'DSName'                   = 'DSName'
+                #'DSType'                   = 'DSType'
+                #'Task'                     = 'Task'
+                #'Version'                  = 'Version'
+
+                # Common Fields
+                'RecordID'                 = 'Record ID'
+                'ID'                       = 'Event ID'
+                'GatheredFrom'             = 'Gathered From'
+                'GatheredLogName'          = 'Gathered LogName'
+            }
+
+            SortBy      = 'Record ID'
+            Descending  = $false
+            IgnoreWords = @{
+
+            }
+        }
+    }
+    ComputerChangesDetailed    = [ordered] @{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $false
+            Events      = 5136, 5137, 5141
+            LogName     = 'Security'
+            Filter      = @{
+                # Filter is special, if there is just one object on the right side
+                # If there are more objects filter will pick all values on the right side and display them as required
+                'ObjectClass'              = 'computer'
+                #'OperationType'            = 'Value Added'
+                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
+            }
+            Functions   = @{
+                #'ProfilePath'        = 'Convert-UAC'
+                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
+                #'DSType'        = 'ConvertFrom-OperationType'
+                'OperationType' = 'ConvertFrom-OperationType'
+            }
+            Fields      = [ordered] @{
+
+                'Computer'                 = 'Domain Controller'
+                'Action'                   = 'Action'
+                'OperationType'            = 'Action Detail'
+                'Who'                      = 'Who'
+                'Date'                     = 'When'
+
+
+                'ObjectDN'                 = 'Computer Object'
+                #'ObjectGUID'               = 'ObjectGUID'
+                #'ObjectClass'              = 'ObjectClass'
+                'AttributeLDAPDisplayName' = 'Field Changed'
+                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
+                'AttributeValue'           = 'Field Value'
+
+                #'OpCorrelationID'          = 'OperationCorelationID'
+                #'AppCorrelationID'         = 'OperationApplicationCorrelationID'
+
+                #'DSName'                   = 'DSName'
+                #'DSType'                   = 'DSType'
+                #'Task'                     = 'Task'
+                #'Version'                  = 'Version'
+
+                # Common Fields
+                'RecordID'                 = 'Record ID'
+                'ID'                       = 'Event ID'
+                'GatheredFrom'             = 'Gathered From'
+                'GatheredLogName'          = 'Gathered LogName'
+            }
+
+            SortBy      = 'Record ID'
+            Descending  = $false
+            IgnoreWords = @{
+
+            }
+        }
+    }
     UserStatus             = @{
         Enabled = $false
         Events  = @{
@@ -284,17 +402,17 @@ $Script:ReportDefinitions = @{
         }
     }
     GroupPolicyChanges     = [ordered] @{
-        Enabled     = $false
-        'Group Policy Name Changes'     = @{
+        Enabled                     = $false
+        'Group Policy Name Changes' = @{
             Enabled     = $false
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
             Filter      = @{
                 # Filter is special, if there is just one object on the right side
                 # If there are more objects filter will pick all values on the right side and display them as required
-                'ObjectClass'              = 'groupPolicyContainer'
-               #'OperationType'            = 'Value Added'
-                'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
+                #'ObjectClass'              = 'groupPolicyContainer'
+                #'OperationType'            = 'Value Added'
+                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
             }
             Functions   = @{
                 #'ProfilePath'        = 'Convert-UAC'
@@ -340,7 +458,7 @@ $Script:ReportDefinitions = @{
 
             }
         }
-        'Group Policy Edits'     = @{
+        'Group Policy Edits'        = @{
             Enabled     = $false
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
@@ -348,7 +466,7 @@ $Script:ReportDefinitions = @{
                 # Filter is special, if there is just one object on the right side
                 # If there are more objects filter will pick all values on the right side and display them as required
                 'ObjectClass'              = 'groupPolicyContainer'
-               #'OperationType'            = 'Value Added'
+                #'OperationType'            = 'Value Added'
                 'AttributeLDAPDisplayName' = 'versionNumber'
             }
             Functions   = @{
