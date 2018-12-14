@@ -86,12 +86,12 @@ function Find-ADEvents {
             $EventsID = foreach ($R in $MyReport.Values) {
                 if ($Log -eq $R.LogName) {
                     $R.Events
+                    $Logger.AddInfoRecord("Events scanning for Events ID: $($R.Events) ($Log)")
                 }
             }
             foreach ($Date in $Dates) {
                 $ExecutionTime = Start-TimeLog
                 $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)")
-                $Logger.AddInfoRecord("Events scanning for Events ID: $EventsID ($Log)")
                 $FoundEvents = Get-Events -Server $Servers -LogName $Log -EventID $EventsID -DateFrom $Date.DateFrom -DateTo $Date.DateTo
                 Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
                 $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner

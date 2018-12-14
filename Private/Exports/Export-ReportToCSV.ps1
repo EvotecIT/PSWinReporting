@@ -5,7 +5,7 @@ function Export-ReportToCSV {
         [System.Collections.IDictionary] $ReportOptions,
         [string] $Extension,
         [string] $ReportName,
-        [System.Collections.IDictionary] $ReportTable
+        [PsCustomObject] $ReportTable
     )
     if ($Report) {
         $ReportFilePath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension $Extension -ReportName $ReportName
