@@ -1,6 +1,6 @@
 ## Define reports
 $Script:ReportDefinitions = @{
-    UserChanges            = @{
+    UserChanges             = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -55,7 +55,7 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    UserChangesDetailed    = [ordered] @{
+    UserChangesDetailed     = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -64,7 +64,7 @@ $Script:ReportDefinitions = @{
             Filter      = @{
                 # Filter is special, if there is just one object on the right side
                 # If there are more objects filter will pick all values on the right side and display them as required
-                'ObjectClass'              = 'user'
+                'ObjectClass' = 'user'
                 #'OperationType'            = 'Value Added'
                 #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
             }
@@ -114,7 +114,7 @@ $Script:ReportDefinitions = @{
             }
         }
     }
-    ComputerChangesDetailed    = [ordered] @{
+    ComputerChangesDetailed = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -123,7 +123,7 @@ $Script:ReportDefinitions = @{
             Filter      = @{
                 # Filter is special, if there is just one object on the right side
                 # If there are more objects filter will pick all values on the right side and display them as required
-                'ObjectClass'              = 'computer'
+                'ObjectClass' = 'computer'
                 #'OperationType'            = 'Value Added'
                 #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
             }
@@ -173,7 +173,7 @@ $Script:ReportDefinitions = @{
             }
         }
     }
-    UserStatus             = @{
+    UserStatus              = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -196,7 +196,7 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    UserLockouts           = @{
+    UserLockouts            = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -220,7 +220,7 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    UserLogon              = @{
+    UserLogon               = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -248,7 +248,7 @@ $Script:ReportDefinitions = @{
             IgnoreWords = @{}
         }
     }
-    ComputerCreatedChanged = @{
+    ComputerCreatedChanged  = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -291,7 +291,7 @@ $Script:ReportDefinitions = @{
             IgnoreWords = @{}
         }
     }
-    ComputerDeleted        = @{
+    ComputerDeleted         = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -314,7 +314,7 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    UserLogonKerberos      = @{
+    UserLogonKerberos       = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -350,7 +350,7 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    GroupMembershipChanges = @{
+    GroupMembershipChanges  = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -376,7 +376,7 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    GroupCreateDelete      = @{
+    GroupCreateDelete       = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -401,7 +401,7 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    GroupPolicyChanges     = [ordered] @{
+    GroupPolicyChanges      = [ordered] @{
         Enabled                     = $false
         'Group Policy Name Changes' = @{
             Enabled     = $false
@@ -410,9 +410,9 @@ $Script:ReportDefinitions = @{
             Filter      = @{
                 # Filter is special, if there is just one object on the right side
                 # If there are more objects filter will pick all values on the right side and display them as required
-                #'ObjectClass'              = 'groupPolicyContainer'
+                'ObjectClass'              = 'groupPolicyContainer'
                 #'OperationType'            = 'Value Added'
-                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
+                'AttributeLDAPDisplayName' = $null, 'displayName' #, 'versionNumber'
             }
             Functions   = @{
                 #'ProfilePath'        = 'Convert-UAC'
@@ -430,7 +430,7 @@ $Script:ReportDefinitions = @{
                 'Date'                     = 'When'
 
 
-                'ObjectDN'                 = 'OBjectDN'
+                'ObjectDN'                 = 'ObjectDN'
                 'ObjectGUID'               = 'ObjectGUID'
                 'ObjectClass'              = 'ObjectClass'
                 'AttributeLDAPDisplayName' = 'AttributeLDAPDisplayName'
@@ -485,7 +485,62 @@ $Script:ReportDefinitions = @{
                 'Date'                     = 'When'
 
 
-                'ObjectDN'                 = 'OBjectDN'
+                'ObjectDN'                 = 'ObjectDN'
+                'ObjectGUID'               = 'ObjectGUID'
+                'ObjectClass'              = 'ObjectClass'
+                'AttributeLDAPDisplayName' = 'AttributeLDAPDisplayName'
+                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
+                'AttributeValue'           = 'AttributeValue'
+                'OperationType'            = 'OperationType'
+                'OpCorrelationID'          = 'OperationCorelationID'
+                'AppCorrelationID'         = 'OperationApplicationCorrelationID'
+
+                'DSName'                   = 'DSName'
+                'DSType'                   = 'DSType'
+                'Task'                     = 'Task'
+                'Version'                  = 'Version'
+
+                # Common Fields
+                'ID'                       = 'Event ID'
+
+                'GatheredFrom'             = 'Gathered From'
+                'GatheredLogName'          = 'Gathered LogName'
+            }
+
+            SortBy      = 'Record ID'
+            Descending  = $false
+            IgnoreWords = @{
+
+            }
+        }
+        'Group Policy Links'        = @{
+            Enabled     = $false
+            Events      = 5136, 5137, 5141
+            LogName     = 'Security'
+            Filter      = @{
+                # Filter is special, if there is just one object on the right side
+                # If there are more objects filter will pick all values on the right side and display them as required
+                'ObjectClass' = 'domainDNS'
+                #'OperationType'            = 'Value Added'
+                #'AttributeLDAPDisplayName' = 'versionNumber'
+            }
+            Functions   = @{
+                #'ProfilePath'        = 'Convert-UAC'
+                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
+                #'DSType'        = 'ConvertFrom-OperationType'
+                'OperationType' = 'ConvertFrom-OperationType'
+            }
+            Fields      = [ordered] @{
+                'RecordID'                 = 'Record ID'
+                'Computer'                 = 'Domain Controller'
+                'Action'                   = 'Action'
+                'Who'                      = 'Who'
+                'Date'                     = 'When'
+
+
+                'ObjectDN'                 = 'ObjectDN'
                 'ObjectGUID'               = 'ObjectGUID'
                 'ObjectClass'              = 'ObjectClass'
                 'AttributeLDAPDisplayName' = 'AttributeLDAPDisplayName'
@@ -577,7 +632,7 @@ $Script:ReportDefinitions = @{
         }
 #>
     }
-    LogsClearedSecurity    = @{
+    LogsClearedSecurity     = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -615,7 +670,7 @@ $Script:ReportDefinitions = @{
             }
         }
     }
-    LogsClearedOther       = @{
+    LogsClearedOther        = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -647,7 +702,7 @@ $Script:ReportDefinitions = @{
             }
         }
     }
-    EventsReboots          = @{
+    EventsReboots           = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false

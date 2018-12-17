@@ -15,6 +15,7 @@ function Find-ADEvents {
         $ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
         $ParamAttrib.Mandatory = $true
         $ParamAttrib.ParameterSetName = '__AllParameterSets'
+
         $ReportAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
         $ReportAttrib.Add($ParamAttrib)
         $ReportAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($Names)))
@@ -71,7 +72,7 @@ function Find-ADEvents {
                 }
             }
         }
-
+        $Logger.AddInfoRecord("Report name: $Report")
         $Events = New-ArrayList
         $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
 
