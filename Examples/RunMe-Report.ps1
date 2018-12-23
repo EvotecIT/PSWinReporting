@@ -64,14 +64,38 @@ $ReportOptions = @{
 
     AsExcel               = $true # attaches Excel to email with all events, required PSWriteExcel module
     AsCSV                 = $true # attaches CSV to email with all events,
-    AsHTML                = $true # puts exported data into email directly with all events
+    AsHTML                = @{
+        Use        = $true # puts exported data into email directly with all events
+        OpenAsFile = $false # requires AsHTML set to $true
+    }
+    AsDynamicHTML         = @{
+        Use         = $true
+        OpenAsFile  = $true
+        Title       = 'Windows Events'
+        Path        = 'C:\Support\Reports\ExportedEvents'
+        FilePattern = 'Evotec-ADMonitoredEvents-<currentdate>.html'
+        DateFormat  = 'yyyy-MM-dd-HH_mm_ss'
+        Branding    = @{
+            Logo = @{
+                Show      = $true
+                RightLogo = @{
+                    ImageLink = 'https://evotec.xyz/wp-content/uploads/2015/05/Logo-evotec-012.png'
+                    Width     = '200'
+                    Height    = ''
+                    Link      = 'https://evotec.xyz'
+                }
+            }
+        }
+        EmbedCSS    = $false
+        EmbedJS     = $false
+    }
     SendMail              = $false
     OpenAsFile            = $true # requires AsHTML set to $true
     KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
     KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
     FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
     FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
-    RemoveDuplicates      = $true #
+    RemoveDuplicates      = $true # when multiple sources are used it's normal for duplicates to occur. This cleans it up.
 
     AsSql                 = @{
         Use                   = $true

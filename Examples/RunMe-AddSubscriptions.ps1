@@ -1,5 +1,4 @@
-#Clear-Host
-Import-Module PSWinReporting -Force
+Import-Module ..\PSWinReporting.psd1 -Force
 Import-Module PSSharedGoods #-Force
 
 $ReportDefinitions = @{

@@ -1,4 +1,4 @@
-Import-Module PSWinReporting
+Import-Module PSWinReporting -Force
 Import-Module PSSharedGoods
 
 $TaskName = 'ForwardedEvents'

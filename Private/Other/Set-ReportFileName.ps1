@@ -4,10 +4,13 @@ function Set-ReportFileName {
         [string] $ReportExtension,
         [string] $ReportName = ""
     )
-    $ReportTime = $(get-date -f $ReportOptions.FilePatternDateFormat)
-    if ($ReportOptions.KeepReportsPath -ne "") { $Path = $ReportOptions.KeepReportsPath} else { $Path = $env:TEMP }
+    if ($ReportOptions.KeepReportsPath -ne "") {
+        $Path = $ReportOptions.KeepReportsPath
+    } else {
+        $Path = $env:TEMP
+    }
     $ReportPath = $Path + "\" + $ReportOptions.FilePattern
-    $ReportPath = $ReportPath -replace "<currentdate>", $ReportTime
+    $ReportPath = $ReportPath -replace "<currentdate>", $(get-date -f $ReportOptions.FilePatternDateFormat)
     if ($ReportName -ne "") {
         $ReportPath = $ReportPath.Replace(".<extension>", "-$ReportName.$ReportExtension")
     } else {

@@ -119,7 +119,7 @@ function Start-Report {
     $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
 
     # prepare body with HTML
-    if ($ReportOptions.AsHTML) {
+    if ($ReportOptions.AsHTML.Use) {
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following AD servers were detected in forest'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
         $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
@@ -131,6 +131,36 @@ function Start-Report {
     }
 
     $Reports = @()
+
+    if ($ReportOptions.AsDynamicHTML.Use) {
+        $ReportFileName = Set-ReportFile -FileNamePattern $ReportOptions.AsDynamicHTML.FilePattern -DateFormat $ReportOptions.AsDynamicHTML.DateFormat
+
+        $ReportStarter = New-HTML -Open -TitleText $ReportOptions.AsDynamicHTML.Title `
+            -HideLogos:(-not $ReportOptions.AsDynamicHTML.Branding.Logo.Show) `
+            -RightLogoString $ReportOptions.AsDynamicHTML.Branding.Logo.RightLogo.ImageLink `
+            -UseCssLinks:$ReportOptions.AsDynamicHTML.EmbedCSS `
+            -UseStyleLinks:$ReportOptions.AsDynamicHTML.EmbedJS
+
+        $Report = New-GenericList
+        $Report.Add($ReportStarter)
+        foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
+            $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
+            if ($ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled) {
+                $Report.Add($(Get-HTMLContent -Open -HeaderText $ReportNameTitle ))
+                $Report.Add($(Get-HTMLColumn -Open -ColumnNumber 1 -ColumnCount 1 ))
+                if ($null -ne $Results.$ReportName) {
+                    $Report.Add($(Get-HTMLContentDataTable -ArrayOfObjects $Results.$ReportName -HideFooter))
+                }
+                $Report.Add($(Get-HTMLColumn -Close))
+            }
+            $Report.Add($(Get-HTMLContent -Close))
+        }
+        $Report.Add((New-HTML -Close))
+
+        [string] $DynamicHTMLPath = Save-HTML -HTML $Report -FilePath "$($ReportOptions.AsDynamicHTML.Path)\$ReportFileName"
+
+        $Reports += $DynamicHTMLPath
+    }
 
     if ($ReportOptions.AsExcel) {
         $Logger.AddInfoRecord('Prepare XLSX files with Events')
@@ -157,22 +187,30 @@ function Start-Report {
 
     $Logger.AddInfoRecord('Prepare Email replacements and formatting')
     # Do Cleanup of Emails
+
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
     $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
     $EmailBody = Set-EmailFormatting -Template $EmailBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions -Logger $Logger
+
     $Time.Stop()
 
     # Sending email - finalizing package
     if ($ReportOptions.SendMail) {
+
+        foreach ($Report in $Reports) {
+            $Logger.AddInfoRecord("Following files will be attached to email $Report")
+        }
+
+
         $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
         $Logger.AddInfoRecord('Sending email with reports')
         if ($FormattingParameters.CompanyBranding.Inline) {
-            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject -InlineAttachments @{logo = $FormattingParameters.CompanyBranding.Logo}
+            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject -InlineAttachments @{logo = $FormattingParameters.CompanyBranding.Logo} #-Verbose
         } else {
-            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject
+            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject #-Verbose
         }
         if ($SendMail.Status) {
             $Logger.AddInfoRecord('Email successfully sent')
@@ -181,12 +219,13 @@ function Start-Report {
         }
     }
 
-    if ($ReportOptions.AsHTML) {
+    if ($ReportOptions.AsHTML.Use) {
         $ReportHTMLPath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension 'html'
         $EmailBody | Out-File -Encoding Unicode -FilePath $ReportHTMLPath
         $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
-        if ($ReportOptions.OpenAsFile) { Invoke-Item $ReportHTMLPath }
+        if ($ReportOptions.AsHTML.OpenAsFile) { Invoke-Item $ReportHTMLPath }
     }
+    if ($ReportOptions.AsDynamicHTML.Use -and $ReportOptions.AsDynamicHTML.OpenAsFile) { Invoke-Item $DynamicHTMLPath }
 
     foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
         $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName

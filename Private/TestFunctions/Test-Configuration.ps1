@@ -59,9 +59,33 @@ function Test-Configuration () {
     $Success = (Test-Key $ReportOptions "ReportOptions" "JustTestPrerequisite" -DisplayProgress) -and $Success
     $Success = (Test-Key $ReportOptions "ReportOptions" "AsExcel" -DisplayProgress) -and $Success
     $Success = (Test-Key $ReportOptions "ReportOptions" "AsCSV" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "AsHTML" -DisplayProgress) -and $Success
+
     $Success = (Test-Key $ReportOptions "ReportOptions" "AsHTML" -DisplayProgress) -and $Success
+    if (Test-Key $ReportOptions "ReportOptions" "AsHTML" ) {
+        $Success = (Test-Key $ReportOptions.AsHTML "ReportOptions.AsHTML" "Use" -DisplayProgress -ValueType 'Boolean') -and $Success
+        $Success = (Test-Key $ReportOptions.AsHTML "ReportOptions.ASHTML" "OpenAsFile" -DisplayProgress -ValueType 'Boolean') -and $Success
+    }
+
+    $Success = (Test-Key $ReportOptions "ReportOptions" "AsDynamicHTML" -DisplayProgress) -and $Success
+    if (Test-Key $ReportOptions "ReportOptions" "AsDynamicHTML" ) {
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "Use" -DisplayProgress -ValueType 'Boolean') -and $Success
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "OpenAsFile" -DisplayProgress -ValueType 'Boolean') -and $Success
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "Title" -DisplayProgress -ValueType 'string') -and $Success
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "Path" -DisplayProgress -ValueType 'string') -and $Success
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "FilePattern" -DisplayProgress -ValueType 'string') -and $Success
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "DateFormat" -DisplayProgress -ValueType 'string') -and $Success
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "EmbedCSS" -DisplayProgress -ValueType 'Boolean') -and $Success
+        $Success = (Test-Key $ReportOptions.AsDynamicHTML "ReportOptions.AsDynamicHTML" "EmbedJS" -DisplayProgress -ValueType 'Boolean') -and $Success
+
+    }
+
+
+
+
+
     $Success = (Test-Key $ReportOptions "ReportOptions" "SendMail" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "OpenAsFile" -DisplayProgress) -and $Success
+
     $Success = (Test-Key $ReportOptions "ReportOptions" "KeepReports" -DisplayProgress) -and $Success
     if (Test-Key $ReportOptions "ReportOptions" "KeepReports" ) {
         if (-not (Test-Path $ReportOptions.KeepReportsPath -PathType Container)) {
@@ -251,14 +275,14 @@ function Test-Configuration () {
     #endregion ReportTimes Custom Dates
 
     #region ReportOptions Options
-    $Success = (Test-Key $ReportOptions "ReportOptions" "AsExcel" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "AsCSV" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "AsHTML" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "SendMail" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "KeepReportsPath" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "FilePattern" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "FilePatternDateFormat" -DisplayProgress) -and $Success
-    $Success = (Test-Key $ReportOptions "ReportOptions" "RemoveDuplicates" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "AsExcel" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "AsCSV" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "AsHTML" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "SendMail" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "KeepReportsPath" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "FilePattern" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "FilePatternDateFormat" -DisplayProgress) -and $Success
+    #$Success = (Test-Key $ReportOptions "ReportOptions" "RemoveDuplicates" -DisplayProgress) -and $Success
     #endregion ReportOptions Options
 
     return $Success
