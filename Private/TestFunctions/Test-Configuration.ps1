@@ -1,4 +1,5 @@
 function Test-Configuration () {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$LoggerParameters,

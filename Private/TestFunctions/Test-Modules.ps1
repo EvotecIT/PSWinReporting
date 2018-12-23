@@ -1,4 +1,5 @@
 function Test-Modules () {
+    [CmdletBinding()]
     param (
         [System.Collections.IDictionary] $ReportOptions
     )
