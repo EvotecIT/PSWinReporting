@@ -7,7 +7,9 @@ function Find-ADEvents {
         [parameter(ParameterSetName = "DateManual")]
         [DateTime] $DateTo,
 
-        [alias('Server', 'ComputerName')][string[]] $Servers
+        [alias('Server', 'ComputerName')][string[]] $Servers,
+
+        [System.Collections.IDictionary] $LoggerParameters
     )
     DynamicParam {
         # Defines Report / Dates Range dynamically from HashTables
@@ -45,12 +47,11 @@ function Find-ADEvents {
         $ReportDefinitions = $Script:ReportDefinitions
 
         ## Logging / Display to screen
-        $Params = @{
-            LogPath    = if ([string]::IsNullOrWhiteSpace($Script:LoggerParameters.LogsDir)) { '' } else { Join-Path $Script:LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log" }
-            ShowTime   = $Script:LoggerParameters.ShowTime
-            TimeFormat = $Script:LoggerParameters.TimeFormat
+
+        if (-not $LoggerParameters) {
+            $LoggerParameters = $Script:LoggerParameters
         }
-        $Logger = Get-Logger @Params
+        $Logger = Get-Logger @LoggerParameters
 
         ##
         if (-not $Servers) {

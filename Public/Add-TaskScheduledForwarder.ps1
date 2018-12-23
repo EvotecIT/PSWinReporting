@@ -6,9 +6,13 @@ function Add-TaskScheduledForwarder {
         [string] $Author = 'Evotec',
         [string] $URI = '\Event Viewer Tasks\ForwardedEvents',
         [string] $Command = 'powershell.exe',
-        [Array] $Argument = @('-windowstyle hidden', 'C:\Support\GitHub\PSWinReporting\Examples\Trigger.ps1', "-EventID $(eventID) -eventRecordID '$(eventRecordID)' -eventChannel '$(eventChannel)' -eventSeverity $(eventSeverity)")
-
+        [Array] $Argument = @('-windowstyle hidden', 'C:\Support\GitHub\PSWinReporting\Examples\Trigger.ps1', "-EventID $(eventID) -eventRecordID '$(eventRecordID)' -eventChannel '$(eventChannel)' -eventSeverity $(eventSeverity)"),
+        [System.Collections.IDictionary] $LoggerParameters
     )
+    if (-not $LoggerParameters) {
+        $LoggerParameters = $Script:LoggerParameters
+    }
+    $Logger = Get-Logger @LoggerParameters
     $XmlTemplate = "$PSScriptRoot\..\Templates\Template-ScheduledTask.xml"
     if (Test-Path $xmlTemplate) {
         Write-Color 'Found Template ', $xmlTemplate -Color White, Yellow
@@ -28,14 +32,14 @@ function Add-TaskScheduledForwarder {
                 $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
                 switch ($ErrorMessage) {
                     default {
-                        Write-Color -Text "Tasks adding error occured:" , $ErrorMessage -Color White, Red
+                        $Logger.AddErrorRecord("Tasks adding error occured: $ErrorMessage")
                     }
                 }
                 Exit
             }
-            Write-Color -Text 'Loaded template ', $ScheduledTaskXML -Color White, Yellow
+            $Logger.AddInfoRecord("Loaded template $ScheduledTaskXML")
         }
     } else {
-        Write-Color -Text 'Template not found ', $xmlTemplate -Color White, Yellow
+        $Logger.AddErrorRecord("Template not found $xmlTemplate")
     }
 }

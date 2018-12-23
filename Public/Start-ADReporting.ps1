@@ -14,9 +14,6 @@ function Start-ADReporting () {
         [System.Collections.IDictionary]$ReportDefinitions
     )
     [bool] $WarningNoLogger = $false
-    #$ErrorActionPreference = 'Stop'
-    #Set-StrictMode -Version Latest
-
     <#
         Set logger
     #>

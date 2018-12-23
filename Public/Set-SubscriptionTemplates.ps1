@@ -7,12 +7,10 @@ function Set-SubscriptionTemplates {
         [System.Collections.IDictionary] $LoggerParameters
     )
 
-    $Params = @{
-        LogPath = Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log"
-        ShowTime = $LoggerParameters.ShowTime
-        TimeFormat = $LoggerParameters.TimeFormat
+    if (-not $LoggerParameters) {
+        $LoggerParameters = $Script:LoggerParameters
     }
-    $Logger = Get-Logger @Params
+    $Logger = Get-Logger @LoggerParameters
 
     if ($DeleteAll -or $DeleteOwn) {
         Remove-Subscription -All:$DeleteAllOther -Own:$DeleteOwn

@@ -3,14 +3,10 @@ function Start-SubscriptionService {
     param(
         [System.Collections.IDictionary] $LoggerParameters
     )
-
-    $Params = @{
-        LogPath = Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log"
-        ShowTime = $LoggerParameters.ShowTime
-        TimeFormat = $LoggerParameters.TimeFormat
+    if (-not $LoggerParameters) {
+        $LoggerParameters = $Script:LoggerParameters
     }
-    $Logger = Get-Logger @Params
-
+    $Logger = Get-Logger @LoggerParameters
     $Logger.AddInfoRecord('Starting Windows Event Collector service.')
     #Write-Color 'Starting Windows Event Collector service.' -Color White, Green, White
     $Output = Start-MyProgram -Program $Script:ProgramWecutil -cmdArgList 'qc', '/q:true'

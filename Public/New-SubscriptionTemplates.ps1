@@ -4,19 +4,13 @@ function New-SubscriptionTemplates {
 		[System.Collections.IDictionary] $ReportDefinitions,
         [System.Collections.IDictionary] $LoggerParameters
     )
-
-    $Params = @{
-        LogPath = Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log"
-        ShowTime = $LoggerParameters.ShowTime
-        TimeFormat = $LoggerParameters.TimeFormat
+    if (-not $LoggerParameters) {
+        $LoggerParameters = $Script:LoggerParameters
     }
-    $Logger = Get-Logger @Params
+    $Logger = Get-Logger @LoggerParameters
 
 	$Events = Get-EventsData -ReportDefinitions $ReportDefinitions -LogName 'Security'
     $Systems = Get-EventsData -ReportDefinitions $ReportDefinitions -LogName 'System'
-
-	#Write-Color 'Found Security Events ', ([string] $Events) -Color White, Yellow
-    #Write-Color 'Found System Events ', ([string] $Systems) -Color White, Yellow
 
     $Logger.AddInfoRecord("Found Security Events $($Events -join ', ')")
     $Logger.AddInfoRecord("Found System Events $($Systems -join ', ')")
