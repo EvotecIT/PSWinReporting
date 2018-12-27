@@ -1,4 +1,5 @@
 function Get-MyEvents {
+    [CmdLetBinding()]
     param(
         [Array] $Events,
         [System.Collections.IDictionary] $ReportDefinition
@@ -15,16 +16,16 @@ function Get-MyEvents {
         $ReportAttrib.Add($ParamAttrib)
         $ReportAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($Names)))
 
-        $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('Report', [string], $ReportAttrib)
+        $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('ReportName', [string], $ReportAttrib)
 
         $RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
-        $RuntimeParamDic.Add('Report', $ReportRuntimeParam)
+        $RuntimeParamDic.Add('ReportName', $ReportRuntimeParam)
         return $RuntimeParamDic
     }
     Process {
-        [string] $ReportName = $PSBoundParameters.Report
-
-        $Logger.AddInfoRecord("Running $ReportName Report")
+        [string] $ReportName = $PSBoundParameters.ReportName
+        [string] $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
+        $Logger.AddInfoRecord("Running beautification process, applying filters for $ReportNameTitle report.")
         $ExecutionTime = Start-TimeLog
 
         foreach ($Report in $ReportDefinition.Keys | Where-Object { $_ -ne 'Enabled' }) {
@@ -36,6 +37,6 @@ function Get-MyEvents {
         }
 
         $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
-        $Logger.AddInfoRecord("Ending $ReportName Report - Time elapsed: $Elapsed")
+        $Logger.AddInfoRecord("Ending beautification process, applying filters for $ReportNameTitle report - Time elapsed: $Elapsed")
     }
 }

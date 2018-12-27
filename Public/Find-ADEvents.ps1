@@ -39,6 +39,8 @@ function Find-ADEvents {
     }
 
     Process {
+        if ($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent) { $Verbose = $true } else { $Verbose = $false }
+
         $Report = $PSBoundParameters.Report
         $DatesRange = $PSBoundParameters.DatesRange
 
@@ -73,7 +75,8 @@ function Find-ADEvents {
                 }
             }
         }
-        $Logger.AddInfoRecord("Report name: $Report")
+        [string] $ReportNameTitle = Format-AddSpaceToSentence -Text $Report
+        $Logger.AddInfoRecord("Report name: $ReportNameTitle")
         $Events = New-ArrayList
         $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
 
@@ -94,12 +97,13 @@ function Find-ADEvents {
             foreach ($Date in $Dates) {
                 $ExecutionTime = Start-TimeLog
                 $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)")
-                $FoundEvents = Get-Events -Server $Servers -LogName $Log -EventID $EventsID -DateFrom $Date.DateFrom -DateTo $Date.DateTo
+                $FoundEvents = Get-Events -Server $Servers -LogName $Log -EventID $EventsID -DateFrom $Date.DateFrom -DateTo $Date.DateTo -Verbose:$Verbose
+                #$Logger.AddInfoRecord("Events: $EventsID Event Count: $($FoundEvents.Count)")
                 Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
                 $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
                 $Logger.AddInfoRecord("Events scanned found $(Get-ObjectCount -Object $FoundEvents) - Time elapsed: $Elapsed")
             }
         }
-        return Get-MyEvents -Events $FoundEvents -ReportDefinition $MyReport -ReportName $Report
+        return Get-MyEvents -Events $Events -ReportDefinition $MyReport -ReportName $Report
     }
 }
