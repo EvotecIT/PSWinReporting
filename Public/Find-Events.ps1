@@ -98,7 +98,18 @@ function Find-Events {
             foreach ($Date in $Dates) {
                 $ExecutionTime = Start-TimeLog
                 $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)")
-                $FoundEvents = Get-Events -Server $Servers -LogName $Log -EventID $EventsID -DateFrom $Date.DateFrom -DateTo $Date.DateTo -Verbose:$Verbose
+                $FoundEvents = Get-Events -Server $Servers `
+                    -LogName $Log `
+                    -EventID $EventsID `
+                    -DateFrom $Date.DateFrom `
+                    -DateTo $Date.DateTo `
+                    -ErrorAction SilentlyContinue `
+                    -ErrorVariable ErrorsReturned `
+                    -Verbose:$Verbose
+
+                foreach ($MyError in $ErrorsReturned) {
+                    $Logger.AddErrorRecord("Server $MyError")
+                }
                 #$Logger.AddInfoRecord("Events: $EventsID Event Count: $($FoundEvents.Count)")
                 Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
                 $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
