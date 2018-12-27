@@ -7,8 +7,8 @@ function Find-Events {
         [parameter(ParameterSetName = "DateManual")]
         [DateTime] $DateTo,
 
-        [alias('Server', 'ComputerName')][string[]] $Servers,
-
+        [alias('Server', 'ComputerName')][string[]] $Servers = $Env:COMPUTERNAME,
+        [switch] $RunAgainstDC,
         [System.Collections.IDictionary] $LoggerParameters
     )
     DynamicParam {
@@ -56,7 +56,7 @@ function Find-Events {
         $Logger = Get-Logger @LoggerParameters
 
         ##
-        if (-not $Servers) {
+        if ($RunAgainstDC) {
             $ServersAD = Get-DC
             $Servers = ($ServersAD | Where-Object { $_.'Host Name' -ne 'N/A' }).'Host Name'
         }
@@ -76,7 +76,7 @@ function Find-Events {
             }
         }
         [string] $ReportNameTitle = Format-AddSpaceToSentence -Text $Report
-        $Logger.AddInfoRecord("Report name: $ReportNameTitle")
+        $Logger.AddInfoRecord("Running $ReportNameTitle report against $($Servers -join ' ,')")
         $Events = New-ArrayList
         $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
 
