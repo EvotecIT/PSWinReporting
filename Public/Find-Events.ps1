@@ -1,4 +1,4 @@
-function Find-ADEvents {
+function Find-Events {
     [CmdLetBinding()]
     param(
         [parameter(ParameterSetName = "DateManual")]

@@ -1,6 +1,6 @@
 ---
 external help file: PSWinReporting-help.xml
-Module Name: PSWinReporting
+Module Name: PsWinReporting
 online version:
 schema: 2.0.0
 ---

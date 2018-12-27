@@ -36,7 +36,10 @@ function Get-MyEvents {
             $EventsFound
         }
 
+        $EventsRemoved = $Events.Count - $EventsFound.Count
         $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
+        $Logger.AddInfoRecord("Events returned: $($EventsFound.Count), events skipped: $EventsRemoved")
         $Logger.AddInfoRecord("Ending beautification process, applying filters for $ReportNameTitle report - Time elapsed: $Elapsed")
+
     }
 }
