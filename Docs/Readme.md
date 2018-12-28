@@ -1,20 +1,20 @@
 ---
-Module Name: PSWinReporting
+Module Name: PsWinReporting
 Module Guid: 4b446d15-93e7-4eec-a6ee-d741f2ae2f3b
 Download Help Link: {{Please enter FwLink manually}}
 Help Version: {{Please enter version of help manually (X.X.X.X) format}}
 Locale: en-US
 ---
 
-# PSWinReporting Module
+# PsWinReporting Module
 ## Description
 {{Manually Enter Description Here}}
 
-## PSWinReporting Cmdlets
+## PsWinReporting Cmdlets
 ### [Add-TaskScheduledForwarder](Add-TaskScheduledForwarder.md)
 {{Fill in the Synopsis}}
 
-### [Find-ADEvents](Find-ADEvents.md)
+### [Find-Events](Find-Events.md)
 {{Fill in the Synopsis}}
 
 ### [New-SubscriptionTemplates](New-SubscriptionTemplates.md)
