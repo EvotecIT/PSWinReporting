@@ -28,23 +28,47 @@ function Start-Report {
     $Logger.AddInfoRecord("Found security events to process: $($EventsToProcessSecurity -join ', ')")
     $Logger.AddInfoRecord("Found system events to process: $($EventsToProcessSystem -join ', ')")
 
+    $AllErrors = @()
+
     $Events = New-ArrayList
     if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {
         $Logger.AddInfoRecord("Preparing Forwarded Events on forwarding servers: $($ReportDefinitions.ReportsAD.Servers.ForwardServer -join ', ')")
         foreach ($ForwardedServer in $ReportDefinitions.ReportsAD.Servers.ForwardServer) {
             #$Events += Get-Events -Server $ReportDefinitions.ReportsAD.ForwardServer -LogName $ReportDefinitions.ReportsAD.ForwardServer.ForwardEventLog
-            $FoundEvents = Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSecurity -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
+            $FoundEvents = Get-AllRequiredEvents -Servers $ForwardedServer `
+                -Dates $Dates `
+                -Events $EventsToProcessSecurity `
+                -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog `
+                -ErrorAction SilentlyContinue `
+                -ErrorVariable +AllErrors `
+                -Verbose:$ReportOptions.Debug.Verbose
             Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
-            $FoundEvents = Get-AllRequiredEvents -Servers $ForwardedServer -Dates $Dates -Events $EventsToProcessSystem -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -Verbose:$ReportOptions.Debug.Verbose
+            $FoundEvents = Get-AllRequiredEvents -Servers $ForwardedServer `
+                -Dates $Dates `
+                -Events $EventsToProcessSystem `
+                -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog `
+                -ErrorAction SilentlyContinue `
+                -ErrorVariable +AllErrors `
+                -Verbose:$ReportOptions.Debug.Verbose
             Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
         }
     }
     if ($ReportDefinitions.ReportsAD.Servers.UseDirectScan) {
         $Logger.AddInfoRecord("Processing Security Events from directly scanned servers: $($Servers -Join ', ')")
-        $FoundEvents = Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
+        $FoundEvents = Get-AllRequiredEvents -Servers $Servers `
+            -Dates $Dates `
+            -Events $EventsToProcessSecurity -LogName 'Security' `
+            -ErrorAction SilentlyContinue `
+            -ErrorVariable +AllErrors `
+            -Verbose:$ReportOptions.Debug.Verbose
         Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
         $Logger.AddInfoRecord("Processing System Events from directly scanned servers: $($Servers -Join ', ')")
-        $FoundEvents = Get-AllRequiredEvents -Servers $Servers -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
+        $FoundEvents = Get-AllRequiredEvents -Servers $Servers `
+            -Dates $Dates `
+            -Events $EventsToProcessSystem -LogName 'System' `
+            -ErrorAction SilentlyContinue `
+            -ErrorVariable +AllErrors `
+            -Verbose:$ReportOptions.Debug.Verbose
         Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
     }
     if ($ReportDefinitions.ReportsAD.ArchiveProcessing.Use) {
@@ -52,16 +76,31 @@ function Start-Report {
         foreach ($File in $EventLogFiles) {
             $TableEventLogFiles += Get-FileInformation -File $File
             $Logger.AddInfoRecord("Processing Security Events on file: $File")
-            $FoundEvents = Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSecurity -LogName 'Security' -Verbose:$ReportOptions.Debug.Verbose
+            $FoundEvents = Get-AllRequiredEvents `
+                -FilePath $File `
+                -Dates $Dates `
+                -Events $EventsToProcessSecurity `
+                -LogName 'Security' `
+                -ErrorAction SilentlyContinue `
+                -ErrorVariable +AllErrors `
+                -Verbose:$ReportOptions.Debug.Verbose
             Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
             $Logger.AddInfoRecord("Processing System Events on file: $File")
-            $FoundEvents = Get-AllRequiredEvents -FilePath $File -Dates $Dates -Events $EventsToProcessSystem -LogName 'System' -Verbose:$ReportOptions.Debug.Verbose
+            $FoundEvents = Get-AllRequiredEvents `
+                -FilePath $File `
+                -Dates $Dates `
+                -Events $EventsToProcessSystem `
+                -LogName 'System' `
+                -ErrorAction SilentlyContinue `
+                -ErrorVariable +AllErrors `
+                -Verbose:$ReportOptions.Debug.Verbose
             Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
         }
     }
 
-
-
+    foreach ($Errors in $AllErrors) {
+        $Logger.AddErrorRecord($Errors)
+    }
     $Logger.AddInfoRecord('Processing Event Log Sizes on defined servers for warnings')
     $EventLogDatesSummary = @()
     if ($ReportDefinitions.ReportsAD.Servers.UseForwarders) {

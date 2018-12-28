@@ -248,6 +248,42 @@ $Script:ReportDefinitions = @{
             IgnoreWords = @{}
         }
     }
+    UserUnlocked            = @{
+        # 4767	A user account was unlocked
+        # https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4767
+        Enabled = $false
+        Events  = @{
+            Enabled     = $false
+            Events      = 4767
+            LogName     = 'Security'
+            IgnoreWords = @{}
+            Functions   = @{
+                #'ProfilePath'        = 'Convert-UAC'
+                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
+                #'DSType'        = 'ConvertFrom-OperationType'
+                # 'IpAddress' = 'Clean-IpAddress'
+            }
+
+            Fields      = [ordered] @{
+                'Computer'         = 'Domain Controller'
+                'Action'           = 'Action'
+                'TargetDomainName' = 'Computer Lockout On'
+                'ObjectAffected'   = 'User Affected'
+                'Who'              = 'Who'
+                'Date'             = 'When'
+
+                # Common Fields
+                'ID'               = 'Event ID'
+                'RecordID'         = 'Record ID'
+                'GatheredFrom'     = 'Gathered From'
+                'GatheredLogName'  = 'Gathered LogName'
+            }
+
+            SortBy      = 'When'
+        }
+    }
     ComputerCreatedChanged  = @{
         Enabled = $false
         Events  = @{
@@ -354,7 +390,7 @@ $Script:ReportDefinitions = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
-            Events      = 4728, 4729, 4732, 4733, 4756, 4757, 4761, 4762
+            Events      = 4728, 4729, 4732, 4733, 4746, 4747, 4751, 4752, 4756, 4757, 4761, 4762, 4785, 4786, 4787, 4788
             LogName     = 'Security'
             IgnoreWords = @{
                 'Who' = '*ANONYMOUS*'
@@ -376,11 +412,11 @@ $Script:ReportDefinitions = @{
             SortBy      = 'When'
         }
     }
-    GroupCreateDelete       = @{
+    GroupEnumeration        = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
-            Events      = 4727, 4730, 4731, 4734, 4759, 4760, 4754, 4758
+            Events      = 4798, 4799
             LogName     = 'Security'
             IgnoreWords = @{
                 'Who' = '*ANONYMOUS*'
@@ -389,6 +425,7 @@ $Script:ReportDefinitions = @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
                 'TargetUserName'  = 'Group Name'
+                #'MemberNameWithoutCN' = 'Member Name' # Required work {$_.MemberName -replace '^CN=|,.*$' }}, fixed in PSEventViewer
                 'Who'             = 'Who'
                 'Date'            = 'When'
 
@@ -399,6 +436,121 @@ $Script:ReportDefinitions = @{
                 'GatheredLogName' = 'Gathered LogName'
             }
             SortBy      = 'When'
+        }
+    }
+    GroupChanges            = @{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $false
+            Events      = 4735, 4737, 4745, 4750, 4760, 4764, 4784, 4791
+            LogName     = 'Security'
+            IgnoreWords = @{
+                'Who' = '*ANONYMOUS*'
+            }
+
+            Fields      = [ordered] @{
+                'Computer'        = 'Domain Controller'
+                'Action'          = 'Action'
+                'TargetUserName'  = 'Group Name'
+                'Who'             = 'Who'
+                'Date'            = 'When'
+                'GroupTypeChange' = 'Changed Group Type'
+                'SamAccountName'  = 'Changed SamAccountName'
+                'SidHistory'      = 'Changed SidHistory'
+
+                # Common Fields
+                'ID'              = 'Event ID'
+                'RecordID'        = 'Record ID'
+                'GatheredFrom'    = 'Gathered From'
+                'GatheredLogName' = 'Gathered LogName'
+            }
+
+            SortBy      = 'When'
+        }
+    }
+    GroupCreateDelete       = @{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $false
+            Events      = 4727, 4730, 4731, 4734, 4744, 4748, 4749, 4753, 4754, 4758, 4759, 4763
+            LogName     = 'Security'
+            IgnoreWords = @{
+                'Who' = '*ANONYMOUS*'
+            }
+            Fields      = [ordered] @{
+                'Computer'        = 'Domain Controller'
+                'Action'          = 'Action'
+                'TargetUserName'  = 'Group Name'
+                'Who'             = 'Who'
+                'Date'            = 'When'
+                #'GroupTypeChange' = 'Group Type Change'
+
+                # Common Fields
+                'ID'              = 'Event ID'
+                'RecordID'        = 'Record ID'
+                'GatheredFrom'    = 'Gathered From'
+                'GatheredLogName' = 'Gathered LogName'
+            }
+            SortBy      = 'When'
+        }
+    }
+    GroupChangesDetailed = [ordered] @{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $false
+            Events      = 5136, 5137, 5141
+            LogName     = 'Security'
+            Filter      = @{
+                # Filter is special, if there is just one object on the right side
+                # If there are more objects filter will pick all values on the right side and display them as required
+                'ObjectClass' = 'group'
+                #'OperationType'            = 'Value Added'
+                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
+            }
+            Functions   = @{
+                #'ProfilePath'        = 'Convert-UAC'
+                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
+                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
+                #'DSType'        = 'ConvertFrom-OperationType'
+                'OperationType' = 'ConvertFrom-OperationType'
+            }
+            Fields      = [ordered] @{
+
+                'Computer'                 = 'Domain Controller'
+                'Action'                   = 'Action'
+                'OperationType'            = 'Action Detail'
+                'Who'                      = 'Who'
+                'Date'                     = 'When'
+
+
+                'ObjectDN'                 = 'Computer Object'
+                #'ObjectGUID'               = 'ObjectGUID'
+                'ObjectClass'              = 'ObjectClass'
+                'AttributeLDAPDisplayName' = 'Field Changed'
+                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
+                'AttributeValue'           = 'Field Value'
+
+                #'OpCorrelationID'          = 'OperationCorelationID'
+                #'AppCorrelationID'         = 'OperationApplicationCorrelationID'
+
+                #'DSName'                   = 'DSName'
+                #'DSType'                   = 'DSType'
+                #'Task'                     = 'Task'
+                #'Version'                  = 'Version'
+
+                # Common Fields
+                'RecordID'                 = 'Record ID'
+                'ID'                       = 'Event ID'
+                'GatheredFrom'             = 'Gathered From'
+                'GatheredLogName'          = 'Gathered LogName'
+            }
+
+            SortBy      = 'Record ID'
+            Descending  = $false
+            IgnoreWords = @{
+
+            }
         }
     }
     GroupPolicyChanges      = [ordered] @{
