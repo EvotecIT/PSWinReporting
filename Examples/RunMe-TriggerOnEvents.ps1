@@ -45,6 +45,13 @@ $ReportOptions = @{
             Channel = '#general'
             Uri     = ""
         }
+        Discord        = @{
+            Use = $false
+            Uri = ''
+            AvatarName = 'PSWinReporting'
+            AvatarImage = "https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png"
+            MessageColor     = 'blue'
+        }
         MSSQL          = @{
             Use                   = $false
             SqlServer             = 'EVO1'
