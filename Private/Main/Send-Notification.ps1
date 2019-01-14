@@ -19,23 +19,10 @@ function Send-Notificaton {
                 [string] $ActivityTitle = $($Event.Action).Trim()
                 [string] $ActivityPriority = 'Default'
 
-
-
                 # Building message
-
-                if ($ActivityTitle -like '*added*') {
-                    $Color = [RGBColors]::Green
-                    $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
-                } elseif ($ActivityTitle -like '*remove*') {
-                    $Color = [RGBColors]::Red
-                    $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
-                } else {
-                    $Color = [RGBColors]::Yellow
-                    $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
-                }
-
-
-
+                $Teams = Get-NotificationParameters -Notifications $ReportOptions.Notifications.MicrosoftTeams -ActivityTitle $ActivityTitle
+                $Slack = Get-NotificationParameters -Notifications $ReportOptions.Notifications.Slack -ActivityTitle $ActivityTitle
+                $Discord = Get-NotificationParameters -Notifications $ReportOptions.Notifications.Discord -ActivityTitle $ActivityTitle
 
                 $FactsSlack = @()
                 $FactsTeams = @()
@@ -54,23 +41,18 @@ function Send-Notificaton {
                     }
                 }
 
-                ### Notifications
-
-                $SlackURI = $ReportOptions.Notifications.Slack.$ActivityPriority.Uri
-                $TeamsURI = $ReportOptions.Notifications.MicrosoftTeams.$ActivityPriority.Uri
-                $DiscordURI = $ReportOptions.Notifications.Discord.$ActivityPriority.Uri
-
                 # Slack Notifications
                 if ($ReportOptions.Notifications.Slack.Use) {
                     $SlackChannel = $ReportOptions.Notifications.Slack.$ActivityPriority.Channel
+                    $SlackColor = ConvertFrom-Color -Color $Slack.Color
 
-                    $Data = New-SlackMessageAttachment -Color 'Yellow' `
+                    $Data = New-SlackMessageAttachment -Color $SlackColor `
                         -Title "$MessageTitle - $ActivityTitle"  `
                         -Fields $FactsSlack `
-                        -Fallback 'Your client is bad' |
+                        -Fallback $ActivityTitle |
                         New-SlackMessage -Channel $SlackChannel `
-                        -IconEmoji :bomb: |
-                        Send-SlackMessage -Uri $SlackURI
+                        -IconEmoji :bomb:  |
+                        Send-SlackMessage -Uri $Slack.Uri -Verbose
 
                     Write-Color @script:WriteParameters -Text "[i] Slack output: ", $Data -Color White, Yellow
                 }
@@ -79,13 +61,13 @@ function Send-Notificaton {
 
                     $Section1 = New-TeamsSection `
                         -ActivityTitle $ActivityTitle `
-                        -ActivityImageLink $ActivityImageLink `
+                        -ActivityImageLink $Teams.ActivityImageLink `
                         -ActivityDetails $FactsTeams
 
                     $Data = Send-TeamsMessage `
-                        -URI $TeamsURI `
+                        -URI $Teams.Uri `
                         -MessageTitle $MessageTitle `
-                        -Color $Color `
+                        -Color $Teams.Color `
                         -Sections $Section1 `
                         -Supress $false #`
                     # -Verbose
@@ -97,16 +79,16 @@ function Send-Notificaton {
                     $AvatarName = $ReportOptions.Notifications.Discord.$ActivityPriority.AvatarName
                     $AvatarUrl = $ReportOptions.Notifications.Discord.$ActitityPriority.AvatarImage
 
-                    $Thumbnail = New-DiscordImage -Url $ActivityImageLink
+                    $Thumbnail = New-DiscordImage -Url $Discord.ActivityImageLink
 
                     $Section1 = New-DiscordSection `
                         -Title $ActivityTitle `
                         -Facts $FactsDiscord `
                         -Thumbnail $Thumbnail `
-                        -Color $Color
+                        -Color $Discord.Color -Verbose
 
                     $Data = Send-DiscordMessage `
-                        -WebHookUrl $DiscordURI `
+                        -WebHookUrl $Discord.Uri `
                         -Sections $Section1 `
                         -AvatarName $AvatarName `
                         -AvatarUrl $AvatarUrl `
