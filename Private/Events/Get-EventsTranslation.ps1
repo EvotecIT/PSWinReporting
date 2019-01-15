@@ -93,7 +93,7 @@ function Get-EventsTranslation {
         [PsCustomObject]$HashTable
 
     }
-    $MyValue = Find-EventsIgnored -Events $MyValue -IgnoreWords $EventsDefinition.IgnoreWords
+    $MyValue = Find-EventsTo -Ignore -Events $MyValue -DataSet $EventsDefinition.IgnoreWords
 
     if ($null -eq $EventsDefinition.Fields) {
         return $MyValue | Sort-Object $EventsDefinition.SortBy

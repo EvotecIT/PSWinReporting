@@ -46,8 +46,26 @@ function Start-Notifications {
         }
     }
 
+    [bool] $FoundPriorityEvent = $false
     foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
-        Send-Notificaton -Events $Results.$ReportName -ReportOptions $ReportOptions
+
+        if ($Results.$ReportName) {
+
+            if ($null -ne $ReportDefinitions.ReportsAD.EventBased.$ReportName.Priority) {
+                foreach ($Priority in $ReportDefinitions.ReportsAD.EventBased.$ReportName.Priority.Keys) {
+                    $MyValue = Find-EventsTo -Prioritize -Events $Results.$ReportName -DataSet  $ReportDefinitions.ReportsAD.EventBased.$ReportName.Priority.$Priority
+                    if ((Get-ObjectCount -Object $MyValue) -gt 0) {
+                        $Logger.AddInfoRecord("Sending event with $Priority priority.")
+                        Send-Notificaton -Events $MyValue -ReportOptions $ReportOptions -Priority $Priority
+                        $FoundPriorityEvent = $true
+                    }
+                }
+            }
+            if (-not $FoundPriorityEvent) {
+                $Logger.AddInfoRecord("Sending event with default priority.")
+                Send-Notificaton -Events $Results.$ReportName -ReportOptions $ReportOptions -Priority 'Default'
+            }
+        }
     }
 
     if ($ReportOptions.Backup.Use) {

@@ -2,7 +2,8 @@ function Send-Notificaton {
     [CmdletBinding()]
     param(
         [PSCustomObject] $Events,
-        [System.Collections.IDictionary] $ReportOptions
+        [System.Collections.IDictionary] $ReportOptions,
+        [string] $Priority = 'Default'
     )
     Begin {
         if ($ReportOptions.Notifications.Slack.Use -eq $false -or
@@ -17,12 +18,12 @@ function Send-Notificaton {
             foreach ($Event in $Events) {
                 [string] $MessageTitle = 'Active Directory Changes'
                 [string] $ActivityTitle = $($Event.Action).Trim()
-                [string] $ActivityPriority = 'Default'
+
 
                 # Building message
-                $Teams = Get-NotificationParameters -Notifications $ReportOptions.Notifications.MicrosoftTeams -ActivityTitle $ActivityTitle
-                $Slack = Get-NotificationParameters -Notifications $ReportOptions.Notifications.Slack -ActivityTitle $ActivityTitle
-                $Discord = Get-NotificationParameters -Notifications $ReportOptions.Notifications.Discord -ActivityTitle $ActivityTitle
+                $Teams = Get-NotificationParameters -Type 'Microsoft Teams' -Notifications $ReportOptions.Notifications.MicrosoftTeams -ActivityTitle $ActivityTitle -Priority $Priority
+                $Slack = Get-NotificationParameters -Type 'Slack' -Notifications $ReportOptions.Notifications.Slack -ActivityTitle $ActivityTitle -Priority $Priority
+                $Discord = Get-NotificationParameters -Type 'Discord' -Notifications $ReportOptions.Notifications.Discord -ActivityTitle $ActivityTitle -Priority $Priority
 
                 $FactsSlack = @()
                 $FactsTeams = @()
@@ -43,7 +44,7 @@ function Send-Notificaton {
 
                 # Slack Notifications
                 if ($ReportOptions.Notifications.Slack.Use) {
-                    $SlackChannel = $ReportOptions.Notifications.Slack.$ActivityPriority.Channel
+                    $SlackChannel = $ReportOptions.Notifications.Slack.$Priority.Channel
                     $SlackColor = ConvertFrom-Color -Color $Slack.Color
 
                     $Data = New-SlackMessageAttachment -Color $SlackColor `
@@ -76,8 +77,8 @@ function Send-Notificaton {
                 # Discord Notifications
                 if ($ReportOptions.Notifications.Discord.Use) {
 
-                    $AvatarName = $ReportOptions.Notifications.Discord.$ActivityPriority.AvatarName
-                    $AvatarUrl = $ReportOptions.Notifications.Discord.$ActitityPriority.AvatarImage
+                    #$AvatarName = $ReportOptions.Notifications.Discord.$Priority.AvatarName
+                    #$AvatarUrl = $ReportOptions.Notifications.Discord.$Priority.AvatarImage
 
                     $Thumbnail = New-DiscordImage -Url $Discord.ActivityImageLink
 
@@ -90,8 +91,8 @@ function Send-Notificaton {
                     $Data = Send-DiscordMessage `
                         -WebHookUrl $Discord.Uri `
                         -Sections $Section1 `
-                        -AvatarName $AvatarName `
-                        -AvatarUrl $AvatarUrl `
+                        -AvatarName $Discord.AvatarName `
+                        -AvatarUrl $Discord.AvatarUrl `
                         -OutputJSON
 
                     Write-Color @script:WriteParameters -Text "[i] Discord output: ", $Data -Color White, Yellow
