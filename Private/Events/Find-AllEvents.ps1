@@ -1,7 +1,7 @@
 function Find-AllEvents {
     param (
         [System.Collections.IDictionary] $ReportDefinitions,
-        $LogNameSearch,
+        [string] $LogNameSearch,
         [switch] $All
     )
     $EventsToProcess = @()

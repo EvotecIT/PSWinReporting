@@ -76,10 +76,6 @@ function Send-Notificaton {
                 }
                 # Discord Notifications
                 if ($ReportOptions.Notifications.Discord.Use) {
-
-                    #$AvatarName = $ReportOptions.Notifications.Discord.$Priority.AvatarName
-                    #$AvatarUrl = $ReportOptions.Notifications.Discord.$Priority.AvatarImage
-
                     $Thumbnail = New-DiscordImage -Url $Discord.ActivityImageLink
 
                     $Section1 = New-DiscordSection `
