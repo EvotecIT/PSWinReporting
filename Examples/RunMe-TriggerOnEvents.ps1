@@ -38,19 +38,112 @@ $ReportOptions = @{
     Notifications         = @{
         MicrosoftTeams = @{
             Use     = $false
-            TeamsID = ''
+
+            Default = @{
+                Uri           = ''
+                ActivityLinks = @{
+                    Added   = @{
+                        Color = [RGBColors]::AliceBlue
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
+                    }
+                    Removed = @{
+                        Color = [RGBColors]::Red
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
+                    }
+                    Default = @{
+                        Color = [RGBColors]::Yellow
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
+                    }
+                }
+            }
+            High    = @{
+                Uri           = ''
+                ActivityLinks = @{
+                    Added   = @{
+                        Color = [RGBColors]::Bisque
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
+                    }
+                    Removed = @{
+                        Color = [RGBColors]::IndianRed
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
+                    }
+                    Change = @{
+                        Color = [RGBColors]::DarkSeaGreen
+                        Link = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20330.png'
+                    }
+                    Default = @{
+                        Color = [RGBColors]::Azure
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
+                    }
+                }
+            }
         }
         Slack          = @{
             Use     = $false
-            Channel = '#general'
-            Uri     = ""
+
+            Default = @{
+                Channel       = '#general'
+                Uri           = ""
+
+                ActivityLinks = @{
+                    Added   = @{
+                        Color = [RGBColors]::Blue
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
+                    }
+                    Removed = @{
+                        Color = [RGBColors]::Red
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
+                    }
+                    Default = @{
+                        Color = [RGBColors]::Yellow
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
+                    }
+                }
+            }
         }
         Discord        = @{
-            Use = $false
-            Uri = ''
-            AvatarName = 'PSWinReporting'
-            AvatarImage = "https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png"
-            MessageColor     = 'blue'
+            Use     = $false
+
+            Default = @{
+                Uri           = ''
+                AvatarName    = 'PSWinReporting'
+                AvatarImage   = "https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png"
+
+                ActivityLinks = @{
+                    Added   = @{
+                        Color = [RGBColors]::Blue
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
+                    }
+                    Removed = @{
+                        Color = [RGBColors]::Red
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
+                    }
+                    Default = @{
+                        Color = [RGBColors]::Yellow
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
+                    }
+                }
+            }
+            High = @{
+                Uri           = ''
+                AvatarName    = 'High Priority'
+                AvatarImage   = "https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png"
+
+                ActivityLinks = @{
+                    Added   = @{
+                        Color = [RGBColors]::Blue
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
+                    }
+                    Removed = @{
+                        Color = [RGBColors]::Red
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
+                    }
+                    Default = @{
+                        Color = [RGBColors]::Yellow
+                        Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
+                    }
+                }
+            }
         }
         MSSQL          = @{
             Use                   = $false
@@ -119,7 +212,20 @@ $ReportDefinitions = @{
                 Enabled     = $true
                 Events      = 4720, 4738
                 LogName     = 'Security'
-                IgnoreWords = @{}
+                IgnoreWords = @{
+                    #  'Who' = '*Admin*'
+                }
+                Priority    = @{
+                    High = @{
+                        'Domain Controller' = ''
+                        'Action'            = ''
+                        'User Affected'     = ''
+                        'Who'               = '*Admin*'
+                        'When'              = ''
+                        'Event ID'          = ''
+                        'Record ID'         = ''
+                    }
+                }
             }
             UserStatus             = @{
                 Enabled     = $true
