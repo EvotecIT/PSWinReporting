@@ -174,31 +174,29 @@ function Start-Report {
     if ($ReportOptions.AsDynamicHTML.Use) {
         $ReportFileName = Set-ReportFile -FileNamePattern $ReportOptions.AsDynamicHTML.FilePattern -DateFormat $ReportOptions.AsDynamicHTML.DateFormat
 
-        $ReportStarter = New-HTML -Open -TitleText $ReportOptions.AsDynamicHTML.Title `
+        $DynamicHTML = New-HTML -TitleText $ReportOptions.AsDynamicHTML.Title `
             -HideLogos:(-not $ReportOptions.AsDynamicHTML.Branding.Logo.Show) `
             -RightLogoString $ReportOptions.AsDynamicHTML.Branding.Logo.RightLogo.ImageLink `
             -UseCssLinks:$ReportOptions.AsDynamicHTML.EmbedCSS `
-            -UseStyleLinks:$ReportOptions.AsDynamicHTML.EmbedJS
+            -UseStyleLinks:$ReportOptions.AsDynamicHTML.EmbedJS {
 
-        $Report = New-GenericList
-        $Report.Add($ReportStarter)
-        foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
-            $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
-            if ($ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled) {
-                $Report.Add($(Get-HTMLContent -Open -HeaderText $ReportNameTitle ))
-                $Report.Add($(Get-HTMLColumn -Open -ColumnNumber 1 -ColumnCount 1 ))
-                if ($null -ne $Results.$ReportName) {
-                    $Report.Add($(Get-HTMLContentDataTable -ArrayOfObjects $Results.$ReportName -HideFooter))
+            foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
+                $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
+                if ($ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled) {
+                    New-HTMLContent -HeaderText $ReportNameTitle -CanCollapse {
+                        New-HTMLColumn -ColumnNumber 1 -ColumnCount 1 {
+                            if ($null -ne $Results.$ReportName) {
+                                Get-HTMLContentDataTable -ArrayOfObjects $Results.$ReportName -HideFooter
+                            }
+                        }
+                    }
                 }
-                $Report.Add($(Get-HTMLColumn -Close))
             }
-            $Report.Add($(Get-HTMLContent -Close))
         }
-        $Report.Add((New-HTML -Close))
-
-        [string] $DynamicHTMLPath = Save-HTML -HTML $Report -FilePath "$($ReportOptions.AsDynamicHTML.Path)\$ReportFileName"
-
-        $Reports += $DynamicHTMLPath
+        if ($null -ne $DynamicHTML) {
+            [string] $DynamicHTMLPath = Save-HTML -HTML $DynamicHTML -FilePath "$($ReportOptions.AsDynamicHTML.Path)\$ReportFileName"
+            $Reports += $DynamicHTMLPath
+        }
     }
 
     if ($ReportOptions.AsExcel) {
@@ -264,9 +262,17 @@ function Start-Report {
         $ReportHTMLPath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension 'html'
         $EmailBody | Out-File -Encoding Unicode -FilePath $ReportHTMLPath
         $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
-        if ($ReportOptions.AsHTML.OpenAsFile) { Invoke-Item $ReportHTMLPath }
+        if ($ReportHTMLPath -ne '' -and ($ReportOptions.AsHTML.OpenAsFile)) {
+            if (Test-Path -LiteralPath $ReportHTMLPath) {
+                Invoke-Item $ReportHTMLPath
+            }
+        }
     }
-    if ($ReportOptions.AsDynamicHTML.Use -and $ReportOptions.AsDynamicHTML.OpenAsFile) { Invoke-Item $DynamicHTMLPath }
+    if ($ReportOptions.AsDynamicHTML.Use -and $ReportOptions.AsDynamicHTML.OpenAsFile) {
+        if ($DynamicHTMLPath -ne '' -and (Test-Path -LiteralPath $DynamicHTMLPath)) {
+            Invoke-Item $DynamicHTMLPath
+        }
+    }
 
     foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
         $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName

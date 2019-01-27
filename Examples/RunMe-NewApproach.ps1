@@ -62,11 +62,11 @@ $ReportOptions = [ordered] @{
     AsExcel               = $true # attaches Excel to email with all events, required PSWriteExcel module
     AsCSV                 = $true # attaches CSV to email with all events,
     AsHTML                = @{
-        Use        = $true # puts exported data into email directly with all events
+        Enabled   = $true # puts exported data into email directly with all events
         OpenAsFile = $true # requires AsHTML set to $true
     }
     AsDynamicHTML         = @{
-        Use         = $false
+        Enabled     = $true
         OpenAsFile  = $true
         Title       = 'Windows Events'
         Path        = 'C:\Support\Reports\ExportedEvents'
@@ -86,8 +86,9 @@ $ReportOptions = [ordered] @{
         EmbedCSS    = $false
         EmbedJS     = $false
     }
-    SendMail              = $false
-    OpenAsFile            = $true # requires AsHTML set to $true
+    SendMail              = @{
+        Enabled = $false
+    }
     KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
     KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
     FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
