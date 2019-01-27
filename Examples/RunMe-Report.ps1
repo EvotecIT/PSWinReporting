@@ -220,8 +220,6 @@ $ReportTimes = @{
     }
 }
 $ReportDefinitions = @{
-    TimeToGenerate = $false
-
     ReportsAD      = @{
         Servers           = @{
             UseForwarders   = $true # if $true skips Automatic/OnlyPDC/DC for reading logs. However it uses Automatic to deliver size of logs so keep Automatic to $true

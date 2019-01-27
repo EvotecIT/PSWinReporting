@@ -1,4 +1,5 @@
 function Set-TimeReports {
+    [CmdletBinding()]
     param(
         [System.Collections.IDictionary] $HashTable
     )

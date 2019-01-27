@@ -1,4 +1,5 @@
 function Start-ADReporting () {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
         [System.Collections.IDictionary]$LoggerParameters,

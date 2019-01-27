@@ -1,4 +1,4 @@
-function Get-CongfigurationEvents {
+function Get-EventLogFileList {
     [CmdletBinding()]
     param(
         $Sections

@@ -72,7 +72,7 @@ function Start-Report {
         Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
     }
     if ($ReportDefinitions.ReportsAD.ArchiveProcessing.Use) {
-        $EventLogFiles = Get-CongfigurationEvents -Sections $ReportDefinitions.ReportsAD.ArchiveProcessing
+        $EventLogFiles = Get-EventLogFileList -Sections $ReportDefinitions.ReportsAD.ArchiveProcessing
         foreach ($File in $EventLogFiles) {
             $TableEventLogFiles += Get-FileInformation -File $File
             $Logger.AddInfoRecord("Processing Security Events on file: $File")
@@ -153,18 +153,18 @@ function Start-Report {
 
     # Prepare email body
     $Logger.AddInfoRecord('Prepare email head and body')
-    $EmailBody = Set-EmailHead -FormattingOptions $FormattingParameters
-    $EmailBody += Set-EmailReportBranding -FormattingParameters $FormattingParameters
-    $EmailBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
+    $HtmlHead = Set-EmailHead -FormattingOptions $FormattingParameters
+    $HtmlBody = Set-EmailReportBranding -FormattingParameters $FormattingParameters
+    $HtmlBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
 
     # prepare body with HTML
     if ($ReportOptions.AsHTML.Use) {
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following AD servers were detected in forest'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
-        $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
+        $HtmlBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following AD servers were detected in forest'
+        $HtmlBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
+        $HtmlBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
         foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName -ToLowerCase
-            $EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -ReportTable $Results.$ReportName -ReportTableText "Following $ReportNameTitle happened"
+            $HtmlBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -ReportTable $Results.$ReportName -ReportTableText "Following $ReportNameTitle happened"
 
         }
     }
@@ -227,12 +227,14 @@ function Start-Report {
     $Logger.AddInfoRecord('Prepare Email replacements and formatting')
     # Do Cleanup of Emails
 
-    $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
-    $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
-    $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
-    $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
-    $EmailBody = Set-EmailWordReplacements -Body $EmailBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
-    $EmailBody = Set-EmailFormatting -Template $EmailBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions -Logger $Logger
+    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
+    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
+    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
+    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
+    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
+    $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions -Logger $Logger -SkipNewLines
+
+    $EmailBody = $HtmlHead + $HtmlBody
 
     $Time.Stop()
 
