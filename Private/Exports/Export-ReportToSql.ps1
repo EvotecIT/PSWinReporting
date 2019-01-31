@@ -1,12 +1,11 @@
 function Export-ReportToSQL {
+    [CmdletBinding()]
     param (
         [System.Collections.IDictionary] $Report,
         [System.Collections.IDictionary] $ReportOptions,
         [string] $ReportName,
-        $ReportTable
+        [Array] $ReportTable
     )
-    #Get-ObjectType -Object $Report -Verbose -VerboseOnly
-    #Get-ObjectType -Object $ReportOptions -Verbose -VerboseOnly
     if ($Report.Enabled) {
         # checks if Report is enabled
         if ($ReportOptions.Contains('AsSql') -and $ReportOptions.AsSql.Use) {

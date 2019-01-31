@@ -42,9 +42,9 @@ function Start-ReportSpecial {
     }
 
     # Get LogNames
-    $LogNames = foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -ne 'Enabled' }) {
+    $LogNames = foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
         if ($ReportDefinitions.$Report.Enabled) {
-            foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -ne 'Enabled'}) {
+            foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
                 if ($ReportDefinitions.$Report.$SubReport.Enabled) {
                     $ReportDefinitions.$Report.$SubReport.LogName
 
@@ -78,9 +78,9 @@ function Start-ReportSpecial {
     #>
 
     [Array] $ExtendedInput = foreach ($Log in $LogNames | Sort-Object -Unique) {
-        $EventIDs = foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -ne 'Enabled' }) {
+        $EventIDs = foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
             if ($ReportDefinitions.$Report.Enabled) {
-                foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -ne 'Enabled'}) {
+                foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
                     if ($ReportDefinitions.$Report.$SubReport.Enabled) {
                         if ($ReportDefinitions.$Report.$SubReport.LogName -eq $Log) {
                             $ReportDefinitions.$Report.$SubReport.Events
@@ -127,13 +127,15 @@ function Start-ReportSpecial {
         $OutputServers
         $OutputFiles
     }
-
     # Scan all events and get everything at once
     $AllEvents = Get-Events `
         -ExtendedInput $ExtendedInput `
         -ErrorAction SilentlyContinue `
         -ErrorVariable AllErrors `
         -Verbose:$Verbose
+
+    $Logger.AddInfoRecord("Found $($AllEvents.Count) events.")
+
 
     foreach ($Errors in $AllErrors) {
         $Logger.AddErrorRecord($Errors)
@@ -142,12 +144,12 @@ function Start-ReportSpecial {
 
     # Prepare the results based on chosen criteria
     $Results = @{}
-    foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -ne 'Enabled' }) {
+    foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
         if ($ReportDefinitions.$Report.Enabled) {
             #$ReportNameTitle = Format-AddSpaceToSentence -Text $Report -ToLowerCase
             $Logger.AddInfoRecord("Running $Report")
             $TimeExecution = Start-TimeLog
-            foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -ne 'Enabled'}) {
+            foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'  }) {
                 if ($ReportDefinitions.$Report.$SubReport.Enabled) {
                     $Logger.AddInfoRecord("Running $Report with subsection $SubReport")
                     [string] $EventsType = $ReportDefinitions.$Report.$SubReport.LogName
@@ -204,11 +206,11 @@ function Start-ReportSpecial {
             -UseCssLinks:$ReportOptions.AsDynamicHTML.EmbedCSS `
             -UseStyleLinks:$ReportOptions.AsDynamicHTML.EmbedJS {
 
-            foreach ($ReportName in $ReportDefinitions.Keys) {
+            foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
                 $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
                 if ($ReportDefinitions.$ReportName.Enabled) {
                     New-HTMLContent -HeaderText $ReportNameTitle -CanCollapse {
-                        New-HTMLColumn -ColumnNumber 1 -ColumnCount 1 {
+                        New-HTMLColumn -Columns 1 {
                             if ($null -ne $Results.$ReportName) {
                                 Get-HTMLContentDataTable -ArrayOfObjects $Results.$ReportName -HideFooter
                             }
@@ -230,7 +232,7 @@ function Start-ReportSpecial {
         #Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersAD
         #Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Event log sizes" -ReportTable $EventLogTable
 
-        foreach ($ReportName in $ReportDefinitions.Keys) {
+        foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
             Export-ReportToXLSX -Report $ReportDefinitions.$ReportName.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
         }
@@ -241,24 +243,18 @@ function Start-ReportSpecial {
         #$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportServers" -ReportTable $ServersAD
         #$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportEventLogSize" -ReportTable $EventLogTable
 
-        foreach ($ReportName in $ReportDefinitions.Keys) {
+        foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
             $Reports += Export-ReportToCSV -Report $ReportDefinitions.$ReportName.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName $ReportName -ReportTable $Results.$ReportName
         }
     }
     $Reports = $Reports |  Where-Object { $_ } | Sort-Object -Unique
 
 
-
-
-
-
     # Sending email - finalizing package
     if ($ReportOptions.SendMail.Enabled) {
-
         foreach ($Report in $Reports) {
             $Logger.AddInfoRecord("Following files will be attached to email $Report")
         }
-
 
         $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
         $Logger.AddInfoRecord('Sending email with reports')
@@ -289,9 +285,9 @@ function Start-ReportSpecial {
         }
     }
 
-    foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
+    foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
         $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
-        Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName -ReportOptions $ReportOptions -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
+        Export-ToSql -Report $ReportDefinitions.$ReportName -ReportOptions $ReportOptions -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
     }
     Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
 

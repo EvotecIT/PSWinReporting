@@ -153,8 +153,6 @@ $ReportOptions = [ordered] @{
     }
 }
 
-#$Servers = 'AD1', 'AD2'
-
 $Target = [ordered]@{
     Servers           = [ordered] @{
         Enabled = $true
@@ -241,8 +239,6 @@ $ReportTimes = @{
         Enabled = $false
     }
 }
-
-
 ## Define reports
 $ReportADDefinitions = [ordered] @{
     UserChanges             = @{
@@ -632,9 +628,9 @@ $ReportADDefinitions = [ordered] @{
         }
     }
     GroupMembershipChanges  = @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4728, 4729, 4732, 4733, 4746, 4747, 4751, 4752, 4756, 4757, 4761, 4762, 4785, 4786, 4787, 4788
             LogName     = 'Security'
             IgnoreWords = @{
@@ -1145,6 +1141,6 @@ $Test = Start-WinReporting -LoggerParameters $LoggerParameters `
     -ReportOptions $ReportOptions `
     -ReportTimes $ReportTimes `
     -ReportDefinitions $ReportADDefinitions `
-    -Target $Target ##-Verbose
+    -Target $Target -Verbose
 
 $Test
