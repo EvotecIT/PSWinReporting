@@ -184,7 +184,7 @@ function Start-Report {
                 $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
                 if ($ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled) {
                     New-HTMLContent -HeaderText $ReportNameTitle -CanCollapse {
-                        New-HTMLColumn -ColumnNumber 1 -ColumnCount 1 {
+                        New-HTMLColumn -Columns 1 {
                             if ($null -ne $Results.$ReportName) {
                                 Get-HTMLContentDataTable -ArrayOfObjects $Results.$ReportName -HideFooter
                             }
