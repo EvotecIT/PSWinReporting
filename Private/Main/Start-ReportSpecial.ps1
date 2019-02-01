@@ -2,16 +2,15 @@ function Start-ReportSpecial {
     [CmdletBinding()]
     param (
         [System.Collections.IDictionary] $Dates,
-        [System.Collections.IDictionary] $EmailParameters,
-        [System.Collections.IDictionary] $FormattingParameters,
-        [System.Collections.IDictionary] $ReportOptions,
-        [System.Collections.IDictionary] $ReportDefinitions,
-        [System.Collections.IDictionary] $Target
+        [alias('ReportOptions')][System.Collections.IDictionary] $Options,
+        [alias('ReportDefinitions')][System.Collections.IDictionary] $Definitions,
+        [alias('Servers', 'Computers')][System.Collections.IDictionary] $Target
     )
     $Verbose = ($PSCmdlet.MyInvocation.BoundParameters['Verbose'] -eq $true)
     $Time = Start-TimeLog
     $EventIDs = New-GenericList
-    $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
+    $Results = @{}
+    $AttachedReports = @()
 
     # Get Servers
     $ServersList = New-ArrayList
@@ -33,20 +32,21 @@ function Start-ReportSpecial {
         $null = $ServersList.AddRange($Servers)
     }
     if ($Target.DomainControllers.Enabled) {
-        $Logger.AddInfoRecord("Preparing servers list - Domain Controllers autodetection")
+        $Logger.AddInfoRecord("Preparing servers list - domain controllers autodetection")
         [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty).HostName
         $null = $ServersList.AddRange($Servers)
     }
     if ($Target.LocalFiles.Enabled) {
+        $Logger.AddInfoRecord("Preparing file list - defined event logs")
         $Files = Get-EventLogFileList -Sections $Target.LocalFiles
     }
 
     # Get LogNames
-    $LogNames = foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
-        if ($ReportDefinitions.$Report.Enabled) {
-            foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
-                if ($ReportDefinitions.$Report.$SubReport.Enabled) {
-                    $ReportDefinitions.$Report.$SubReport.LogName
+    $LogNames = foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
+        if ($Definitions.$Report.Enabled) {
+            foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+                if ($Definitions.$Report.$SubReport.Enabled) {
+                    $Definitions.$Report.$SubReport.LogName
 
                 }
             }
@@ -78,25 +78,25 @@ function Start-ReportSpecial {
     #>
 
     [Array] $ExtendedInput = foreach ($Log in $LogNames | Sort-Object -Unique) {
-        $EventIDs = foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
-            if ($ReportDefinitions.$Report.Enabled) {
-                foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
-                    if ($ReportDefinitions.$Report.$SubReport.Enabled) {
-                        if ($ReportDefinitions.$Report.$SubReport.LogName -eq $Log) {
-                            $ReportDefinitions.$Report.$SubReport.Events
+        $EventIDs = foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
+            if ($Definitions.$Report.Enabled) {
+                foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+                    if ($Definitions.$Report.$SubReport.Enabled) {
+                        if ($Definitions.$Report.$SubReport.LogName -eq $Log) {
+                            $Definitions.$Report.$SubReport.Events
                         }
                     }
                 }
             }
         }
-        $Logger.AddInfoRecord("Scanning Events ID: $($EventIDs) ($Log)")
+        #$Logger.AddInfoRecord("Preparing to scan log $Log for Events:$($EventIDs -join ', ')")
 
         $OutputServers = foreach ($Server in $ServersList) {
             if ($Server -is [System.Collections.IDictionary]) {
                 [PSCustomObject]@{
                     Server   = $Server.ComputerName
                     LogName  = $Server.LogName
-                    EventID  = $EventIDs
+                    EventID  = $EventIDs | Sort-Object -Unique
                     Type     = 'Computer'
                     DateFrom = $Dates.DateFrom
                     DateTo   = $Dates.DateTo
@@ -106,7 +106,7 @@ function Start-ReportSpecial {
                     [PSCustomObject]@{
                         Server   = $S
                         LogName  = $Log
-                        EventID  = $EventIDs
+                        EventID  = $EventIDs | Sort-Object -Unique
                         Type     = 'Computer'
                         DateFrom = $Dates.DateFrom
                         DateTo   = $Dates.DateTo
@@ -118,7 +118,7 @@ function Start-ReportSpecial {
             [PSCustomObject]@{
                 Server   = $File
                 LogName  = $Log
-                EventID  = $EventIDs
+                EventID  = $EventIDs | Sort-Object -Unique
                 Type     = 'File'
                 DateFrom = $Dates.DateFrom
                 DateTo   = $Dates.DateTo
@@ -126,6 +126,13 @@ function Start-ReportSpecial {
         }
         $OutputServers
         $OutputFiles
+    }
+    foreach ($Entry in $ExtendedInput) {
+        if ($Entry.Type -eq 'Computer') {
+            $Logger.AddInfoRecord("Computer $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')")
+        } else {
+            $Logger.AddInfoRecord("File $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')")
+        }
     }
     # Scan all events and get everything at once
     $AllEvents = Get-Events `
@@ -135,27 +142,30 @@ function Start-ReportSpecial {
         -Verbose:$Verbose
 
     $Logger.AddInfoRecord("Found $($AllEvents.Count) events.")
-
-
     foreach ($Errors in $AllErrors) {
         $Logger.AddErrorRecord($Errors)
     }
 
+    if ($Options.RemoveDuplicates.Enabled) {
+        $Logger.AddInfoRecord("Removing Duplicates from all events. Current list contains $(Get-ObjectCount -Object $AllEvents) events")
+        $AllEvents = Remove-DuplicateObjects -Object $AllEvents -Property $Options.RemoveDuplicates.Properties
+        $Logger.AddInfoRecord("Removed Duplicates Following $(Get-ObjectCount -Object $AllEvents) events will be analyzed further")
+    }
+
 
     # Prepare the results based on chosen criteria
-    $Results = @{}
-    foreach ($Report in  $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
-        if ($ReportDefinitions.$Report.Enabled) {
+    foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+        if ($Definitions.$Report.Enabled) {
             #$ReportNameTitle = Format-AddSpaceToSentence -Text $Report -ToLowerCase
             $Logger.AddInfoRecord("Running $Report")
             $TimeExecution = Start-TimeLog
-            foreach ($SubReport in $ReportDefinitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'  }) {
-                if ($ReportDefinitions.$Report.$SubReport.Enabled) {
+            foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'  }) {
+                if ($Definitions.$Report.$SubReport.Enabled) {
                     $Logger.AddInfoRecord("Running $Report with subsection $SubReport")
-                    [string] $EventsType = $ReportDefinitions.$Report.$SubReport.LogName
-                    [Array] $EventsNeeded = $ReportDefinitions.$Report.$SubReport.Events
+                    [string] $EventsType = $Definitions.$Report.$SubReport.LogName
+                    [Array] $EventsNeeded = $Definitions.$Report.$SubReport.Events
                     [Array] $EventsFound = Find-EventsNeeded -Events $AllEvents -EventIDs $EventsNeeded -EventsType $EventsType
-                    [Array] $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $ReportDefinitions.$Report.$SubReport
+                    [Array] $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $Definitions.$Report.$SubReport
                     $Logger.AddInfoRecord("Ending $Report with subsection $SubReport events found $($EventsFound.Count)")
                     $Results.$Report = $EventsFound
                 }
@@ -165,50 +175,49 @@ function Start-ReportSpecial {
         }
     }
 
-
-    # Prepare email body
-    $Logger.AddInfoRecord('Prepare email head and body')
-    $HtmlHead = Set-EmailHead -FormattingOptions $FormattingParameters
-    $HtmlBody = Set-EmailReportBranding -FormattingParameters $FormattingParameters
-    $HtmlBody += Set-EmailReportDetails -FormattingParameters $FormattingParameters -Dates $Dates -Warnings $Warnings
-
-
     # Prepare email body - tables (real data)
-    if ($ReportOptions.AsHTML.Enabled) {
-        #$EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following AD servers were detected in forest'
-        #$EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
-        #$EmailBody += Export-ReportToHTML -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
-        foreach ($ReportName in $ReportDefinitions.Keys) {
+    if ($Options.AsHTML.Enabled) {
+        # Prepare email body
+        $Logger.AddInfoRecord('Prepare email head and body')
+        $HtmlHead = Set-EmailHead -FormattingOptions $Options.AsHTML.Formatting
+        $HtmlBody = Set-EmailReportBranding -FormattingParameters $Options.AsHTML.Formatting
+        $HtmlBody += Set-EmailReportDetails -FormattingParameters $Options.AsHTML.Formatting -Dates $Dates -Warnings $Warnings
+
+        #$EmailBody += Export-ReportToHTML -Report $Definitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following AD servers were detected in forest'
+        #$EmailBody += Export-ReportToHTML -Report $Definitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
+        #$EmailBody += Export-ReportToHTML -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
+        foreach ($ReportName in $Definitions.Keys) {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName -ToLowerCase
-            $HtmlBody += Export-ReportToHTML -Report $ReportDefinitions.$ReportName.Enabled -ReportTable $Results.$ReportName -ReportTableText "Following $ReportNameTitle happened"
+            $HtmlBody += Export-ReportToHTML -Report $Definitions.$ReportName.Enabled -ReportTable $Results.$ReportName -ReportTableText "Following $ReportNameTitle happened"
 
         }
+        # Do Cleanup of Emails
+        $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
+        $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
+        $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
+        $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
+        $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
+        $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $Options.AsHTML.Formatting -ConfigurationParameters $Options -Logger $Logger -SkipNewLines
+
+        $HTML = $HtmlHead + $HtmlBody
+        $ReportHTMLPath = Set-ReportFileName -ReportOptions $Options -ReportExtension 'html'
+        $HTML | Out-File -Encoding Unicode -FilePath $ReportHTMLPath
+        $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
     }
-    # Do Cleanup of Emails
-    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
-    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
-    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
-    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
-    $HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
-    $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $FormattingParameters -ConfigurationParameters $ReportOptions -Logger $Logger -SkipNewLines
-
-    $EmailBody = $HtmlHead + $HtmlBody
 
 
-    $Reports = @()
+    if ($Options.AsDynamicHTML.Enabled) {
+        $ReportFileName = Set-ReportFile -FileNamePattern $Options.AsDynamicHTML.FilePattern -DateFormat $Options.AsDynamicHTML.DateFormat
 
-    if ($ReportOptions.AsDynamicHTML.Enabled) {
-        $ReportFileName = Set-ReportFile -FileNamePattern $ReportOptions.AsDynamicHTML.FilePattern -DateFormat $ReportOptions.AsDynamicHTML.DateFormat
+        $DynamicHTML = New-HTML -TitleText $Options.AsDynamicHTML.Title `
+            -HideLogos:(-not $Options.AsDynamicHTML.Branding.Logo.Show) `
+            -RightLogoString $Options.AsDynamicHTML.Branding.Logo.RightLogo.ImageLink `
+            -UseCssLinks:$Options.AsDynamicHTML.EmbedCSS `
+            -UseStyleLinks:$Options.AsDynamicHTML.EmbedJS {
 
-        $DynamicHTML = New-HTML -TitleText $ReportOptions.AsDynamicHTML.Title `
-            -HideLogos:(-not $ReportOptions.AsDynamicHTML.Branding.Logo.Show) `
-            -RightLogoString $ReportOptions.AsDynamicHTML.Branding.Logo.RightLogo.ImageLink `
-            -UseCssLinks:$ReportOptions.AsDynamicHTML.EmbedCSS `
-            -UseStyleLinks:$ReportOptions.AsDynamicHTML.EmbedJS {
-
-            foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
+            foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
                 $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
-                if ($ReportDefinitions.$ReportName.Enabled) {
+                if ($Definitions.$ReportName.Enabled) {
                     New-HTMLContent -HeaderText $ReportNameTitle -CanCollapse {
                         New-HTMLColumn -Columns 1 {
                             if ($null -ne $Results.$ReportName) {
@@ -221,75 +230,84 @@ function Start-ReportSpecial {
             }
         }
         if ($null -ne $DynamicHTML) {
-            [string] $DynamicHTMLPath = Save-HTML -HTML $DynamicHTML -FilePath "$($ReportOptions.AsDynamicHTML.Path)\$ReportFileName"
-            $Reports += $DynamicHTMLPath
+            [string] $DynamicHTMLPath = Save-HTML -HTML $DynamicHTML -FilePath "$($Options.AsDynamicHTML.Path)\$ReportFileName"
+            if ($Options.SendMail.AttachDynamicHTML) {
+                $AttachedReports += $DynamicHTMLPath
+            }
         }
     }
+    if ($Options.AsExcel.Enabled) {
+        $Logger.AddInfoRecord('Prepare Microsoft Excel (.XLSX) file with Events')
+        $ReportFilePathXLSX = Set-ReportFile -FileNamePattern $Options.AsExcel.FilePattern -DateFormat $Options.AsExcel.DateFormat
+        # $ReportFilePathXLSX = Set-ReportFileName -ReportOptions $Options -ReportExtension "xlsx"
+        #Export-ReportToXLSX -Report $Definitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersAD
+        #Export-ReportToXLSX -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName "Event log sizes" -ReportTable $EventLogTable
 
-    if ($ReportOptions.AsExcel) {
-        $Logger.AddInfoRecord('Prepare XLSX files with Events')
-        $ReportFilePathXLSX = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension "xlsx"
-        #Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersAD
-        #Export-ReportToXLSX -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName "Event log sizes" -ReportTable $EventLogTable
-
-        foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
+        foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
-            Export-ReportToXLSX -Report $ReportDefinitions.$ReportName.Enabled -ReportOptions $ReportOptions -ReportFilePath $ReportFilePathXLSX -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
+            Export-ReportToXLSX -Report $Definitions.$ReportName.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
         }
-        $Reports += $ReportFilePathXLSX
+        if ($Options.SendMail.AttachXLSX) {
+            $AttachedReports += $ReportFilePathXLSX
+        }
     }
-    if ($ReportOptions.AsCSV) {
+    if ($Options.AsCSV.Enabled) {
+        $ReportFilePathCSV = @()
         $Logger.AddInfoRecord('Prepare CSV files with Events')
-        #$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportServers" -ReportTable $ServersAD
-        #$Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportEventLogSize" -ReportTable $EventLogTable
+        #$ReportFilePathCSV += Export-ReportToCSV -Report $Definitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $Options -Extension "csv" -ReportName "ReportServers" -ReportTable $ServersAD
+        #$ReportFilePathCSV += Export-ReportToCSV -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $Options -Extension "csv" -ReportName "ReportEventLogSize" -ReportTable $EventLogTable
 
-        foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
-            $Reports += Export-ReportToCSV -Report $ReportDefinitions.$ReportName.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName $ReportName -ReportTable $Results.$ReportName
+        foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
+            $ReportFilePathCSV += Export-ReportToCSV -Report $Definitions.$ReportName.Enabled -ReportOptions $Options -Extension "csv" -ReportName $ReportName -ReportTable $Results.$ReportName
+        }
+        if ($Options.SendMail.AttachCSV) {
+            $AttachedReports += $ReportFilePathCSV
         }
     }
-    $Reports = $Reports |  Where-Object { $_ } | Sort-Object -Unique
+    if ($Options.AsHTML.Enabled) {
+        if ($ReportHTMLPath -ne '' -and ($Options.AsHTML.OpenAsFile)) {
+            if (Test-Path -LiteralPath $ReportHTMLPath) {
+                Invoke-Item $ReportHTMLPath
+            }
+        }
+    }
+    if ($Options.AsDynamicHTML.Enabled -and $Options.AsDynamicHTML.OpenAsFile) {
+        if ($DynamicHTMLPath -ne '' -and (Test-Path -LiteralPath $DynamicHTMLPath)) {
+            Invoke-Item $DynamicHTMLPath
+        }
+    }
+    $AttachedReports = $AttachedReports |  Where-Object { $_ } | Sort-Object -Unique
 
 
     # Sending email - finalizing package
-    if ($ReportOptions.SendMail.Enabled) {
-        foreach ($Report in $Reports) {
+    if ($Options.SendMail.Enabled) {
+        foreach ($Report in $AttachedReports) {
             $Logger.AddInfoRecord("Following files will be attached to email $Report")
         }
-
-        $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
-        $Logger.AddInfoRecord('Sending email with reports')
-        if ($FormattingParameters.CompanyBranding.Inline) {
-            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject -InlineAttachments @{logo = $FormattingParameters.CompanyBranding.Logo} #-Verbose
+        if ($Options.SendMail.AttachHTML) {
+            $EmailBody = $HTML
         } else {
-            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject #-Verbose
+            $EmailBody = ''
+        }
+
+        $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
+        $Logger.AddInfoRecord('Sending email with reports')
+        if ($Options.AsHTML.Formatting.CompanyBranding.Inline) {
+            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.AsHTML.Formatting.CompanyBranding.Logo} #-Verbose
+        } else {
+            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject #-Verbose
         }
         if ($SendMail.Status) {
             $Logger.AddInfoRecord('Email successfully sent')
         } else {
             $Logger.AddInfoRecord("Error sending message: $($SendMail.Error)")
         }
+        Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports -ReportFiles $AttachedReports
     }
-    if ($ReportOptions.AsHTML.Enabled) {
-        $ReportHTMLPath = Set-ReportFileName -ReportOptions $ReportOptions -ReportExtension 'html'
-        $EmailBody | Out-File -Encoding Unicode -FilePath $ReportHTMLPath
-        $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
-        if ($ReportHTMLPath -ne '' -and ($ReportOptions.AsHTML.OpenAsFile)) {
-            if (Test-Path -LiteralPath $ReportHTMLPath) {
-                Invoke-Item $ReportHTMLPath
-            }
-        }
-    }
-    if ($ReportOptions.AsDynamicHTML.Enabled -and $ReportOptions.AsDynamicHTML.OpenAsFile) {
-        if ($DynamicHTMLPath -ne '' -and (Test-Path -LiteralPath $DynamicHTMLPath)) {
-            Invoke-Item $DynamicHTMLPath
-        }
-    }
-
-    foreach ($ReportName in $ReportDefinitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
+    foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
         $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
-        Export-ToSql -Report $ReportDefinitions.$ReportName -ReportOptions $ReportOptions -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
+        Export-ToSql -Report $Definitions.$ReportName -ReportOptions $Options -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
     }
-    Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
 
     $ElapsedTime = Stop-TimeLog -Time $Time
     $Logger.AddInfoRecord("Time to finish $ElapsedTime")

@@ -115,9 +115,9 @@ function Start-Report {
     $Logger.AddInfoRecord('Verifying Warnings reported earlier')
     $Warnings = Invoke-EventLogVerification -Results $EventLogDatesSummary -Dates $Dates
 
-    if ($ReportOptions.RemoveDuplicates) {
+    if ($ReportOptions.RemoveDuplicates.Enabled) {
         $Logger.AddInfoRecord("Removing Duplicates from all events. Current list contains $(Get-ObjectCount -Object $Events) events")
-        $Events = Remove-DuplicateObjects -Object $Events -Property 'RecordID'
+        $Events = Remove-DuplicateObjects -Object $Events -Property $ReportOptions.RemoveDuplicates.Properties
         $Logger.AddInfoRecord("Removed Duplicates Following $(Get-ObjectCount -Object $Events) events will be analyzed further")
     }
 
@@ -278,5 +278,5 @@ function Start-Report {
         $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
         Export-ReportToSql -Report $ReportDefinitions.ReportsAD.EventBased.$ReportName -ReportOptions $ReportOptions -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
     }
-    Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -AsExcel $ReportOptions.AsExcel -AsCSV $ReportOptions.AsCSV -ReportFiles $Reports
+    Remove-ReportsFiles -KeepReports $ReportOptions.KeepReports -ReportFiles $Reports
 }

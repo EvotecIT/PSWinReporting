@@ -1,7 +1,12 @@
-function Remove-ReportsFiles ($KeepReports, $AsExcel, $AsCSV, $ReportFiles) {
-    if (-not $KeepReports -and ($AsExcel -or $AsCSV)) {
+function Remove-ReportsFiles {
+    [CmdletBinding()]
+    param(
+        [bool] $KeepReports,
+        [Array] $ReportFiles
+    )
+    if (-not $KeepReports) {
         foreach ($Report in $ReportFiles) {
-            if (Test-Path $report) {
+            if (Test-Path $Report) {
                 $Logger.AddRecord("Removing file $Report")
                 try {
                     Remove-Item $Report

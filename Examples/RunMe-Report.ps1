@@ -95,8 +95,10 @@ $ReportOptions = @{
     KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
     FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
     FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
-    RemoveDuplicates      = $true # when multiple sources are used it's normal for duplicates to occur. This cleans it up.
-
+    RemoveDuplicates      = @{
+        Enabled    = $true # when multiple sources are used it's normal for duplicates to occur. This cleans it up.
+        Properties = 'RecordID', 'Computer'
+    }
     AsSql                 = @{
         Use                   = $true
         SqlServer             = 'EVO1'

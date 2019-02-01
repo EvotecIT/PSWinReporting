@@ -1,34 +1,18 @@
 function Start-WinReporting {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$LoggerParameters,
-        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$EmailParameters,
-        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$FormattingParameters,
-        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$ReportOptions,
-        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$ReportTimes,
-        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$ReportDefinitions,
-        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$Target
+        [Parameter(Mandatory = $true)][System.Collections.IDictionary]$Times,
+        [Parameter(Mandatory = $true)][alias('ReportOptions')][System.Collections.IDictionary] $Options,
+        [Parameter(Mandatory = $true)][alias('ReportDefinitions')][System.Collections.IDictionary] $Definitions,
+        [Parameter(Mandatory = $true)][alias('Servers', 'Computers')][System.Collections.IDictionary] $Target
     )
-
     # Logger Setup
-    [bool] $WarningNoLogger = $false
-
-    if (-not $LoggerParameters) {
+    if ($Options.Logging) {
+        $LoggerParameters = $Options.Logging
+    } else {
         $LoggerParameters = $Script:LoggerParameters
-        $WarningNoLogger = $true
     }
-
-    $Params = @{
-        LogPath    = if ([string]::IsNullOrWhiteSpace($LoggerParameters.LogsDir)) { '' } else { Join-Path $LoggerParameters.LogsDir "$([datetime]::Now.ToString('yyyy.MM.dd_hh.mm'))_ADReporting.log" }
-        ShowTime   = $LoggerParameters.ShowTime
-        TimeFormat = $LoggerParameters.TimeFormat
-    }
-    $Logger = Get-Logger @Params
-
-    if ($WarningNoLogger) {
-        $Logger.AddWarningRecord("New version of PSWinReporting requires Logger Parameter. Please read documentation. No logs will be written to disk.")
-    }
-
+    $Logger = Get-Logger @LoggerParameters
     # Test Configuration
 
 
@@ -37,15 +21,13 @@ function Start-WinReporting {
 
 
     # Run report
-    $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
+    $Dates = Get-ChoosenDates -ReportTimes $Times
     foreach ($Date in $Dates) {
         $Logger.AddInfoRecord("Starting to build a report for dates $($Date.DateFrom) to $($Date.DateTo)")
         Start-ReportSpecial `
             -Dates $Date `
-            -EmailParameters $EmailParameters `
-            -FormattingParameters $FormattingParameters `
-            -ReportOptions $ReportOptions `
-            -ReportDefinitions $ReportDefinitions `
+            -Options $Options `
+            -Definitions $Definitions `
             -Target $Target
     }
 }
