@@ -288,18 +288,29 @@ function Start-ReportSpecial {
             $AttachedReports += $ReportFilePathCSV
         }
     }
-    if ($Options.AsHTML.Enabled) {
-        if ($ReportHTMLPath -ne '' -and ($Options.AsHTML.OpenAsFile)) {
-            if (Test-Path -LiteralPath $ReportHTMLPath) {
-                Invoke-Item $ReportHTMLPath
-            }
+    if ($Options.AsHTML.Enabled -and $Options.AsHTML.OpenAsFile) {
+        if ($ReportHTMLPath -ne '' -and (Test-Path -LiteralPath $ReportHTMLPath)) {
+            Invoke-Item -LiteralPath $ReportHTMLPath
         }
     }
     if ($Options.AsDynamicHTML.Enabled -and $Options.AsDynamicHTML.OpenAsFile) {
         if ($DynamicHTMLPath -ne '' -and (Test-Path -LiteralPath $DynamicHTMLPath)) {
-            Invoke-Item $DynamicHTMLPath
+            Invoke-Item -LiteralPath $DynamicHTMLPath
         }
     }
+    if ($Options.AsExcel.Enabled -and $Options.AsExcel.OpenAsFile) {
+        if ($ReportFilePathXLSX -ne '' -and (Test-Path -LiteralPath $ReportFilePathXLSX)) {
+            Invoke-Item -LiteralPath $ReportFilePathXLSX
+        }
+    }
+    if ($Options.AsCSV.Enabled -and $Options.AsCSV.OpenAsFile) {
+        foreach ($CSV in $AttachCSV) {
+            if ($CSV -ne '' -and (Test-Path -LiteralPath $CSV)) {
+                Invoke-Item -LiteralPath $CSV
+            }
+        }
+    }
+
     $AttachedReports = $AttachedReports |  Where-Object { $_ } | Sort-Object -Unique
 
 
