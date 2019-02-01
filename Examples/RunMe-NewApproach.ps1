@@ -681,7 +681,7 @@ $DefinitionsAD = [ordered] @{
             Events      = 4798, 4799
             LogName     = 'Security'
             IgnoreWords = @{
-                'Who' = '*ANONYMOUS*'
+                #'Who' = '*ANONYMOUS*'
             }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
@@ -735,7 +735,7 @@ $DefinitionsAD = [ordered] @{
             Events      = 4727, 4730, 4731, 4734, 4744, 4748, 4749, 4753, 4754, 4758, 4759, 4763
             LogName     = 'Security'
             IgnoreWords = @{
-                'Who' = '*ANONYMOUS*'
+                # 'Who' = '*ANONYMOUS*'
             }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
