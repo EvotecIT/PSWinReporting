@@ -11,6 +11,10 @@ function Start-ReportSpecial {
     $EventIDs = New-GenericList
     $Results = @{}
     $AttachedReports = @()
+    $AttachXLSX = @()
+    $AttachHTML = @()
+    $AttachDynamicHTML = @()
+    $AttachCSV = @()
 
     # Get Servers
     $ServersList = New-ArrayList
@@ -200,14 +204,25 @@ function Start-ReportSpecial {
         $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $Options.AsHTML.Formatting -ConfigurationParameters $Options -Logger $Logger -SkipNewLines
 
         $HTML = $HtmlHead + $HtmlBody
-        $ReportHTMLPath = Set-ReportFileName -ReportOptions $Options -ReportExtension 'html'
-        $HTML | Out-File -Encoding Unicode -FilePath $ReportHTMLPath
-        $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
+        #$ReportHTMLPath = Set-ReportFileName -ReportOptions $Options -ReportExtension 'html'
+        $ReportHTMLPath = Set-ReportFile -Path $Options.AsHTML.Path -FileNamePattern $Options.AsHTML.FilePattern -DateFormat $Options.AsHTML.DateFormat
+        try {
+            $HTML | Out-File -Encoding Unicode -FilePath $ReportHTMLPath -ErrorAction Stop
+            $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
+            if ($Options.SendMail.Attach.HTML) {
+                $AttachHTML += $ReportHTMLPath
+                $AttachedReports += $ReportHTMLPath
+            }
+        } catch {
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            $Logger.AddErrorRecord("Error saving file $ReportHTMLPath.")
+            $Logger.AddErrorRecord("Error: $ErrorMessage")
+        }
     }
 
 
     if ($Options.AsDynamicHTML.Enabled) {
-        $ReportFileName = Set-ReportFile -FileNamePattern $Options.AsDynamicHTML.FilePattern -DateFormat $Options.AsDynamicHTML.DateFormat
+        $ReportFileName = Set-ReportFile -Path $Options.AsDynamicHTML.Path -FileNamePattern $Options.AsDynamicHTML.FilePattern -DateFormat $Options.AsDynamicHTML.DateFormat
 
         $DynamicHTML = New-HTML -TitleText $Options.AsDynamicHTML.Title `
             -HideLogos:(-not $Options.AsDynamicHTML.Branding.Logo.Show) `
@@ -230,15 +245,22 @@ function Start-ReportSpecial {
             }
         }
         if ($null -ne $DynamicHTML) {
-            [string] $DynamicHTMLPath = Save-HTML -HTML $DynamicHTML -FilePath "$($Options.AsDynamicHTML.Path)\$ReportFileName"
-            if ($Options.SendMail.AttachDynamicHTML) {
-                $AttachedReports += $DynamicHTMLPath
+            try {
+                [string] $DynamicHTMLPath = Save-HTML -HTML $DynamicHTML -FilePath $ReportFileName
+                if ($Options.SendMail.Attach.DynamicHTML) {
+                    $AttachDynamicHTML += $DynamicHTMLPath
+                    $AttachedReports += $DynamicHTMLPath
+                }
+            } catch {
+                $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+                $Logger.AddErrorRecord("Error saving file $ReportHTMLPath.")
+                $Logger.AddErrorRecord("Error: $ErrorMessage")
             }
         }
     }
     if ($Options.AsExcel.Enabled) {
         $Logger.AddInfoRecord('Prepare Microsoft Excel (.XLSX) file with Events')
-        $ReportFilePathXLSX = Set-ReportFile -FileNamePattern $Options.AsExcel.FilePattern -DateFormat $Options.AsExcel.DateFormat
+        $ReportFilePathXLSX = Set-ReportFile -Path $Options.AsExcel.Path -FileNamePattern $Options.AsExcel.FilePattern -DateFormat $Options.AsExcel.DateFormat
         # $ReportFilePathXLSX = Set-ReportFileName -ReportOptions $Options -ReportExtension "xlsx"
         #Export-ReportToXLSX -Report $Definitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersAD
         #Export-ReportToXLSX -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName "Event log sizes" -ReportTable $EventLogTable
@@ -247,7 +269,8 @@ function Start-ReportSpecial {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
             Export-ReportToXLSX -Report $Definitions.$ReportName.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName $ReportNameTitle -ReportTable $Results.$ReportName
         }
-        if ($Options.SendMail.AttachXLSX) {
+        if ($Options.SendMail.Attach.XLSX) {
+            $AttachXLSX += $ReportFilePathXLSX
             $AttachedReports += $ReportFilePathXLSX
         }
     }
@@ -258,9 +281,10 @@ function Start-ReportSpecial {
         #$ReportFilePathCSV += Export-ReportToCSV -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $Options -Extension "csv" -ReportName "ReportEventLogSize" -ReportTable $EventLogTable
 
         foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
-            $ReportFilePathCSV += Export-ReportToCSV -Report $Definitions.$ReportName.Enabled -ReportOptions $Options -Extension "csv" -ReportName $ReportName -ReportTable $Results.$ReportName
+            $ReportFilePathCSV += Export-ToCSV -Report $Definitions.$ReportName.Enabled -ReportName $ReportName -ReportTable $Results.$ReportName -Path $Options.AsCSV.Path -FilePattern $Options.AsCSV.FilePattern -DateFormat $Options.AsCSV.DateFormat
         }
-        if ($Options.SendMail.AttachCSV) {
+        if ($Options.SendMail.Attach.CSV) {
+            $AttachCSV += $ReportFilePathCSV
             $AttachedReports += $ReportFilePathCSV
         }
     }
@@ -284,7 +308,7 @@ function Start-ReportSpecial {
         foreach ($Report in $AttachedReports) {
             $Logger.AddInfoRecord("Following files will be attached to email $Report")
         }
-        if ($Options.SendMail.AttachHTML) {
+        if ($Options.SendMail.InlineHTML) {
             $EmailBody = $HTML
         } else {
             $EmailBody = ''
@@ -293,16 +317,19 @@ function Start-ReportSpecial {
         $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
         $Logger.AddInfoRecord('Sending email with reports')
         if ($Options.AsHTML.Formatting.CompanyBranding.Inline) {
-            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.AsHTML.Formatting.CompanyBranding.Logo} #-Verbose
+            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.AsHTML.Formatting.CompanyBranding.Logo} -Logger $Logger
         } else {
-            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject #-Verbose
+            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -Logger $Logger
         }
         if ($SendMail.Status) {
             $Logger.AddInfoRecord('Email successfully sent')
         } else {
             $Logger.AddInfoRecord("Error sending message: $($SendMail.Error)")
         }
-        Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports -ReportFiles $AttachedReports
+        Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports.XLSX -ReportFiles $AttachXLSX
+        Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports.CSV -ReportFiles $AttachCSV
+        Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports.HTML -ReportFiles $AttachHTML
+        Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports.DynamicHTML -ReportFiles $AttachDynamicHTML
     }
     foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
         $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName

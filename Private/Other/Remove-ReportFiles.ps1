@@ -6,13 +6,12 @@ function Remove-ReportsFiles {
     )
     if (-not $KeepReports) {
         foreach ($Report in $ReportFiles) {
-            if (Test-Path $Report) {
-                $Logger.AddRecord("Removing file $Report")
+            if ($Report -ne '' -and (Test-Path -LiteralPath $Report)) {
+                $Logger.AddInfoRecord("Removing file $Report")
                 try {
-                    Remove-Item $Report
+                    Remove-Item -LiteralPath $Report -ErrorAction Stop
                 } catch {
                     $Logger.AddErrorRecord("Error removing file: $($_.Exception.Message)")
-                    continue
                 }
             }
         }
