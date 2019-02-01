@@ -1,76 +1,78 @@
-$LoggerParameters = @{
-    ShowTime   = $true
-    LogsDir    = 'C:\temp\logs'
-    TimeFormat = 'yyyy-MM-dd HH:mm:ss'
-}
-$EmailParameters = @{
-    EmailFrom                   = "notifications@domain.com"
-    EmailTo                     = "przemyslaw.klys@domain.com, admin@domain.com"
-    EmailCC                     = ""
-    EmailBCC                    = ""
-    EmailReplyTo                = ""
-    EmailServer                 = "smtp.office365.com"
-    EmailServerPassword         = "YourPassword"
-    EmailServerPasswordAsSecure = $false
-    EmailServerPasswordFromFile = $false
-    EmailServerPort             = "587"
-    EmailServerLogin            = "notifications@domain.com"
-    EmailServerEnableSSL        = 1
-    EmailEncoding               = "Unicode"
-    EmailSubject                = "[Reporting] Event Changes for period <<DateFrom>> to <<DateTo>>"
-    EmailPriority               = "Low" # Normal, High
-}
-$FormattingParameters = @{
-    CompanyBranding        = @{
-        Logo   = 'https://evotec.xyz/wp-content/uploads/2015/05/Logo-evotec-012.png'
-        Width  = '200'
-        Height = ''
-        Link   = 'https://evotec.xyz'
-        Inline = $false
+Import-Module PSSharedGoods -Force
+Import-Module PSWinReporting.psd1 -Force
+
+$Options = [ordered] @{
+    JustTestPrerequisite = $false # runs testing without actually running script
+
+    AsExcel              = @{
+        Enabled     = $false # creates report in XLSX
+        OpenAsFile  = $false
+
+        Path        = 'C:\Support\Reports\ExportedEvents'
+        FilePattern = 'Evotec-ADMonitoredEvents-<currentdate>.xlsx'
+        DateFormat  = 'yyyy-MM-dd-HH_mm_ss'
     }
-    FontFamily             = 'Calibri Light'
-    FontSize               = '9pt'
-    FontHeadingFamily      = 'Calibri Light'
-    FontHeadingSize        = '12pt'
+    AsCSV                = @{
+        Enabled     = $false
+        OpenAsFile  = $false
 
-    FontTableHeadingFamily = 'Calibri Light'
-    FontTableHeadingSize   = '9pt'
+        Path        = 'C:\Support\Reports\ExportedEvents'
+        FilePattern = 'Evotec-ADMonitoredEvents-<currentdate>-<reportname>.csv'
+        DateFormat  = 'yyyy-MM-dd-HH_mm_ss'
 
-    FontTableDataFamily    = 'Calibri Light'
-    FontTableDataSize      = '9pt'
-
-    Colors                 = @{
-        # case sensitive
-        Red   = 'removed', 'deleted', 'locked out', 'lockouts', 'disabled', 'Domain Admins', 'was cleared'
-        Blue  = 'changed', 'changes', 'change', 'reset'
-        Green = 'added', 'enabled', 'unlocked', 'created'
+        # Keep in mind <reportname> is critical here
+        # if you don't use it next file will overwrite the old one
     }
-    Styles                 = @{
-        # case sensitive
-        B = 'status', 'Domain Admins', 'Enterprise Admins', 'Schema Admins', 'was cleared', 'lockouts' # BOLD
-        I = '' # Italian
-        U = 'status'# Underline
-    }
-    Links                  = @{
+    AsHTML               = @{
+        Enabled     = $true # creates report in HTML
+        OpenAsFile  = $false # requires AsHTML set to $true
 
-    }
-}
+        Path        = 'C:\Support\Reports\ExportedEvents'
+        FilePattern = 'Evotec-ADMonitoredEvents-StaticHTML-<currentdate>.html'
+        DateFormat  = 'yyyy-MM-dd-HH_mm_ss'
 
-$ReportOptions = [ordered] @{
-    JustTestPrerequisite  = $false # runs testing without actually running script
+        Formatting  = @{
+            CompanyBranding        = @{
+                Logo   = 'https://evotec.xyz/wp-content/uploads/2015/05/Logo-evotec-012.png'
+                Width  = '200'
+                Height = ''
+                Link   = 'https://evotec.xyz'
+                Inline = $false
+            }
+            FontFamily             = 'Calibri Light'
+            FontSize               = '9pt'
+            FontHeadingFamily      = 'Calibri Light'
+            FontHeadingSize        = '12pt'
 
-    AsExcel               = $true # attaches Excel to email with all events, required PSWriteExcel module
-    AsCSV                 = $true # attaches CSV to email with all events,
-    AsHTML                = @{
-        Enabled   = $true # puts exported data into email directly with all events
-        OpenAsFile = $true # requires AsHTML set to $true
+            FontTableHeadingFamily = 'Calibri Light'
+            FontTableHeadingSize   = '9pt'
+
+            FontTableDataFamily    = 'Calibri Light'
+            FontTableDataSize      = '9pt'
+
+            Colors                 = @{
+                # case sensitive
+                Red   = 'removed', 'deleted', 'locked out', 'lockouts', 'disabled', 'Domain Admins', 'was cleared'
+                Blue  = 'changed', 'changes', 'change', 'reset'
+                Green = 'added', 'enabled', 'unlocked', 'created'
+            }
+            Styles                 = @{
+                # case sensitive
+                B = 'status', 'Domain Admins', 'Enterprise Admins', 'Schema Admins', 'was cleared', 'lockouts' # BOLD
+                I = '' # Italian
+                U = 'status'# Underline
+            }
+            Links                  = @{
+
+            }
+        }
     }
-    AsDynamicHTML         = @{
-        Enabled     = $true
+    AsDynamicHTML        = @{
+        Enabled     = $true # creates report in Dynamic HTML
         OpenAsFile  = $true
         Title       = 'Windows Events'
         Path        = 'C:\Support\Reports\ExportedEvents'
-        FilePattern = 'Evotec-ADMonitoredEvents-<currentdate>.html'
+        FilePattern = 'Evotec-ADMonitoredEvents-DynamicHTML-<currentdate>.html'
         DateFormat  = 'yyyy-MM-dd-HH_mm_ss'
         Branding    = @{
             Logo = @{
@@ -86,17 +88,8 @@ $ReportOptions = [ordered] @{
         EmbedCSS    = $false
         EmbedJS     = $false
     }
-    SendMail              = @{
-        Enabled = $false
-    }
-    KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
-    KeepReportsPath       = 'C:\Support\Reports\ExportedEvents' # if empty, temp path is used
-    FilePattern           = 'Evotec-ADMonitoredEvents-<currentdate>.<extension>'
-    FilePatternDateFormat = 'yyyy-MM-dd-HH_mm_ss'
-    RemoveDuplicates      = $true # when multiple sources are used it's normal for duplicates to occur. This cleans it up.
-
-    AsSql                 = @{
-        Use                   = $true
+    AsSql                = @{
+        Enabled               = $false
         SqlServer             = 'EVO1'
         SqlDatabase           = 'SSAE18'
         SqlTable              = 'dbo.[Events]'
@@ -104,7 +97,7 @@ $ReportOptions = [ordered] @{
         # Changing makes sense only for right side...
         SqlTableCreate        = $true
         SqlTableAlterIfNeeded = $false # if table mapping is defined doesn't do anything
-        SqlCheckBeforeInsert  = 'EventRecordID' # Based on column name
+        SqlCheckBeforeInsert  = 'EventRecordID', 'DomainController' # Based on column name
 
 
         SqlTableMapping       = [ordered] @{
@@ -127,8 +120,8 @@ $ReportOptions = [ordered] @{
             'Script Path'            = 'ScriptPath'
             'Profile Path'           = 'ProfilePath'
             'User Workstation'       = 'UserWorkstation'
-            'Password Last Set'      = 'PasswordLastSet,[datetime]'
-            'Account Expires'        = 'AccountExpires,[datetime]'
+            'Password Last Set'      = 'PasswordLastSet'
+            'Account Expires'        = 'AccountExpires'
             'Primary Group Id'       = 'PrimaryGroupId'
             'Allowed To Delegate To' = 'AllowedToDelegateTo'
             'Old Uac Value'          = 'OldUacValue'
@@ -147,17 +140,63 @@ $ReportOptions = [ordered] @{
             'Gathered LogName'       = 'GatheredLogName'
         }
     }
-    Debug                 = @{
+    SendMail             = @{
+        Enabled     = $false
+
+        InlineHTML  = $true # this goes inline - if empty email will have no content
+
+        Attach      = @{
+            XLSX        = $true # this goes as attachment
+            CSV         = $true # this goes as attachment
+            DynamicHTML = $true # this goes as attachment
+            HTML        = $true # this goes as attachment
+            # if all 4 above are false email will have no attachment
+            # remember that for this to work each part has to be enabled
+            # using attach XLSX without generating XLSX won't magically let it attach
+        }
+        KeepReports = @{
+            XLSX        = $true # keeps files after reports are sent
+            CSV         = $true # keeps files after reports are sent
+            HTML        = $true # keeps files after reports are sent
+            DynamicHTML = $true # keeps files after reports are sent
+        }
+        Parameters  = @{
+            From             = 'notifications@domain.pl'
+            To               = 'przemyslaw.klys@domain.pl' #Arriva-se@support.euvic.pl
+            CC               = ''
+            BCC              = ''
+            ReplyTo          = ''
+            Server           = 'mail'
+            Password         = ''
+            PasswordAsSecure = $false
+            PasswordFromFile = $false
+            Port             = '587'
+            Login            = 'rpassword'
+            EnableSSL        = 1
+            Encoding         = 'Unicode'
+            Subject          = '[Reporting Evotec] Event Changes for period <<DateFrom>> to <<DateTo>>'
+            Priority         = 'Low'
+        }
+    }
+    RemoveDuplicates     = @{
+        Enabled    = $true # when multiple sources are used it's normal for duplicates to occur. This cleans it up.
+        Properties = 'RecordID', 'Computer'
+    }
+    Logging              = @{
+        ShowTime   = $true
+        LogsDir    = 'C:\temp\logs'
+        TimeFormat = 'yyyy-MM-dd HH:mm:ss'
+    }
+    Debug                = @{
         DisplayTemplateHTML = $false
         Verbose             = $false
     }
 }
-
 $Target = [ordered]@{
     Servers           = [ordered] @{
         Enabled = $true
-        #Server1 = @{ ComputerName = 'EVO1'; LogName = 'ForwardedEvents' }
-        #Server2 = 'AD1', 'AD2'
+        # Server1 = @{ ComputerName = 'EVO1'; LogName = 'ForwardedEvents' }
+        # Server2 = 'AD1', 'AD2'
         Server3 = 'AD1.ad.evotec.xyz'
     }
     DomainControllers = [ordered] @{
@@ -166,7 +205,7 @@ $Target = [ordered]@{
     LocalFiles        = [ordered] @{
         Enabled     = $false
         Directories = [ordered] @{
-            MyEvents = 'C:\MyEvents' #
+            #MyEvents = 'C:\MyEvents' #
             #MyOtherEvent = 'C:\MyEvent1'
         }
         Files       = [ordered] @{
@@ -174,8 +213,7 @@ $Target = [ordered]@{
         }
     }
 }
-
-$ReportTimes = @{
+$Times = @{
     # Report Per Hour
     PastHour             = @{
         Enabled = $false # if it's 23:22 it will report 22:00 till 23:00
@@ -240,10 +278,62 @@ $ReportTimes = @{
     }
 }
 ## Define reports
-$ReportADDefinitions = [ordered] @{
+$DefinitionsAD = [ordered] @{
     UserChanges             = @{
-        Enabled = $true
-        Events  = @{
+        Enabled   = $true
+        SqlExport = @{
+            EnabledGlobal         = $false
+            Enabled               = $false
+            SqlServer             = 'EVO1'
+            SqlDatabase           = 'SSAE18'
+            SqlTable              = 'dbo.[EventsNewSpecial]'
+            # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
+            # Changing makes sense only for right side...
+            SqlTableCreate        = $true
+            SqlTableAlterIfNeeded = $false # if table mapping is defined doesn't do anything
+            SqlCheckBeforeInsert  = 'EventRecordID', 'DomainController' # Based on column name
+
+            SqlTableMapping       = [ordered] @{
+                'Event ID'               = 'EventID,[int]'
+                'Who'                    = 'EventWho'
+                'When'                   = 'EventWhen,[datetime]'
+                'Record ID'              = 'EventRecordID,[bigint]'
+                'Domain Controller'      = 'DomainController'
+                'Action'                 = 'Action'
+                'Group Name'             = 'GroupName'
+                'User Affected'          = 'UserAffected'
+                'Member Name'            = 'MemberName'
+                'Computer Lockout On'    = 'ComputerLockoutOn'
+                'Reported By'            = 'ReportedBy'
+                'SamAccountName'         = 'SamAccountName'
+                'Display Name'           = 'DisplayName'
+                'UserPrincipalName'      = 'UserPrincipalName'
+                'Home Directory'         = 'HomeDirectory'
+                'Home Path'              = 'HomePath'
+                'Script Path'            = 'ScriptPath'
+                'Profile Path'           = 'ProfilePath'
+                'User Workstation'       = 'UserWorkstation'
+                'Password Last Set'      = 'PasswordLastSet'
+                'Account Expires'        = 'AccountExpires'
+                'Primary Group Id'       = 'PrimaryGroupId'
+                'Allowed To Delegate To' = 'AllowedToDelegateTo'
+                'Old Uac Value'          = 'OldUacValue'
+                'New Uac Value'          = 'NewUacValue'
+                'User Account Control'   = 'UserAccountControl'
+                'User Parameters'        = 'UserParameters'
+                'Sid History'            = 'SidHistory'
+                'Logon Hours'            = 'LogonHours'
+                'OperationType'          = 'OperationType'
+                'Message'                = 'Message'
+                'Backup Path'            = 'BackupPath'
+                'Log Type'               = 'LogType'
+                'AddedWhen'              = 'EventAdded,[datetime],null' # ColumnsToTrack when it was added to database and by who / not part of event
+                'AddedWho'               = 'EventAddedWho'  # ColumnsToTrack when it was added to database and by who / not part of event
+                'Gathered From'          = 'GatheredFrom'
+                'Gathered LogName'       = 'GatheredLogName'
+            }
+        }
+        Events    = @{
             Enabled     = $true
             Events      = 4720, 4738
             LogName     = 'Security'
@@ -303,44 +393,20 @@ $ReportADDefinitions = [ordered] @{
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
             Filter      = @{
-                # Filter is special, if there is just one object on the right side
-                # If there are more objects filter will pick all values on the right side and display them as required
                 'ObjectClass' = 'user'
-                #'OperationType'            = 'Value Added'
-                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
             }
             Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
                 'OperationType' = 'ConvertFrom-OperationType'
             }
             Fields      = [ordered] @{
-
                 'Computer'                 = 'Domain Controller'
                 'Action'                   = 'Action'
                 'OperationType'            = 'Action Detail'
                 'Who'                      = 'Who'
                 'Date'                     = 'When'
-
-
                 'ObjectDN'                 = 'User Object'
-                #'ObjectGUID'               = 'ObjectGUID'
-                #'ObjectClass'              = 'ObjectClass'
                 'AttributeLDAPDisplayName' = 'Field Changed'
-                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
                 'AttributeValue'           = 'Field Value'
-
-                #'OpCorrelationID'          = 'OperationCorelationID'
-                #'AppCorrelationID'         = 'OperationApplicationCorrelationID'
-
-                #'DSName'                   = 'DSName'
-                #'DSType'                   = 'DSType'
-                #'Task'                     = 'Task'
-                #'Version'                  = 'Version'
-
                 # Common Fields
                 'RecordID'                 = 'Record ID'
                 'ID'                       = 'Event ID'
@@ -356,62 +422,35 @@ $ReportADDefinitions = [ordered] @{
         }
     }
     ComputerChangesDetailed = [ordered] @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
             Filter      = @{
-                # Filter is special, if there is just one object on the right side
-                # If there are more objects filter will pick all values on the right side and display them as required
                 'ObjectClass' = 'computer'
-                #'OperationType'            = 'Value Added'
-                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
             }
             Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
                 'OperationType' = 'ConvertFrom-OperationType'
             }
             Fields      = [ordered] @{
-
                 'Computer'                 = 'Domain Controller'
                 'Action'                   = 'Action'
                 'OperationType'            = 'Action Detail'
                 'Who'                      = 'Who'
                 'Date'                     = 'When'
-
-
                 'ObjectDN'                 = 'Computer Object'
-                #'ObjectGUID'               = 'ObjectGUID'
-                #'ObjectClass'              = 'ObjectClass'
                 'AttributeLDAPDisplayName' = 'Field Changed'
-                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
                 'AttributeValue'           = 'Field Value'
-
-                #'OpCorrelationID'          = 'OperationCorelationID'
-                #'AppCorrelationID'         = 'OperationApplicationCorrelationID'
-
-                #'DSName'                   = 'DSName'
-                #'DSType'                   = 'DSType'
-                #'Task'                     = 'Task'
-                #'Version'                  = 'Version'
-
                 # Common Fields
                 'RecordID'                 = 'Record ID'
                 'ID'                       = 'Event ID'
                 'GatheredFrom'             = 'Gathered From'
                 'GatheredLogName'          = 'Gathered LogName'
             }
-
             SortBy      = 'Record ID'
             Descending  = $false
-            IgnoreWords = @{
-
-            }
+            IgnoreWords = @{}
         }
     }
     UserStatus              = @{
@@ -427,7 +466,6 @@ $ReportADDefinitions = [ordered] @{
                 'Who'             = 'Who'
                 'Date'            = 'When'
                 'ObjectAffected'  = 'User Affected'
-
                 # Common Fields
                 'ID'              = 'Event ID'
                 'RecordID'        = 'Record ID'
@@ -438,9 +476,9 @@ $ReportADDefinitions = [ordered] @{
         }
     }
     UserLockouts            = @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4740
             LogName     = 'Security'
             IgnoreWords = @{}
@@ -451,7 +489,6 @@ $ReportADDefinitions = [ordered] @{
                 'ObjectAffected'   = 'User Affected'
                 'Who'              = 'Reported By'
                 'Date'             = 'When'
-
                 # Common Fields
                 'ID'               = 'Event ID'
                 'RecordID'         = 'Record ID'
@@ -492,21 +529,13 @@ $ReportADDefinitions = [ordered] @{
     UserUnlocked            = @{
         # 4767	A user account was unlocked
         # https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4767
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4767
             LogName     = 'Security'
             IgnoreWords = @{}
-            Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
-                # 'IpAddress' = 'Clean-IpAddress'
-            }
-
+            Functions   = @{}
             Fields      = [ordered] @{
                 'Computer'         = 'Domain Controller'
                 'Action'           = 'Action'
@@ -514,21 +543,19 @@ $ReportADDefinitions = [ordered] @{
                 'ObjectAffected'   = 'User Affected'
                 'Who'              = 'Who'
                 'Date'             = 'When'
-
                 # Common Fields
                 'ID'               = 'Event ID'
                 'RecordID'         = 'Record ID'
                 'GatheredFrom'     = 'Gathered From'
                 'GatheredLogName'  = 'Gathered LogName'
             }
-
             SortBy      = 'When'
         }
     }
     ComputerCreatedChanged  = @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4741, 4742 # created, changed
             LogName     = 'Security'
             Ignore      = @{
@@ -569,9 +596,9 @@ $ReportADDefinitions = [ordered] @{
         }
     }
     ComputerDeleted         = @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4743 # deleted
             LogName     = 'Security'
             IgnoreWords = @{}
@@ -581,7 +608,6 @@ $ReportADDefinitions = [ordered] @{
                 'ObjectAffected'  = 'Computer Affected'
                 'Who'             = 'Who'
                 'Date'            = 'When'
-
                 # Common Fields
                 'ID'              = 'Event ID'
                 'RecordID'        = 'Record ID'
@@ -599,11 +625,6 @@ $ReportADDefinitions = [ordered] @{
             LogName     = 'Security'
             IgnoreWords = @{}
             Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
                 'IpAddress' = 'Clean-IpAddress'
             }
             Fields      = [ordered] @{
@@ -640,7 +661,7 @@ $ReportADDefinitions = [ordered] @{
                 'Computer'            = 'Domain Controller'
                 'Action'              = 'Action'
                 'TargetUserName'      = 'Group Name'
-                'MemberNameWithoutCN' = 'Member Name' # Required work {$_.MemberName -replace '^CN=|,.*$' }}, fixed in PSEventViewer
+                'MemberNameWithoutCN' = 'Member Name'
                 'Who'                 = 'Who'
                 'Date'                = 'When'
 
@@ -656,7 +677,7 @@ $ReportADDefinitions = [ordered] @{
     GroupEnumeration        = @{
         Enabled = $false
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4798, 4799
             LogName     = 'Security'
             IgnoreWords = @{
@@ -666,10 +687,8 @@ $ReportADDefinitions = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
                 'TargetUserName'  = 'Group Name'
-                #'MemberNameWithoutCN' = 'Member Name' # Required work {$_.MemberName -replace '^CN=|,.*$' }}, fixed in PSEventViewer
                 'Who'             = 'Who'
                 'Date'            = 'When'
-
                 # Common Fields
                 'ID'              = 'Event ID'
                 'RecordID'        = 'Record ID'
@@ -680,9 +699,9 @@ $ReportADDefinitions = [ordered] @{
         }
     }
     GroupChanges            = @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4735, 4737, 4745, 4750, 4760, 4764, 4784, 4791
             LogName     = 'Security'
             IgnoreWords = @{
@@ -710,9 +729,9 @@ $ReportADDefinitions = [ordered] @{
         }
     }
     GroupCreateDelete       = @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 4727, 4730, 4731, 4734, 4744, 4748, 4749, 4753, 4754, 4758, 4759, 4763
             LogName     = 'Security'
             IgnoreWords = @{
@@ -724,8 +743,6 @@ $ReportADDefinitions = [ordered] @{
                 'TargetUserName'  = 'Group Name'
                 'Who'             = 'Who'
                 'Date'            = 'When'
-                #'GroupTypeChange' = 'Group Type Change'
-
                 # Common Fields
                 'ID'              = 'Event ID'
                 'RecordID'        = 'Record ID'
@@ -736,50 +753,30 @@ $ReportADDefinitions = [ordered] @{
         }
     }
     GroupChangesDetailed    = [ordered] @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
             Filter      = @{
-                # Filter is special, if there is just one object on the right side
-                # If there are more objects filter will pick all values on the right side and display them as required
+                # Filter is special
+                # if there is just one object on the right side it will filter on that field
+                # if there are more objects filter will pick all values on the right side and display them (using AND)
                 'ObjectClass' = 'group'
-                #'OperationType'            = 'Value Added'
-                #'AttributeLDAPDisplayName' = $null,'displayName' #, 'versionNumber'
             }
             Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
                 'OperationType' = 'ConvertFrom-OperationType'
             }
             Fields      = [ordered] @{
-
                 'Computer'                 = 'Domain Controller'
                 'Action'                   = 'Action'
                 'OperationType'            = 'Action Detail'
                 'Who'                      = 'Who'
                 'Date'                     = 'When'
-
-
                 'ObjectDN'                 = 'Computer Object'
-                #'ObjectGUID'               = 'ObjectGUID'
                 'ObjectClass'              = 'ObjectClass'
                 'AttributeLDAPDisplayName' = 'Field Changed'
-                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
                 'AttributeValue'           = 'Field Value'
-
-                #'OpCorrelationID'          = 'OperationCorelationID'
-                #'AppCorrelationID'         = 'OperationApplicationCorrelationID'
-
-                #'DSName'                   = 'DSName'
-                #'DSType'                   = 'DSType'
-                #'Task'                     = 'Task'
-                #'Version'                  = 'Version'
-
                 # Common Fields
                 'RecordID'                 = 'Record ID'
                 'ID'                       = 'Event ID'
@@ -808,11 +805,6 @@ $ReportADDefinitions = [ordered] @{
                 'AttributeLDAPDisplayName' = $null, 'displayName' #, 'versionNumber'
             }
             Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
                 'OperationType' = 'ConvertFrom-OperationType'
             }
             Fields      = [ordered] @{
@@ -863,11 +855,6 @@ $ReportADDefinitions = [ordered] @{
                 'AttributeLDAPDisplayName' = 'versionNumber'
             }
             Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
                 'OperationType' = 'ConvertFrom-OperationType'
             }
             Fields      = [ordered] @{
@@ -918,11 +905,6 @@ $ReportADDefinitions = [ordered] @{
                 #'AttributeLDAPDisplayName' = 'versionNumber'
             }
             Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
                 'OperationType' = 'ConvertFrom-OperationType'
             }
             Fields      = [ordered] @{
@@ -961,77 +943,13 @@ $ReportADDefinitions = [ordered] @{
 
             }
         }
-        <#
-
-        Events2     = @{
-            Enabled     = $false
-            Events      = 5136, 5137, 5141
-            LogName     = 'Security'
-            Filter      = @{
-                # Filter is special, if there is just one object on the right side
-                # If there are more objects filter will pick all values on the right side and display them as required
-                'ObjectClass'   = 'groupPolicyContainer'
-                'OperationType' = 'Value Added'
-                # 'AttributeLDAPDisplayName' = 'displayName','versionNumber'
-            }
-            Functions   = @{
-                #'ProfilePath'        = 'Convert-UAC'
-                #'OldUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'NewUacValue'        = 'Remove-WhiteSpace', 'Convert-UAC'
-                #'UserAccountControl' = 'Remove-WhiteSpace', 'Split-OnSpace', 'Convert-UAC'
-                #'DSType'        = 'ConvertFrom-OperationType'
-                'OperationType' = 'ConvertFrom-OperationType'
-            }
-            Fields      = [ordered] @{
-
-
-                'Computer'                 = 'Domain Controller'
-                'Action'                   = 'Action'
-                'Who'                      = 'Who'
-                'Date'                     = 'When'
-
-
-                'ObjectDN'                 = 'OBjectDN'
-                'ObjectGUID'               = 'ObjectGUID'
-                'ObjectClass'              = 'ObjectClass'
-                'AttributeLDAPDisplayName' = 'AttributeLDAPDisplayName'
-                #'AttributeSyntaxOID'       = 'AttributeSyntaxOID'
-                'AttributeValue'           = 'AttributeValue'
-                'OperationType'            = 'OperationType'
-
-                'OpCorrelationID'          = 'OperationCorelationID'
-                'AppCorrelationID'         = 'OperationApplicationCorrelationID'
-
-                'DSName'                   = 'DSName'
-                'DSType'                   = 'DSType'
-                'Task'                     = 'Task'
-                'Version'                  = 'Version'
-
-                # Common Fields
-                'ID'                       = 'Event ID'
-                'RecordID'                 = 'Record ID'
-                'GatheredFrom'             = 'Gathered From'
-                'GatheredLogName'          = 'Gathered LogName'
-            }
-
-            SortBy      = 'Record ID'
-            Descending  = $false
-            IgnoreWords = @{
-
-            }
-        }
-        EventsType3 = @{
-
-        }
-#>
     }
     LogsClearedSecurity     = @{
-        Enabled = $false
+        Enabled = $true
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 1102, 1105
             LogName     = 'Security'
-
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
@@ -1098,18 +1016,16 @@ $ReportADDefinitions = [ordered] @{
     EventsReboots           = @{
         Enabled = $false
         Events  = @{
-            Enabled     = $false
+            Enabled     = $true
             Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
             LogName     = 'System'
             IgnoreWords = @{
 
             }
-            #SortBy      = 'When'
         }
     }
 }
-
-$ReportADSync = @{
+$DefinitionsADSync = @{
     ADSync = @{
         Enabled     = $false
         Events      = 6100
@@ -1132,15 +1048,4 @@ $ReportADSync = @{
     }
 }
 
-Import-Module PSSharedGoods -Force
-Import-Module ..\PSWinReporting.psd1 -Force
-
-$Test = Start-WinReporting -LoggerParameters $LoggerParameters `
-    -EmailParameters $EmailParameters `
-    -FormattingParameters $FormattingParameters `
-    -ReportOptions $ReportOptions `
-    -ReportTimes $ReportTimes `
-    -ReportDefinitions $ReportADDefinitions `
-    -Target $Target -Verbose
-
-$Test
+Start-WinReporting -Options $Options -Times $Times -Definitions $DefinitionsAD -Target $Target -Verbose

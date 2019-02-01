@@ -23,7 +23,6 @@ function Start-ReportSpecial {
         [Array] $Servers = foreach ($Server in $Target.Servers.Keys | Where-Object { $_ -ne 'Enabled' }) {
 
             if ($Target.Servers.$Server -is [System.Collections.IDictionary]) {
-                #$Target.Servers.$Server
                 [ordered] @{
                     ComputerName = $Target.Servers.$Server.ComputerName
                     LogName      = $Target.Servers.$Server.LogName
