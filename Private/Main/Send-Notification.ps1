@@ -2,14 +2,14 @@ function Send-Notificaton {
     [CmdletBinding()]
     param(
         [PSCustomObject] $Events,
-        [System.Collections.IDictionary] $ReportOptions,
+        [Parameter(Mandatory = $true)][alias('ReportOptions')][System.Collections.IDictionary] $Options,
         [string] $Priority = 'Default'
     )
     Begin {
-        if ($ReportOptions.Notifications.Slack.Use -eq $false -or
-            $ReportOptions.Notifications.MicrosoftTeams.Use -eq $false -or
-            $ReportOptions.Notifications.Discord.Use -eq $false -or
-            $ReportOptions.Notifications.MSSQL.Use -eq $false) {
+        if ($Options.Notifications.Slack.Enabled -eq $false -or
+            $Options.Notifications.MicrosoftTeams.Enabled -eq $false -or
+            $Options.Notifications.Discord.Enabled -eq $false -or
+            $Options.Notifications.MSSQL.Enabled -eq $false) {
             return
         }
     }
@@ -21,9 +21,9 @@ function Send-Notificaton {
 
 
                 # Building message
-                $Teams = Get-NotificationParameters -Type 'Microsoft Teams' -Notifications $ReportOptions.Notifications.MicrosoftTeams -ActivityTitle $ActivityTitle -Priority $Priority
-                $Slack = Get-NotificationParameters -Type 'Slack' -Notifications $ReportOptions.Notifications.Slack -ActivityTitle $ActivityTitle -Priority $Priority
-                $Discord = Get-NotificationParameters -Type 'Discord' -Notifications $ReportOptions.Notifications.Discord -ActivityTitle $ActivityTitle -Priority $Priority
+                $Teams = Get-NotificationParameters -Type 'Microsoft Teams' -Notifications $Options.Notifications.MicrosoftTeams -ActivityTitle $ActivityTitle -Priority $Priority
+                $Slack = Get-NotificationParameters -Type 'Slack' -Notifications $Options.Notifications.Slack -ActivityTitle $ActivityTitle -Priority $Priority
+                $Discord = Get-NotificationParameters -Type 'Discord' -Notifications $Options.Notifications.Discord -ActivityTitle $ActivityTitle -Priority $Priority
 
                 $FactsSlack = @()
                 $FactsTeams = @()
@@ -43,8 +43,8 @@ function Send-Notificaton {
                 }
 
                 # Slack Notifications
-                if ($ReportOptions.Notifications.Slack.Use) {
-                    $SlackChannel = $ReportOptions.Notifications.Slack.$Priority.Channel
+                if ($Options.Notifications.Slack.Enabled) {
+                    $SlackChannel = $Options.Notifications.Slack.$Priority.Channel
                     $SlackColor = ConvertFrom-Color -Color $Slack.Color
 
                     $Data = New-SlackMessageAttachment -Color $SlackColor `
@@ -58,7 +58,7 @@ function Send-Notificaton {
                     Write-Color @script:WriteParameters -Text "[i] Slack output: ", $Data -Color White, Yellow
                 }
                 # Microsoft Teams Nofications
-                if ($ReportOptions.Notifications.MicrosoftTeams.Use) {
+                if ($Options.Notifications.MicrosoftTeams.Enabled) {
 
                     $Section1 = New-TeamsSection `
                         -ActivityTitle $ActivityTitle `
@@ -75,7 +75,7 @@ function Send-Notificaton {
                     Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
                 }
                 # Discord Notifications
-                if ($ReportOptions.Notifications.Discord.Use) {
+                if ($Options.Notifications.Discord.Enabled) {
                     $Thumbnail = New-DiscordImage -Url $Discord.ActivityImageLink
 
                     $Section1 = New-DiscordSection `
@@ -93,8 +93,8 @@ function Send-Notificaton {
 
                     Write-Color @script:WriteParameters -Text "[i] Discord output: ", $Data -Color White, Yellow
                 }
-                if ($ReportOptions.Notifications.MSSQL.Use) {
-                    $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $ReportOptions.Notifications.MSSQL -Verbose:$ReportOptions.Debug.Verbose
+                if ($Options.Notifications.MSSQL.Enabled) {
+                    $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $Options.Notifications.MSSQL -Verbose:$Options.Debug.Verbose
                     foreach ($Query in $SqlQuery) {
                         Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
                     }

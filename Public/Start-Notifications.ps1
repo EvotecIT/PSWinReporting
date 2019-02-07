@@ -1,74 +1,110 @@
 function Start-Notifications {
     [CmdletBinding()]
     param(
-        [System.Collections.IDictionary]$ReportOptions,
-        [System.Collections.IDictionary] $ReportDefinitions,
+        [System.Collections.IDictionary] $Options,
+        [System.Collections.IDictionary] $Definitions,
+        [System.Collections.IDictionary] $Target,
         [int] $EventID,
         [int64] $EventRecordID,
         [string] $EventChannel,
         [System.Collections.IDictionary] $LoggerParameters
     )
+    $Results = @{}
     if (-not $LoggerParameters) {
         $LoggerParameters = $Script:LoggerParameters
     }
     $Logger = Get-Logger @LoggerParameters
+
+
     $Logger.AddInfoRecord("Executed Trigger for ID: $eventid and RecordID: $eventRecordID")
-    $Logger.AddInfoRecord("Using Microsoft Teams: $($ReportOptions.Notifications.MicrosoftTeams.Use)")
-
-    if ($ReportOptions.Notifications.MicrosoftTeams.Use) {
-        [string] $URI = Format-FirstXChars -Text $ReportOptions.Notifications.MicrosoftTeams.TeamsID -NumberChars 50
-        $Logger.AddInfoRecord("TeamsID: $URI...")
+    $Logger.AddInfoRecord("Using Microsoft Teams: $($Options.Notifications.MicrosoftTeams.Enabled)")
+    if ($Options.Notifications.MicrosoftTeams.Enabled) {
+        foreach ($Priority in $Options.Notifications.MicrosoftTeams.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+            [string] $URI = Format-FirstXChars -Text $Options.Notifications.MicrosoftTeams.$Priority.Uri -NumberChars 50
+            $Logger.AddInfoRecord("Priority: $Priority, TeamsID: $URI...")
+        }
     }
-    $Logger.AddInfoRecord("Using Slack: $($ReportOptions.Notifications.Slack.Use)")
-    if ($ReportOptions.Notifications.Slack.Use) {
-        [string] $URI = Format-FirstXChars -Text $ReportOptions.Notifications.Slack.URI -NumberChars 25
-        $Logger.AddInfoRecord("Slack URI: $URI...")
-        $Logger.AddInfoRecord("Slack Channel: $($($ReportOptions.Notifications.Slack.Channel))...")
+    $Logger.AddInfoRecord("Using Slack: $($Options.Notifications.Slack.Enabled)")
+    if ($Options.Notifications.Slack.Enabled) {
+        foreach ($Priority in $Options.Notifications.Slack.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+            [string] $URI = Format-FirstXChars -Text $Options.Notifications.Slack.$Priority.URI -NumberChars 25
+            $Logger.AddInfoRecord("Priority: $Priority, Slack URI: $URI...")
+            $Logger.AddInfoRecord("Priority: $Priority, Slack Channel: $($($Options.Notifications.Slack.$Priority.Channel))...")
+        }
     }
-    $Logger.AddInfoRecord("Using MSSQL: $($ReportOptions.Notifications.MSSQL.Use)")
+    $Logger.AddInfoRecord("Using Discord: $($Options.Notifications.Discord.Enabled)")
+    if ($Options.Notifications.Discord.Enabled) {
+        foreach ($Priority in $Options.Notifications.Discord.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+            [string] $URI = Format-FirstXChars -Text $Options.Notifications.Discord.$Priority.URI -NumberChars 25
+            $Logger.AddInfoRecord("Priority: $Priority, Discord URI: $URI...")
+        }
+    }
+    $Logger.AddInfoRecord("Using MSSQL: $($Options.Notifications.MSSQL.Enabled)")
+    if ($Options.Notifications.MSSQL.Enabled) {
+        foreach ($Priority in $Options.Notifications.MSSQL.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+            $Logger.AddInfoRecord("Priority: $Priority, Server\Instance: $($Options.Notifications.MSSQL.$Priority.SqlServer)")
+            $Logger.AddInfoRecord("Priority: $Priority, Database: $($Options.Notifications.MSSQL.$Priority.SqlDatabase)")
+        }
+    }
 
-    if (-not $ReportOptions.Notifications.Slack.Use -and -not $ReportOptions.Notifications.MicrosoftTeams.Use -and -not $ReportOptions.Notifications.MSSQL.Use) {
+    if (-not $Options.Notifications.Slack.Enabled -and -not $Options.Notifications.MicrosoftTeams.Enabled -and -not $Options.Notifications.MSSQL.Enabled -and -not $Options.Notifications.Discord.Enabled) {
         # Terminating as no options are $true
         return
     }
 
-    $Events = Get-Events -Server $ReportDefinitions.ReportsAD.Servers.ForwardServer -LogName $ReportDefinitions.ReportsAD.Servers.ForwardEventLog -EventID $eventid -RecordID $eventRecordID -Verbose:$ReportOptions.Debug.Verbose
-
-    # Process events
-    $Results = @{}
-    foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
-        if ($ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled -eq $true) {
-            $Logger.AddInfoRecord("Running $ReportName Report")
-            $TimeExecution = Start-TimeLog
-            $Results.$ReportName = Get-EventsWorkaround -Events $Events -IgnoreWords $ReportDefinitions.ReportsAD.EventBased.$ReportName.IgnoreWords -Report $ReportName
-            $ElapsedTime = Stop-TimeLog -Time $TimeExecution -Option OneLiner
-            $Logger.AddInfoRecord("Ending $ReportName Report - Elapsed time: $ElapsedTime")
+    [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -RecordID $EventRecordID
+    foreach ($Entry in $ExtendedInput) {
+        if ($Entry.Type -eq 'Computer') {
+            $Logger.AddInfoRecord("Computer $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')")
+        } else {
+            $Logger.AddInfoRecord("File $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')")
         }
     }
 
+    $AllEvents = Get-Events -ExtendedInput $ExtendedInput -EventID $eventid -RecordID $eventRecordID -Verbose:$Options.Debug.Verbose
+
+    # Prepare the results based on chosen criteria
+    foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
+        if ($Definitions.$Report.Enabled) {
+            #$ReportNameTitle = Format-AddSpaceToSentence -Text $Report -ToLowerCase
+            $Logger.AddInfoRecord("Running $Report")
+            $TimeExecution = Start-TimeLog
+            foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'  }) {
+                if ($Definitions.$Report.$SubReport.Enabled) {
+                    $Logger.AddInfoRecord("Running $Report with subsection $SubReport")
+                    [string] $EventsType = $Definitions.$Report.$SubReport.LogName
+                    [Array] $EventsNeeded = $Definitions.$Report.$SubReport.Events
+                    [Array] $EventsFound = Find-EventsNeeded -Events $AllEvents -EventIDs $EventsNeeded -EventsType $EventsType
+                    [Array] $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $Definitions.$Report.$SubReport
+                    $Logger.AddInfoRecord("Ending $Report with subsection $SubReport events found $($EventsFound.Count)")
+                    $Results.$Report = $EventsFound
+                }
+            }
+            $ElapsedTimeReport = Stop-TimeLog -Time $TimeExecution -Option OneLiner
+            $Logger.AddInfoRecord("Ending $Report - Time to run $ElapsedTimeReport")
+        }
+    }
     [bool] $FoundPriorityEvent = $false
-    foreach ($ReportName in $ReportDefinitions.ReportsAD.EventBased.Keys) {
-
+    foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport', 'Priority' }) {
         if ($Results.$ReportName) {
-
-            if ($null -ne $ReportDefinitions.ReportsAD.EventBased.$ReportName.Priority) {
-                foreach ($Priority in $ReportDefinitions.ReportsAD.EventBased.$ReportName.Priority.Keys) {
-                    $MyValue = Find-EventsTo -Prioritize -Events $Results.$ReportName -DataSet  $ReportDefinitions.ReportsAD.EventBased.$ReportName.Priority.$Priority
+            if ($null -ne $Definitions.$ReportName.Priority) {
+                foreach ($Priority in $Definitions.$ReportName.Priority.Keys) {
+                    $MyValue = Find-EventsTo -Prioritize -Events $Results.$ReportName -DataSet  $Definitions.$ReportName.Priority.$Priority
                     if ((Get-ObjectCount -Object $MyValue) -gt 0) {
                         $Logger.AddInfoRecord("Sending event with $Priority priority.")
-                        Send-Notificaton -Events $MyValue -ReportOptions $ReportOptions -Priority $Priority
+                        Send-Notificaton -Events $MyValue -Options $Options -Priority $Priority
                         $FoundPriorityEvent = $true
                     }
                 }
             }
             if (-not $FoundPriorityEvent) {
                 $Logger.AddInfoRecord("Sending event with default priority.")
-                Send-Notificaton -Events $Results.$ReportName -ReportOptions $ReportOptions -Priority 'Default'
+                Send-Notificaton -Events $Results.$ReportName -Options $Options -Priority 'Default'
             }
         }
     }
 
-    if ($ReportOptions.Backup.Use) {
-        Protect-ArchivedLogs -TableEventLogClearedLogs $TableEventLogClearedLogs -DestinationPath $ReportOptions.Backup.DestinationPath -Verbose:$ReportOptions.Debug.Verbose
+    if ($Options.Backup.Enabled) {
+        Protect-ArchivedLogs -TableEventLogClearedLogs $TableEventLogClearedLogs -DestinationPath $Options.Backup.DestinationPath -Verbose:$Options.Debug.Verbose
     }
 }
