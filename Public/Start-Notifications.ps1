@@ -6,15 +6,17 @@ function Start-Notifications {
         [System.Collections.IDictionary] $Target,
         [int] $EventID,
         [int64] $EventRecordID,
-        [string] $EventChannel,
-        [System.Collections.IDictionary] $LoggerParameters
+        [string] $EventChannel
     )
-    $Results = @{}
-    if (-not $LoggerParameters) {
+    # Logger Setup
+    if ($Options.Logging) {
+        $LoggerParameters = $Options.Logging
+    } else {
         $LoggerParameters = $Script:LoggerParameters
     }
     $Logger = Get-Logger @LoggerParameters
 
+    $Results = @{}
 
     $Logger.AddInfoRecord("Executed Trigger for ID: $eventid and RecordID: $eventRecordID")
     $Logger.AddInfoRecord("Using Microsoft Teams: $($Options.Notifications.MicrosoftTeams.Enabled)")
@@ -46,8 +48,18 @@ function Start-Notifications {
             $Logger.AddInfoRecord("Priority: $Priority, Database: $($Options.Notifications.MSSQL.$Priority.SqlDatabase)")
         }
     }
+    $Logger.AddInfoRecord("Using Email: $($Options.Notifications.Email.Enabled)")
+    if ($Options.Notifications.Email.Enabled) {
+        foreach ($Priority in $Options.Notifications.Email.Keys | Where-Object { 'Enabled', 'Formatting' -notcontains $_ }) {
+            $Logger.AddInfoRecord("Priority: $Priority, Email TO: $($Options.Notifications.Email.$Priority.Parameters.To), Email CC: $($Options.Notifications.Email.$Priority.Parameters.CC)")
+        }
+    }
 
-    if (-not $Options.Notifications.Slack.Enabled -and -not $Options.Notifications.MicrosoftTeams.Enabled -and -not $Options.Notifications.MSSQL.Enabled -and -not $Options.Notifications.Discord.Enabled) {
+    if (-not $Options.Notifications.Slack.Enabled -and
+        -not $Options.Notifications.MicrosoftTeams.Enabled -and
+        -not $Options.Notifications.MSSQL.Enabled -and
+        -not $Options.Notifications.Discord.Enabled -and
+        -not $Options.Notifications.Email.Enabled) {
         # Terminating as no options are $true
         return
     }

@@ -14,11 +14,11 @@ function Start-WinReporting {
     }
     $Logger = Get-Logger @LoggerParameters
     # Test Configuration
-
+    #TODO
 
 
     # Test Modules
-
+    #TODO
 
     # Run report
     $Dates = Get-ChoosenDates -ReportTimes $Times
