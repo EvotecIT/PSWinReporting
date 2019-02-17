@@ -13,9 +13,9 @@
 
 # PSWinReporting - Legacy Edition
 
-This `PowerShell Module`, which started as an event library `(Get-EventsLibrary.ps1)`, has now grown up and became full fledged PowerShell Module. This module has multiple functionalities but one of the signature features of this module is ability to parse Security (mostly) logs on `Domain Controllers`. But that's not all. You can set up reporting on it and have emails delivered with summary of hourly, daily, weekly, monthly or quarterly changes. Changes that happen on your Active Directory Domain. Changes that your Service Desk agents, or other administrators do. And with new versions… well you can do a lot of stuff. Just read below. Make sure to go thru related articles as they have all the KNOW HOW which is quite useful if you want to get everything from this module. Module is published on [Powershell Gallery](https://www.powershellgallery.com/packages/PSWinReporting/).
+This `PowerShell Module`, which started as an event library `(Get-EventsLibrary.ps1)`, has now grown up and became full fledged PowerShell Module. This module has multiple functionalities but one of the signature features of this module is ability to parse Security (mostly) logs on `Domain Controllers`. But that's not all. You can set up reporting on it and have emails delivered with summary of **hourly**, **daily**, **weekly**, **monthly** or **quarterly** changes. Changes that happen on your **Active Directory** Domain. Changes that your Service Desk agents, or other administrators do. And with new versions… well you can do a lot of stuff. Just read below. Make sure to go thru related articles as they have all the KNOW HOW which is quite useful if you want to get everything from this module. Module is published on [Powershell Gallery](https://www.powershellgallery.com/packages/PSWinReporting/).
 
-This *legacy edition* will continue it's life as *1.7.X*. If you want to keep on using it, feel free, but it's highely encouraged to use *2.x.x* when it's fully functional with all features. 
+This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to keep on using it, feel free, but it's highely encouraged to use ***2.x.x*** when it's fully functional with all features. 
 
 ## Links
 
