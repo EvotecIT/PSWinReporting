@@ -43,10 +43,10 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     #region Report Definions
     $ConfigurationDefinitions += Test-Key $ReportDefinitions "ReportDefinitions" "ReportsAD" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD "ReportDefinitions.ReportsAD" "Servers" -DisplayProgress $true
-    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "UseForwarders" -DisplayProgress $true
-    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "ForwardServer" -DisplayProgress $true
-    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "ForwardEventLog" -DisplayProgress $true
-    $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "UseDirectScan" -DisplayProgress $true
+   # $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "UseForwarders" -DisplayProgress $true
+   # $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "ForwardServer" -DisplayProgress $true
+   # $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "ForwardEventLog" -DisplayProgress $true
+    #$ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "UseDirectScan" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "Automatic" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "OnlyPDC" -DisplayProgress $true
     $ConfigurationDefinitions += Test-Key $ReportDefinitions.ReportsAD.Servers "ReportDefinitions.ReportsAD.Servers" "DC" -DisplayProgress $true
@@ -123,7 +123,7 @@ function Test-Configuration ($EmailParameters, $FormattingParameters, $ReportOpt
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "KeepReportsPath" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePattern" -DisplayProgress $true
     $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "FilePatternDateFormat" -DisplayProgress $true
-    $ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "RemoveDuplicates" -DisplayProgress $true
+    #$ConfigurationReport += Test-Key $ReportOptions "ReportOptions" "RemoveDuplicates" -DisplayProgress $true
     #endregion ReportOptions Options
     if ($ConfigurationFormatting -notcontains $false -and
         $ConfigurationReport -notcontains $false -and
