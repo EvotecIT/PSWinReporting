@@ -1,10 +1,10 @@
 function Start-Notifications {
     [CmdletBinding()]
     param(
-        [hashtable] $ReportOptions,
-        [hashtable] $ReportDefinitions,
+        [System.Collections.IDictionary] $ReportOptions,
+        [System.Collections.IDictionary] $ReportDefinitions,
         [int] $EventID,
-        [int] $EventRecordID,
+        [int64] $EventRecordID,
         [string] $EventChannel
     )
     Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false

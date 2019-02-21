@@ -1,9 +1,9 @@
 function Start-RescanEvents {
     [CmdletBinding()]
     param(
-        [Hashtable] $ReportOptions,
-        [Hashtable] $ReportDefinitions,
-        [Hashtable] $ReportTimes
+        [System.Collections.IDictionary] $ReportOptions,
+        [System.Collections.IDictionary] $ReportDefinitions,
+        [System.Collections.IDictionary] $ReportTimes
     )
     Set-DisplayParameters -ReportOptions $ReportOptions -DisplayProgress $false
 

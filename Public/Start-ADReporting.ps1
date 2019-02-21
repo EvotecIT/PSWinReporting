@@ -1,10 +1,10 @@
 function Start-ADReporting () {
     param (
-        [hashtable]$EmailParameters,
-        [hashtable]$FormattingParameters,
-        [hashtable]$ReportOptions,
-        [hashtable]$ReportTimes,
-        [hashtable]$ReportDefinitions
+        [System.Collections.IDictionary]$EmailParameters,
+        [System.Collections.IDictionary]$FormattingParameters,
+        [System.Collections.IDictionary]$ReportOptions,
+        [System.Collections.IDictionary]$ReportTimes,
+        [System.Collections.IDictionary]$ReportDefinitions
     )
     Set-DisplayParameters -ReportOptions $ReportOptions
 
