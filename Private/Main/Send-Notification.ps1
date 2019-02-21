@@ -63,7 +63,8 @@ function Send-Notificaton {
                         -MessageTitle $MessageTitle `
                         -Color $Teams.Color `
                         -Sections $Section1 `
-                        -Supress $false #`
+                        -Supress $false `
+                        -MessageSummary $ActivityTitle
                     # -Verbose
                     Write-Color @script:WriteParameters -Text "[i] Teams output: ", $Data -Color White, Yellow
                 }
@@ -137,7 +138,7 @@ function Send-Notificaton {
                     } else {
                         $Logger.AddInfoRecord("Error sending message: $($SendMail.Error)")
                     }
-                    Remove-ReportFiles -KeepReports $false -ReportFiles 
+                    Remove-ReportFiles -KeepReports $false -ReportFiles
                 }
             }
         }
