@@ -17,6 +17,7 @@ This `PowerShell Module`, which started as an event library `(Get-EventsLibrary.
 
 This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to keep on using it, feel free, but it's highely encouraged to use ***2.x.x*** when it's fully functional with all features. 
 
+
 ## ChangeLog
 
 - 1.7.7 - 21.02.2019
