@@ -17,6 +17,17 @@ This `PowerShell Module`, which started as an event library `(Get-EventsLibrary.
 
 This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to keep on using it, feel free, but it's highely encouraged to use ***2.x.x*** when it's fully functional with all features. 
 
+## ChangeLog
+
+- 1.7.7 - 21.02.2019
+  - Fix for long RecordID
+  - Fix of colors for Teams 
+  - Fix for Teams Summary visible in activity pane
+- 1.7.6 - XX.02.2019
+  - Fixes for PDC detection
+  - Some optimization
+  - Bundle as single PSM1 file (speed up loading process)
+
 ## Links
 
 -   [Documentation for PSWinReporting (module description, installation, how to)](https://evotec.xyz/hub/scripts/pswinreporting-powershell-module/) - Full project description
