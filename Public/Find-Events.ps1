@@ -1,15 +1,11 @@
 function Find-Events {
     [CmdLetBinding()]
     param(
-        [parameter(ParameterSetName = "DateManual")]
-        [DateTime] $DateFrom,
-
-        [parameter(ParameterSetName = "DateManual")]
-        [DateTime] $DateTo,
+        [parameter(ParameterSetName = "DateManual")][DateTime] $DateFrom,
+        [parameter(ParameterSetName = "DateManual")][DateTime] $DateTo,
         [alias('Server', 'ComputerName')][string[]] $Servers = $Env:COMPUTERNAME,
-
-        [switch] $RunAgainstDC,
-
+        [alias('RunAgainstDC')][switch] $DetectDC,
+        [switch] $Quiet,
         [System.Collections.IDictionary] $LoggerParameters
     )
     DynamicParam {
@@ -57,7 +53,7 @@ function Find-Events {
         $Logger = Get-Logger @LoggerParameters
 
         ##
-        if ($RunAgainstDC) {
+        if ($DetectDC) {
             $ServersAD = Get-DC
             $Servers = ($ServersAD | Where-Object { $_.'Host Name' -ne 'N/A' }).'Host Name'
         }
@@ -77,7 +73,7 @@ function Find-Events {
             }
         }
         [string] $ReportNameTitle = Format-AddSpaceToSentence -Text $Report
-        $Logger.AddInfoRecord("Running $ReportNameTitle report against $($Servers -join ', ')")
+        if (-not $Quiet) { $Logger.AddInfoRecord("Running $ReportNameTitle report against $($Servers -join ', ')") }
         $Events = New-ArrayList
         $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
 
@@ -92,12 +88,12 @@ function Find-Events {
             $EventsID = foreach ($R in $MyReport.Values) {
                 if ($Log -eq $R.LogName) {
                     $R.Events
-                    $Logger.AddInfoRecord("Events scanning for Events ID: $($R.Events) ($Log)")
+                    if (-not $Quiet) { $Logger.AddInfoRecord("Events scanning for Events ID: $($R.Events) ($Log)") }
                 }
             }
             foreach ($Date in $Dates) {
                 $ExecutionTime = Start-TimeLog
-                $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)")
+                if (-not $Quiet) { $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)") }
                 $FoundEvents = Get-Events -Server $Servers `
                     -LogName $Log `
                     -EventID $EventsID `
@@ -108,14 +104,14 @@ function Find-Events {
                     -Verbose:$Verbose
 
                 foreach ($MyError in $ErrorsReturned) {
-                    $Logger.AddErrorRecord("Server $MyError")
+                    if (-not $Quiet) { $Logger.AddErrorRecord("Server $MyError") }
                 }
                 #$Logger.AddInfoRecord("Events: $EventsID Event Count: $($FoundEvents.Count)")
                 Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
                 $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
-                $Logger.AddInfoRecord("Events scanned found $(Get-ObjectCount -Object $FoundEvents) - Time elapsed: $Elapsed")
+                if (-not $Quiet) { $Logger.AddInfoRecord("Events scanned found $(Get-ObjectCount -Object $FoundEvents) - Time elapsed: $Elapsed") }
             }
         }
-        return Get-MyEvents -Events $Events -ReportDefinition $MyReport -ReportName $Report
+        return Get-MyEvents -Events $Events -ReportDefinition $MyReport -ReportName $Report -Quiet:$Quiet
     }
 }
