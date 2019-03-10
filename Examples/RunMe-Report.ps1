@@ -57,10 +57,10 @@ $ReportOptions = @{
     AsCSV                 = $false # attaches CSV to email with all events,
     AsHTML                = $true # puts exported data into email directly with all events
     SendMail              = $false
-    OpenAsFile            = $false
+    OpenAsFile            = $true
     KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
     KeepReportsPath       = "C:\Support\Reports\ExportedEvents" # if empty, temp path is used
-    FilePattern           = "Colmore-<currentdate>.<extension>"
+    FilePattern           = "Evotec-<currentdate>.<extension>"
     FilePatternDateFormat = "yyyy-MM-dd-HH_mm_ss"
     RemoveDuplicates      = $true #
 

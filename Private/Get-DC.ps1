@@ -5,7 +5,7 @@ function Get-DC {
         $Forest = Get-ADForest -ErrorAction Stop
     } catch {
         $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-        Write-Color @script:WriteParameters "[i] Get-ADForest Error: ", "$($_.Exception.Message)" -Color White, Red
+        Write-Color @script:WriteParameters "[i] Get-ADForest Error: ", $ErrorMessage -Color White, Red
         return
         #return $ErrorMessage
     }
@@ -13,7 +13,8 @@ function Get-DC {
         try {
             $Domain = Get-AdDomain -Server $DomainName -ErrorAction Stop
         } catch {
-            Write-Color @script:WriteParameters "[i] Get-AdDomain on $DomainName error: ", "$($_.Exception.Message)" -Color White, Red
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            Write-Color @script:WriteParameters "[i] Get-AdDomain on $DomainName error: ", $ErrorMessage -Color White, Red
             continue
         }
         try {
