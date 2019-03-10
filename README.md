@@ -20,6 +20,9 @@ This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to
 
 ## ChangeLog
 
+- 1.8.0 - 10.03.2019
+  - Update to configuration and overview of some features
+  - All information provied in blog post: https://evotec.xyz/pswinreporting-1-8-split-of-branches-legacy-vs-new-hope/
 - 1.7.7 - 21.02.2019
   - Fix for long RecordID
   - Fix of colors for Teams 
@@ -32,6 +35,7 @@ This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to
 ## Links
 
 -   [Documentation for PSWinReporting (module description, installation, how to)](https://evotec.xyz/hub/scripts/pswinreporting-powershell-module/) - Full project description
+-   [Review of features coming in 2.0 along with some features description for the current version](https://evotec.xyz/pswinreporting-1-8-split-of-branches-legacy-vs-new-hope/) - Nice overview
 -   [Review of new features in PSWinReporting 1.7](https://evotec.xyz/pswinreporting-forwarders-microsoft-teams-slack-microsoft-sql-and-more/) - Lots of changes, review required. Microsoft Teams, Slack, SQL and forwarders support
 -   [Review of new features in PSWinReporting 1.0](https://evotec.xyz/pswinreporting-1-0-is-out/) - Lots of changes, review required.
 -   [Last version of Get-EventsLibrary.ps1](https://evotec.xyz/get-eventslibrary-ps1-monitoring-events-powershell/) - This is actual code base for the old version. Just in case…
