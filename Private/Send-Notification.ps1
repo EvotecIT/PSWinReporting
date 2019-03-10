@@ -2,7 +2,8 @@ function Send-Notificaton {
     [CmdletBinding()]
     param(
         [PSCustomObject] $Events,
-        [System.Collections.IDictionary] $ReportOptions
+        [System.Collections.IDictionary] $ReportOptions,
+        [System.Collections.IDictionary] $ReportDefinitions
     )
 
 
@@ -73,6 +74,13 @@ function Send-Notificaton {
                     Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
                 }
             }
+            if ($ReportDefinitions.ExportToSql) {
+                $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $ReportDefinitions.ExportToSql -Verbose:$ReportOptions.Debug.Verbose
+                foreach ($Query in $SqlQuery) {
+                    Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
+                }
+            }
         }
+    
     }
 }

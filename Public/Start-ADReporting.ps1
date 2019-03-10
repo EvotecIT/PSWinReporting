@@ -9,7 +9,7 @@ function Start-ADReporting () {
     Set-DisplayParameters -ReportOptions $ReportOptions
 
     Test-Prerequisite $EmailParameters $FormattingParameters $ReportOptions $ReportTimes $ReportDefinitions
-    if ($ReportOptions.JustTestPrerequisite -ne $null -and $ReportOptions.JustTestPrerequisite -eq $true) {
+    if ($null -ne $ReportOptions.JustTestPrerequisite -and $ReportOptions.JustTestPrerequisite -eq $true) {
         Exit
     }
 

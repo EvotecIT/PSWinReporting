@@ -6,10 +6,16 @@ function Get-DC {
     } catch {
         $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
         Write-Color @script:WriteParameters "[i] Get-ADForest Error: ", "$($_.Exception.Message)" -Color White, Red
+        return
         #return $ErrorMessage
     }
     foreach ($DomainName in $Forest.Domains) {
-        $Domain = Get-AdDomain -Server $DomainName -ErrorAction SilentlyContinue
+        try {
+            $Domain = Get-AdDomain -Server $DomainName -ErrorAction Stop
+        } catch {
+            Write-Color @script:WriteParameters "[i] Get-AdDomain on $DomainName error: ", "$($_.Exception.Message)" -Color White, Red
+            continue
+        }
         try {
             $DomainControllers = $(Get-ADDomainController -Server $DomainName -Filter * -ErrorAction Stop )
             foreach ($Policy in $DomainControllers) {

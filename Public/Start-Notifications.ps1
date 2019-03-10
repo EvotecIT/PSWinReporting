@@ -107,7 +107,6 @@ function Start-Notifications {
         Write-Color @script:WriteParameters "[i] Ending ", "Computer Deleted Report." -Color White, Green, White, Green, White, Green, White
     }
 
-
     if ($ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges.Enabled -eq $true) {
         Write-Color @script:WriteParameters "[i] Running ", "Group Membership Changes Report" -Color White, Green, White, Green, White, Green, White
         $ExecutionTime = Start-TimeLog # Timer St
@@ -151,19 +150,19 @@ function Start-Notifications {
         $script:TimeToGenerateReports.Reports.LogsClearedOther.Total = Stop-TimeLog -Time $ExecutionTime
     }
 
-    Send-Notificaton -Events $UsersEventsTable -ReportOptions $ReportOptions
-    Send-Notificaton -Events $UsersLockoutsTable -ReportOptions $ReportOptions
-    Send-Notificaton -Events $UsersEventsStatusesTable -ReportOptions $ReportOptions
-    Send-Notificaton -Events $TableGroupPolicyChanges -ReportOptions $ReportOptions
-    Send-Notificaton -Events $TableEventLogClearedLogs -ReportOptions $ReportOptions
-    Send-Notificaton -Events $TableEventLogClearedLogsOther -ReportOptions $ReportOptions
-    Send-Notificaton -Events $GroupsEventsTable -ReportOptions $ReportOptions
-    Send-Notificaton -Events $GroupCreateDeleteTable -ReportOptions $ReportOptions
-    Send-Notificaton -Events $LogonEvents -ReportOptions $ReportOptions
-    Send-Notificaton -Events $LogonEventsKerberos -ReportOptions $ReportOptions
-    Send-Notificaton -Events $RebootEventsTable -ReportOptions $ReportOptions
-    Send-Notificaton -Events $ComputerChanges -ReportOptions $ReportOptions
-    Send-Notificaton -Events $ComputerDeleted -ReportOptions $ReportOptions
+    Send-Notificaton -Events $UsersEventsTable -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.UserChanges
+    Send-Notificaton -Events $UsersLockoutsTable -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.UserLockouts
+    Send-Notificaton -Events $UsersEventsStatusesTable -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.UserStatus
+    Send-Notificaton -Events $TableGroupPolicyChanges -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.GroupPolicyChanges
+    Send-Notificaton -Events $TableEventLogClearedLogs -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity
+    Send-Notificaton -Events $TableEventLogClearedLogsOther -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther
+    Send-Notificaton -Events $GroupsEventsTable -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.GroupMembershipChanges
+    Send-Notificaton -Events $GroupCreateDeleteTable -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.GroupCreateDelete
+    Send-Notificaton -Events $LogonEvents -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.UserLogon
+    Send-Notificaton -Events $LogonEventsKerberos -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.UserLogonKerberos
+    Send-Notificaton -Events $RebootEventsTable -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.EventsReboots
+    Send-Notificaton -Events $ComputerChanges -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.ComputerCreatedChanged
+    Send-Notificaton -Events $ComputerDeleted -ReportOptions $ReportOptions -ReportDefinitions $ReportDefinitions.ReportsAD.EventBased.ComputerDeleted
 
     if ($ReportOptions.Backup.Use) {
         Protect-ArchivedLogs -TableEventLogClearedLogs $TableEventLogClearedLogs -DestinationPath $ReportOptions.Backup.DestinationPath -Verbose:$ReportOptions.Debug.Verbose

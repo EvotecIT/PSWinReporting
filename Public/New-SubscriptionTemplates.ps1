@@ -9,6 +9,9 @@ function New-SubscriptionTemplates {
     Write-Color 'Found System Events ', ([string] $Systems) -Color White, Yellow
     $ServersAD = Get-DC
     $Servers = Find-ServersAD -ReportDefinitions $ReportDefinitions -DC $ServersAD
+    if (-not $Servers) {
+        return
+    }
     Write-Color 'Found Servers ', ([string] $Servers) -Color White, Yellow
     # $xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-Collector.xml"
     $XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-Collector.xml"

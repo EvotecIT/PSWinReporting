@@ -1,9 +1,9 @@
 function Export-ReportToSQL {
     param (
-        [hashtable] $Report,
-        [hashtable] $ReportOptions,
+        [System.Collections.IDictionary] $Report,
+        [System.Collections.IDictionary] $ReportOptions,
         [string] $ReportName,
-        $ReportTable
+        [Array] $ReportTable
     )
     #Get-ObjectType -Object $Report -Verbose -VerboseOnly
     #Get-ObjectType -Object $ReportOptions -Verbose -VerboseOnly
