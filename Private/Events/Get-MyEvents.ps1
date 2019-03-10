@@ -2,7 +2,8 @@ function Get-MyEvents {
     [CmdLetBinding()]
     param(
         [Array] $Events,
-        [System.Collections.IDictionary] $ReportDefinition
+        [System.Collections.IDictionary] $ReportDefinition,
+        [switch] $Quiet
     )
     DynamicParam {
         # Defines Report / Dates Range dynamically from HashTables
@@ -25,7 +26,7 @@ function Get-MyEvents {
     Process {
         [string] $ReportName = $PSBoundParameters.ReportName
         [string] $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
-        $Logger.AddInfoRecord("Running beautification process, applying filters for $ReportNameTitle report.")
+        if (-not $Quiet) { $Logger.AddInfoRecord("Running beautification process, applying filters for $ReportNameTitle report.") }
         $ExecutionTime = Start-TimeLog
 
         foreach ($Report in $ReportDefinition.Keys | Where-Object { $_ -ne 'Enabled' }) {
@@ -38,8 +39,8 @@ function Get-MyEvents {
 
         $EventsRemoved = $Events.Count - $EventsFound.Count
         $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
-        $Logger.AddInfoRecord("Events returned: $($EventsFound.Count), events skipped: $EventsRemoved")
-        $Logger.AddInfoRecord("Ending beautification process, applying filters for $ReportNameTitle report - Time elapsed: $Elapsed")
+        if (-not $Quiet) { $Logger.AddInfoRecord("Events returned: $($EventsFound.Count), events skipped: $EventsRemoved") }
+        if (-not $Quiet) { $Logger.AddInfoRecord("Ending beautification process, applying filters for $ReportNameTitle report - Time elapsed: $Elapsed") }
 
     }
 }

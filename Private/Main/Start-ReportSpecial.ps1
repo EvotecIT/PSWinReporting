@@ -121,7 +121,7 @@ function Start-ReportSpecial {
                     New-HTMLContent -HeaderText $ReportNameTitle -CanCollapse {
                         New-HTMLColumn -Columns 1 {
                             if ($null -ne $Results.$ReportName) {
-                                Get-HTMLContentDataTable -ArrayOfObjects $Results.$ReportName -HideFooter
+                                New-HTMLTable -DataTable $Results.$ReportName -HideFooter
                             }
                         }
                     }
@@ -220,7 +220,7 @@ function Start-ReportSpecial {
         if ($SendMail.Status) {
             $Logger.AddInfoRecord('Email successfully sent')
         } else {
-            $Logger.AddInfoRecord("Error sending message: $($SendMail.Error)")
+            $Logger.AddErrorRecord("Error sending message: $($SendMail.Error)")
         }
         Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports.XLSX -ReportFiles $AttachXLSX
         Remove-ReportsFiles -KeepReports $Options.SendMail.KeepReports.CSV -ReportFiles $AttachCSV

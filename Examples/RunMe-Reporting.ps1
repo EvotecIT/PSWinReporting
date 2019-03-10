@@ -25,7 +25,7 @@ $Options = [ordered] @{
     }
     AsHTML               = @{
         Enabled     = $true # creates report in HTML
-        OpenAsFile  = $false # requires AsHTML set to $true
+        OpenAsFile  = $true # requires AsHTML set to $true
 
         Path        = 'C:\Support\Reports\ExportedEvents'
         FilePattern = 'Evotec-ADMonitoredEvents-StaticHTML-<currentdate>.html'
@@ -1023,28 +1023,6 @@ $DefinitionsAD = [ordered] @{
 
             }
         }
-    }
-}
-$DefinitionsADSync = @{
-    ADSync = @{
-        Enabled     = $false
-        Events      = 6100
-        LogName     = 'Application'
-        IgnoreWords = @{}
-        Fields      = [ordered] @{
-            'Computer'        = 'Domain Controller'
-            'Action'          = 'Action'
-            'Who'             = 'Who'
-            'Date'            = 'When'
-            'ObjectAffected'  = 'User Affected'
-
-            # Common Fields
-            'ID'              = 'Event ID'
-            'RecordID'        = 'Record ID'
-            'GatheredFrom'    = 'Gathered From'
-            'GatheredLogName' = 'Gathered LogName'
-        }
-        SortBy      = 'When'
     }
 }
 
