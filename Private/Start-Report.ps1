@@ -272,9 +272,6 @@ function Start-Report {
         $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedSecurity.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "IncludeClearedLogsSecurity" -ReportTable $TableEventLogClearedLogs
         $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.LogsClearedOther.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "IncludeClearedLogsOther" -ReportTable $TableEventLogClearedLogs
         $Reports += Export-ReportToCSV -Report $ReportDefinitions.ReportsAD.EventBased.EventsReboots.Enabled -ReportOptions $ReportOptions -Extension "csv" -ReportName "ReportReboots" -ReportTable $RebootEventsTable
-
-
-
     }
     $Reports = $Reports |  Where-Object { $_ } | Sort-Object -Uniq
 
@@ -291,14 +288,43 @@ function Start-Report {
 
     # Sending email - finalizing package
     if ($ReportOptions.SendMail) {
-        $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
-        Write-Color @script:WriteParameters "[i] Sending email with reports..." -Color White, Green -NoNewLine
-        $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject
-        if ($SendMail.Status) {
-            Write-Color "Success!" -Color Green
+
+        # This tests if there is at least one event in reports
+        $Reporting = @( 
+            $UsersEventsTable,
+            $UsersEventsStatusesTable,
+            $UsersLockoutsTable,
+            $ComputerChanges, 
+            $ComputerDeleted,
+            $LogonEvents,
+            $LogonEventsKerberos,
+            $GroupsEventsTable,
+            $GroupCreateDeleteTable,
+            $TableGroupPolicyChanges,
+            $TableEventLogClearedLogs,
+            $TableEventLogClearedLogsOther,
+            $RebootEventsTable
+        )
+        $AtleastOneEvent = $false
+        foreach ($Table in $Reporting) {
+            if ($null -ne $Table -and (Get-ObjectCount -Object $Table) -gt 0) {
+                $AtleastOneEvent = $true
+                break
+            }
+        }
+        # Testing if sending is required
+        if ($ReportOptions.SendMailOnlyOnEvents -eq $true -and $AtleastOneEvent -eq $false) {
+            Write-Color @script:WriteParameters "[i] Sending email with reports... ", 'Skipped on demand. ', 'No events found.' -Color White, Yellow, Green
         } else {
-            Write-Color "Not working!" -Color Red
-            Write-Color @script:WriteParameters "[i] Error: ", "$($SendMail.Error)" -Color White, Red
+            $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
+            Write-Color @script:WriteParameters "[i] Sending email with reports..." -Color White, Green -NoNewLine
+            $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject
+            if ($SendMail.Status) {
+                Write-Color "Success!" -Color Green
+            } else {
+                Write-Color "Not working!" -Color Red
+                Write-Color @script:WriteParameters "[i] Error: ", "$($SendMail.Error)" -Color White, Red
+            }
         }
     } else {
         Write-Color @script:WriteParameters "[i] Skipping sending email with reports...", "as per configuration!" -Color White, Green

@@ -17,7 +17,10 @@ function Start-ADReporting () {
     if (-not $ReportOptions.Contains('RemoveDuplicates')) {
         $ReportOptions.RemoveDuplicates = $false
     }
-
+    if (-not $ReportOptions.Contains('SendMailOnlyOnEvents')) {
+        $ReportOptions.SendMailOnlyOnEvents = $false
+    }
+    
     if (-not $ReportDefinitions.ReportsAD.Servers.Contains('UseDirectScan')) {
         if ($ReportOptions.ReportsAD.Servers.UseForwarders) {
             $ReportDefinitions.ReportsAD.Servers.UseDirectScan = $false

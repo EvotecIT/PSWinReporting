@@ -20,6 +20,9 @@ This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to
 
 ## ChangeLog
 
+- 1.8.1 - 18.03.2019
+  - Added SendMailOnlyOnEvents feature. 
+  - Fixed SQL Server issue when DB name was containing `-` (Update-Module PSSharedGooods is required)
 - 1.8.0 - 10.03.2019
   - Update to configuration and overview of some features
   - All information provied in blog post: https://evotec.xyz/pswinreporting-1-8-split-of-branches-legacy-vs-new-hope/
