@@ -27,7 +27,7 @@ function Get-DC {
                     'Operating System' = $Policy.OperatingSystem
                     'Site'             = $Policy.Site
                     'Ipv4'             = if ($Policy.Ipv4Address -eq '') { 'N/A' } else { $Policy.Ipv4Address }
-                    'Ipv6'             = if ($Policy.Ipv6Address -eq '') { 'N/A' } else { $Policy.Ipv4Address }
+                    'Ipv6'             = if ($Policy.Ipv6Address -eq '') { 'N/A' } else { $Policy.Ip64Address }
                     'Is GC'            = $Policy.IsGlobalCatalog
                     'Is ReadOnly'      = $Policy.IsReadOnly
                     'Is PDC'           = if ($Policy.HostName -eq $Domain.PDCEmulator) { 'Yes' } else { 'No' }

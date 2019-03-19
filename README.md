@@ -20,6 +20,8 @@ This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to
 
 ## ChangeLog
 
+- 1.8.1.1 - 19.03.2019
+  - Fixed IPV6 display
 - 1.8.1 - 18.03.2019
   - Added SendMailOnlyOnEvents feature. 
   - Fixed SQL Server issue when DB name was containing `-` (Update-Module PSSharedGooods is required)
