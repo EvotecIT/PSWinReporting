@@ -56,7 +56,8 @@ $ReportOptions = @{
     AsExcel               = $false # attaches Excel to email with all events, required ImportExcel module
     AsCSV                 = $false # attaches CSV to email with all events,
     AsHTML                = $true # puts exported data into email directly with all events
-    SendMail              = $false
+    SendMail              = $true
+    SendMailOnlyOnEvents  = $false
     OpenAsFile            = $true
     KeepReports           = $true # keeps files after reports are sent (only if AssExcel/AsCSV are in use)
     KeepReportsPath       = "C:\Support\Reports\ExportedEvents" # if empty, temp path is used
@@ -178,7 +179,7 @@ $ReportDefinitions = @{
             ForwardServer   = $ENV:COMPUTERNAME
             ForwardEventLog = 'ForwardedEvents'
 
-            UseDirectScan   = $true
+            UseDirectScan   = $false
             Automatic       = $true
             OnlyPDC         = $false
             DC              = ''
@@ -212,7 +213,7 @@ $ReportDefinitions = @{
                 ExportToSql      = @{
                     Use                   = $true
                     SqlServer             = 'EVOWIN'
-                    SqlDatabase           = 'SSAE18'
+                    SqlDatabase           = 'SSA-E18'
                     SqlTable              = 'dbo.[EventsUserStatus]'
                     # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
                     # Changing makes sense only for right side...
@@ -358,7 +359,7 @@ $ReportDefinitions = @{
     }
 }
 
-Import-Module PSWinReporting -Force
+Import-Module .\PSWinReporting.psd1 -Force
 
 ### Starts Module (Requires config above)
 $startADReportingSplat = @{
