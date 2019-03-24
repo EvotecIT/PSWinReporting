@@ -8,7 +8,6 @@ function Start-ReportSpecial {
     )
     $Verbose = ($PSCmdlet.MyInvocation.BoundParameters['Verbose'] -eq $true)
     $Time = Start-TimeLog
-    $Results = @{}
     $AttachedReports = @()
     $AttachXLSX = @()
     $AttachHTML = @()
@@ -24,11 +23,7 @@ function Start-ReportSpecial {
         }
     }
     # Scan all events and get everything at once
-    $AllEvents = Get-Events `
-        -ExtendedInput $ExtendedInput `
-        -ErrorAction SilentlyContinue `
-        -ErrorVariable AllErrors `
-        -Verbose:$Verbose
+    $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
 
     $Logger.AddInfoRecord("Found $($AllEvents.Count) events.")
     foreach ($Errors in $AllErrors) {
@@ -41,28 +36,7 @@ function Start-ReportSpecial {
         $Logger.AddInfoRecord("Removed Duplicates Following $(Get-ObjectCount -Object $AllEvents) events will be analyzed further")
     }
 
-
-    # Prepare the results based on chosen criteria
-    foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
-        if ($Definitions.$Report.Enabled) {
-            #$ReportNameTitle = Format-AddSpaceToSentence -Text $Report -ToLowerCase
-            $Logger.AddInfoRecord("Running $Report")
-            $TimeExecution = Start-TimeLog
-            foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'  }) {
-                if ($Definitions.$Report.$SubReport.Enabled) {
-                    $Logger.AddInfoRecord("Running $Report with subsection $SubReport")
-                    [string] $EventsType = $Definitions.$Report.$SubReport.LogName
-                    [Array] $EventsNeeded = $Definitions.$Report.$SubReport.Events
-                    [Array] $EventsFound = Find-EventsNeeded -Events $AllEvents -EventIDs $EventsNeeded -EventsType $EventsType
-                    [Array] $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $Definitions.$Report.$SubReport
-                    $Logger.AddInfoRecord("Ending $Report with subsection $SubReport events found $($EventsFound.Count)")
-                    $Results.$Report = $EventsFound
-                }
-            }
-            $ElapsedTimeReport = Stop-TimeLog -Time $TimeExecution -Option OneLiner
-            $Logger.AddInfoRecord("Ending $Report - Time to run $ElapsedTimeReport")
-        }
-    }
+    $Results = Get-EventsOutput -Definitions $Definitions -AllEvents $AllEvents
 
     # Prepare email body - tables (real data)
     if ($Options.AsHTML.Enabled) {
@@ -110,10 +84,8 @@ function Start-ReportSpecial {
         $ReportFileName = Set-ReportFile -Path $Options.AsDynamicHTML.Path -FileNamePattern $Options.AsDynamicHTML.FilePattern -DateFormat $Options.AsDynamicHTML.DateFormat
 
         $DynamicHTML = New-HTML -TitleText $Options.AsDynamicHTML.Title `
-            -HideLogos:(-not $Options.AsDynamicHTML.Branding.Logo.Show) `
-            -RightLogoString $Options.AsDynamicHTML.Branding.Logo.RightLogo.ImageLink `
             -UseCssLinks:$Options.AsDynamicHTML.EmbedCSS `
-            -UseStyleLinks:$Options.AsDynamicHTML.EmbedJS {
+            -UseJavaScriptLinks:$Options.AsDynamicHTML.EmbedJS {
 
             foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
                 $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName

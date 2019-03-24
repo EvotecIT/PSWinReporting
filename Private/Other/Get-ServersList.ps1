@@ -2,7 +2,8 @@ function Get-ServersList {
     [CmdletBinding()]
     param(
         [System.Collections.IDictionary] $Definitions,
-        [System.Collections.IDictionary] $Target
+        [System.Collections.IDictionary] $Target,
+        [System.Collections.IDictionary] $Dates
     )
     # Get Servers
     $ServersList = New-ArrayList

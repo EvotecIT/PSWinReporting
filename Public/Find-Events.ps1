@@ -6,7 +6,8 @@ function Find-Events {
         [alias('Server', 'ComputerName')][string[]] $Servers = $Env:COMPUTERNAME,
         [alias('RunAgainstDC')][switch] $DetectDC,
         [switch] $Quiet,
-        [System.Collections.IDictionary] $LoggerParameters
+        [System.Collections.IDictionary] $LoggerParameters,
+        [switch] $ExtentedOutput
     )
     DynamicParam {
         # Defines Report / Dates Range dynamically from HashTables
@@ -18,7 +19,7 @@ function Find-Events {
         $ReportAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
         $ReportAttrib.Add($ParamAttrib)
         $ReportAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($Names)))
-        $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('Report', [string], $ReportAttrib)
+        $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('Report', [string[]], $ReportAttrib)
 
         $DatesRange = $Script:ReportTimes.Keys
         $ParamAttribDatesRange = New-Object System.Management.Automation.ParameterAttribute
@@ -38,12 +39,12 @@ function Find-Events {
     Process {
         if ($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent) { $Verbose = $true } else { $Verbose = $false }
 
-        $Report = $PSBoundParameters.Report
+        $Reports = $PSBoundParameters.Report
         $DatesRange = $PSBoundParameters.DatesRange
 
         # Bring defaults
-        $ReportTimes = $Script:ReportTimes
-        $ReportDefinitions = $Script:ReportDefinitions
+        $Times = $Script:ReportTimes
+        $Definitions = $Script:ReportDefinitions
 
         ## Logging / Display to screen
 
@@ -52,66 +53,59 @@ function Find-Events {
         }
         $Logger = Get-Logger @LoggerParameters
 
-        ##
-        if ($DetectDC) {
-            $ServersAD = Get-DC
-            $Servers = ($ServersAD | Where-Object { $_.'Host Name' -ne 'N/A' }).'Host Name'
-        }
-
         switch ($PSCmdlet.ParameterSetName) {
             DateRange {
-                $ReportTimes.$DatesRange.Enabled = $true
+                $Times.$DatesRange.Enabled = $true
             }
             DateManual {
                 if ($DateFrom -and $DateTo) {
-                    $ReportTimes.CustomDate.Enabled = $true
-                    $ReportTimes.CustomDate.DateFrom = $DateFrom
-                    $ReportTimes.CustomDate.DateTo = $DateTo
+                    $Times.CustomDate.Enabled = $true
+                    $Times.CustomDate.DateFrom = $DateFrom
+                    $Times.CustomDate.DateTo = $DateTo
                 } else {
                     return
                 }
             }
         }
-        [string] $ReportNameTitle = Format-AddSpaceToSentence -Text $Report
-        if (-not $Quiet) { $Logger.AddInfoRecord("Running $ReportNameTitle report against $($Servers -join ', ')") }
-        $Events = New-ArrayList
-        $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
 
-        $MyReport = $ReportDefinitions[$Report]
-        $LogNames = foreach ($SubReport in  $MyReport.Keys | Where-Object { $_ -ne 'Enabled' }) {
-            $MyReport[$SubReport].LogName
+        # Fixes ReportTimes
+        $Dates = Get-ChoosenDates -ReportTimes $Times
+        # foreach ($Date in $Dates) {
+        # Fixes Definitions
+        foreach ($Report in $Reports) {
+            $Definitions[$Report].Enabled = $true
         }
-        $LogNames = $LogNames | Sort-Object -Unique
 
-
-        foreach ($Log in $LogNames) {
-            $EventsID = foreach ($R in $MyReport.Values) {
-                if ($Log -eq $R.LogName) {
-                    $R.Events
-                    if (-not $Quiet) { $Logger.AddInfoRecord("Events scanning for Events ID: $($R.Events) ($Log)") }
-                }
-            }
-            foreach ($Date in $Dates) {
-                $ExecutionTime = Start-TimeLog
-                if (-not $Quiet) { $Logger.AddInfoRecord("Getting events for dates $($Date.DateFrom) to $($Date.DateTo)") }
-                $FoundEvents = Get-Events -Server $Servers `
-                    -LogName $Log `
-                    -EventID $EventsID `
-                    -DateFrom $Date.DateFrom `
-                    -DateTo $Date.DateTo `
-                    -ErrorAction SilentlyContinue `
-                    -ErrorVariable ErrorsReturned `
-                    -Verbose:$Verbose
-
-                foreach ($MyError in $ErrorsReturned) {
-                    if (-not $Quiet) { $Logger.AddErrorRecord("Server $MyError") }
-                }
-                #$Logger.AddInfoRecord("Events: $EventsID Event Count: $($FoundEvents.Count)")
-                Add-ToArrayAdvanced -List $Events -Element $FoundEvents -SkipNull -Merge
-                $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
-                if (-not $Quiet) { $Logger.AddInfoRecord("Events scanned found $(Get-ObjectCount -Object $FoundEvents) - Time elapsed: $Elapsed") }
+        $Target = New-TargetServers -Servers $Servers -UseDC:$DetectDC
+        [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates
+        foreach ($Entry in $ExtendedInput) {
+            if ($Entry.Type -eq 'Computer') {
+                if (-not $Quiet) { $Logger.AddInfoRecord("Computer $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')") }
+            } else {
+                if (-not $Quiet) { $Logger.AddInfoRecord("File $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')") }
             }
         }
-        return Get-MyEvents -Events $Events -ReportDefinition $MyReport -ReportName $Report -Quiet:$Quiet
+
+        $ExecutionTime = Start-TimeLog
+
+        if (-not $Quiet) { $Logger.AddInfoRecord("Getting events for dates $($Dates.DateFrom) to $($Dates.DateTo)") }
+
+        # Scan all events and get everything at once
+        $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
+
+        foreach ($MyError in $AllErrors) {
+            if (-not $Quiet) { $Logger.AddErrorRecord("Server $MyError") }
+        }
+        $Elapsed = Stop-TimeLog -Time $ExecutionTime -Option OneLiner
+        if (-not $Quiet) { $Logger.AddInfoRecord("Events scanned found $(Get-ObjectCount -Object $AllEvents) - Time elapsed: $Elapsed") }
+
+        $Results = Get-EventsOutput -Definitions $Definitions -AllEvents $AllEvents -Quiet:$Quiet
+        if ((Get-ObjectCount -Object $Reports) -eq 1) {
+            # if there is only one report to return, return Array
+            $Results[$Reports]
+        } else {
+            # If there is more than one, return hashtable
+            $Results
+        }
     }
 }

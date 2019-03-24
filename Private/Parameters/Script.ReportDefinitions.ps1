@@ -1,7 +1,7 @@
 ## Define reports
 $Script:ReportDefinitions = [ordered] @{
     UserChanges             = @{
-        Enabled   = $true
+        Enabled   = $false
         SqlExport = @{
             EnabledGlobal         = $false
             Enabled               = $false
@@ -108,7 +108,7 @@ $Script:ReportDefinitions = [ordered] @{
         }
     }
     UserChangesDetailed     = [ordered] @{
-        Enabled = $true
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 5136, 5137, 5141
@@ -143,7 +143,7 @@ $Script:ReportDefinitions = [ordered] @{
         }
     }
     ComputerChangesDetailed = [ordered] @{
-        Enabled = $true
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 5136, 5137, 5141
@@ -174,8 +174,8 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    UserStatus              = @{
-        Enabled = $true
+    UserStatus              = [ordered] @{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4722, 4725, 4767, 4723, 4724, 4726
@@ -196,8 +196,8 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLockouts            = @{
-        Enabled = $true
+    UserLockouts            = [ordered] @{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4740
@@ -219,7 +219,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLogon               = @{
+    UserLogon               = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -247,10 +247,10 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    UserUnlocked            = @{
+    UserUnlocked            = [ordered] @{
         # 4767	A user account was unlocked
         # https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4767
-        Enabled = $true
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4767
@@ -273,8 +273,8 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ComputerCreatedChanged  = @{
-        Enabled = $true
+    ComputerCreatedChanged  = [ordered] @{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4741, 4742 # created, changed
@@ -316,8 +316,8 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    ComputerDeleted         = @{
-        Enabled = $true
+    ComputerDeleted         = [ordered]@{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4743 # deleted
@@ -338,7 +338,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLogonKerberos       = @{
+    UserLogonKerberos       = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -369,8 +369,8 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupMembershipChanges  = @{
-        Enabled = $true
+    GroupMembershipChanges  = [ordered]@{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4728, 4729, 4732, 4733, 4746, 4747, 4751, 4752, 4756, 4757, 4761, 4762, 4785, 4786, 4787, 4788
@@ -395,7 +395,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupEnumeration        = @{
+    GroupEnumeration        = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -419,8 +419,8 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupChanges            = @{
-        Enabled = $true
+    GroupChanges            = [ordered]@{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4735, 4737, 4745, 4750, 4760, 4764, 4784, 4791
@@ -449,8 +449,8 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupCreateDelete       = @{
-        Enabled = $true
+    GroupCreateDelete       = [ordered]@{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 4727, 4730, 4731, 4734, 4744, 4748, 4749, 4753, 4754, 4758, 4759, 4763
@@ -474,7 +474,7 @@ $Script:ReportDefinitions = [ordered] @{
         }
     }
     GroupChangesDetailed    = [ordered] @{
-        Enabled = $true
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 5136, 5137, 5141
@@ -513,7 +513,7 @@ $Script:ReportDefinitions = [ordered] @{
         }
     }
     GroupPolicyChanges      = [ordered] @{
-        Enabled                     = $true
+        Enabled                     = $false
         'Group Policy Name Changes' = @{
             Enabled     = $true
             Events      = 5136, 5137, 5141
@@ -665,8 +665,8 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    LogsClearedSecurity     = @{
-        Enabled = $true
+    LogsClearedSecurity     = [ordered]@{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 1102, 1105
@@ -702,8 +702,8 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    LogsClearedOther        = @{
-        Enabled = $true
+    LogsClearedOther        = [ordered]@{
+        Enabled = $false
         Events  = @{
             Enabled     = $true
             Events      = 104
@@ -734,7 +734,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    EventsReboots           = @{
+    EventsReboots           = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true

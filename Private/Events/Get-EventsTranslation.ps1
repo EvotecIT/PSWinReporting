@@ -67,8 +67,6 @@ function Get-EventsTranslation {
                 $HashTable[$EventProperty.Name] = $EventProperty.Value
             }
         }
-        #$HashTable | fs
-
         # This overwrites values based on parameters. It's useful for cleanup or special cases.
         if ($null -ne $EventsDefinition.Overwrite) {
             foreach ($Entry in $EventsDefinition.Overwrite.Keys) {
@@ -91,7 +89,6 @@ function Get-EventsTranslation {
             }
         }
         [PsCustomObject]$HashTable
-
     }
     $MyValue = Find-EventsTo -Ignore -Events $MyValue -DataSet $EventsDefinition.IgnoreWords
 
