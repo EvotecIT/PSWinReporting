@@ -37,21 +37,27 @@ function Find-Events {
     }
 
     Process {
+        ## Logging / Display to screen
+        if (-not $LoggerParameters) {
+            $LoggerParameters = $Script:LoggerParameters
+        }
+        $Logger = Get-Logger @LoggerParameters
         if ($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent) { $Verbose = $true } else { $Verbose = $false }
 
         $Reports = $PSBoundParameters.Report
         $DatesRange = $PSBoundParameters.DatesRange
 
+        $Logger.AddInfoRecord("Preparing $($Reports -join ',')")
+
+
+        # This prevents duplication on second script run
+        foreach ($Report in $Script:ReportDefinitions.Keys) {
+            $Script:ReportDefinitions[$Report].Enabled = $false
+        }
         # Bring defaults
         $Times = $Script:ReportTimes
         $Definitions = $Script:ReportDefinitions
 
-        ## Logging / Display to screen
-
-        if (-not $LoggerParameters) {
-            $LoggerParameters = $Script:LoggerParameters
-        }
-        $Logger = Get-Logger @LoggerParameters
 
         switch ($PSCmdlet.ParameterSetName) {
             DateRange {
