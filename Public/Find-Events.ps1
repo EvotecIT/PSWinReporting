@@ -50,7 +50,7 @@ function Find-Events {
         $Logger.AddInfoRecord("Preparing $($Reports -join ',')")
 
 
-        # This prevents duplication on second script run
+        # This prevents duplication of reports on second script run
         foreach ($Report in $Script:ReportDefinitions.Keys) {
             $Script:ReportDefinitions[$Report].Enabled = $false
         }
