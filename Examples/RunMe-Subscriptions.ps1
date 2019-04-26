@@ -776,5 +776,5 @@ $LoggerParameters = @{
     TimeFormat = 'yyyy-MM-dd HH:mm:ss'
 }
 
-Start-WinSubscriptionService -LoggerParameters $LoggerParameters
-New-WinSubscriptionTemplates -Definitions $DefinitionsAD -Target $Target -LoggerParameters $LoggerParameters -AddTemplates
+Start-WinSubscriptionService #-LoggerParameters $LoggerParameters
+New-WinSubscriptionTemplates -Definitions $DefinitionsAD -Target $Target -AddTemplates #-LoggerParameters $LoggerParameters -AddTemplates
