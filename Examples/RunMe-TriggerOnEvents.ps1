@@ -5,7 +5,7 @@ param(
     $eventChannel,
     $eventSeverity
 )
-Import-Module PSWinReporting.psd1 -Force #-Verbose
+Import-Module PSWinReportingV2 -Force
 
 $Options = @{
     Logging       = @{

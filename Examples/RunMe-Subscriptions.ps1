@@ -1,4 +1,4 @@
-Import-Module ..\PSWinReporting.psd1 -Force
+Import-Module ..\PSWinReportingV2.psd1 -Force
 Import-Module PSSharedGoods #-Force
 
 $DefinitionsAD = [ordered] @{

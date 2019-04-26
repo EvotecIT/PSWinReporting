@@ -1,5 +1,5 @@
 Import-Module PSSharedGoods -Force
-Import-Module PSWinReporting.psd1 -Force
+Import-Module PSWinReportingV2 -Force
 
 $Options = [ordered] @{
     JustTestPrerequisite = $false # runs testing without actually running script
