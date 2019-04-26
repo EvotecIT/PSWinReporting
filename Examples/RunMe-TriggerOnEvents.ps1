@@ -1037,4 +1037,4 @@ $Target = [ordered]@{
         }
     }
 }
-Start-Notifications -Definitions $DefinitionsAD -Options $Options -Target $Target -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -Verbose
+Start-WinNotifications -Definitions $DefinitionsAD -Options $Options -Target $Target -EventID $EventID -EventRecordID $EventRecordID -EventChannel $EventChannel -Verbose

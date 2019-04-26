@@ -1,4 +1,4 @@
-function Remove-TaskScheduledForwarder {
+function Remove-WinTaskScheduledForwarder {
     [CmdletBinding()]
     param(
         [string] $TaskPath = '\Event Viewer Tasks\',

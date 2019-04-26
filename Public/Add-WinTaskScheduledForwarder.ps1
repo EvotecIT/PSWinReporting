@@ -1,4 +1,4 @@
-function Add-TaskScheduledForwarder {
+function Add-WinTaskScheduledForwarder {
     [CmdletBinding()]
     param(
         [string] $TaskPath = '\Event Viewer Tasks\',

@@ -753,8 +753,8 @@ $Target = [ordered]@{
     Servers           = [ordered] @{
         Enabled = $true
         # Server1 = @{ ComputerName = 'EVO1'; LogName = 'ForwardedEvents' }
-        # Server2 = 'AD1', 'AD2'
-        Server3 = 'AD1.ad.evotec.xyz'
+        #Server2 = 'AD1', 'AD2'
+        Server3 = 'AD1.ad.evotec.xyz', 'AD2'
     }
     DomainControllers = [ordered] @{
         Enabled = $false
@@ -776,7 +776,5 @@ $LoggerParameters = @{
     TimeFormat = 'yyyy-MM-dd HH:mm:ss'
 }
 
-#Start-SubscriptionService -LoggerParameters $LoggerParameters
-$Providers = New-SubscriptionTemplates -Definitions $DefinitionsAD -Target $Target  -LoggerParameters $LoggerParameters
-$Providers | ft -a *
-#Set-SubscriptionTemplates -ListTemplates $Providers -DeleteOwn -LoggerParameters $LoggerParameters
+Start-WinSubscriptionService -LoggerParameters $LoggerParameters
+New-WinSubscriptionTemplates -Definitions $DefinitionsAD -Target $Target -LoggerParameters $LoggerParameters -AddTemplates

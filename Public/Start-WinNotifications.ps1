@@ -1,4 +1,4 @@
-function Start-Notifications {
+function Start-WinNotifications {
     [CmdletBinding()]
     param(
         [System.Collections.IDictionary] $Options,
