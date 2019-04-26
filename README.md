@@ -1,13 +1,13 @@
 <center>
 
-[![PowerShellGallery Version](https://img.shields.io/powershellgallery/v/PSWinReporting.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReporting)
+[![PowerShellGallery Version](https://img.shields.io/powershellgallery/v/PSWinReportingV2.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
 
-[![PowerShellGallery Platform](https://img.shields.io/powershellgallery/p/PSWinReporting.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReporting)
-[![PowerShellGallery Preview Version](https://img.shields.io/powershellgallery/vpre/PSWinReporting.svg?label=powershell%20gallery%20preview&colorB=yellow&style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReporting)
+[![PowerShellGallery Platform](https://img.shields.io/powershellgallery/p/PSWinReportingV2.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
+[![PowerShellGallery Preview Version](https://img.shields.io/powershellgallery/vpre/PSWinReportingV2.svg?label=powershell%20gallery%20preview&colorB=yellow&style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
 
 ![Top Language](https://img.shields.io/github/languages/top/evotecit/PSWinReporting.svg?style=for-the-badge)
 ![Code](https://img.shields.io/github/languages/code-size/evotecit/PSWinReporting.svg?style=for-the-badge)
-[![PowerShellGallery Downloads](https://img.shields.io/powershellgallery/dt/PSWinReporting.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReporting)
+[![PowerShellGallery Downloads](https://img.shields.io/powershellgallery/dt/PSWinReportingV2.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
 
 </center>
 
@@ -19,8 +19,8 @@ Full project description is available at my website - [Full project description]
 
 Currently there are 2 branches of of PSWinReporting
 
-- [x] Legacy branch - available in PS Gallery as [PSWinReporting](https://www.powershellgallery.com/packages/PSWinReporting/)
-- [ ] Master branch - available in PS Gallery as [PSWinReportingV2](https://www.powershellgallery.com/packages/PSWinReportingV2/)
+- [x] Legacy branch - available in PS Gallery as [PSWinReporting](https://www.powershellgallery.com/packages/PSWinReporting/) - `Install-Module -Name 'PSWinReporting' -Force`
+- [ ] Master branch - available in PS Gallery as [PSWinReportingV2](https://www.powershellgallery.com/packages/PSWinReportingV2/) - `Install-Module -Name 'PSWinReportingV2' -Force`
 
 I've decided that both PowerShell modules can coexist together, especially foor scenarios for people who want to switch, but don't want to do it right away. This way you can keep using old version as is, and slowly fix your other stuff, or use new `Find-Events` command. Commands are slightly renamed for V2 release.
 
