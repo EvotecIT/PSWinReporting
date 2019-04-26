@@ -1,6 +1,6 @@
 ---
-external help file: PSWinReporting-help.xml
-Module Name: PsWinReporting
+external help file: PSWinReportingV2-help.xml
+Module Name: PSWinReportingV2
 online version:
 schema: 2.0.0
 ---
@@ -8,24 +8,24 @@ schema: 2.0.0
 # Find-Events
 
 ## SYNOPSIS
-{{Fill in the Synopsis}}
+{{ Fill in the Synopsis }}
 
 ## SYNTAX
 
 ### DateManual
 ```
-Find-Events [-DateFrom <DateTime>] [-DateTo <DateTime>] [-Servers <String[]>] [-RunAgainstDC]
- [-LoggerParameters <IDictionary>] -Report <String> [<CommonParameters>]
+Find-Events [-DateFrom <DateTime>] [-DateTo <DateTime>] [-Servers <String[]>] [-DetectDC] [-Quiet]
+ [-LoggerParameters <IDictionary>] [-ExtentedOutput] -Report <String[]> [<CommonParameters>]
 ```
 
 ### DateRange
 ```
-Find-Events [-Servers <String[]>] [-RunAgainstDC] [-LoggerParameters <IDictionary>] -Report <String>
- -DatesRange <String> [<CommonParameters>]
+Find-Events [-Servers <String[]>] [-DetectDC] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput]
+ -Report <String[]> -DatesRange <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+{{ Fill in the Description }}
 
 ## EXAMPLES
 
@@ -39,7 +39,7 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -DateFrom
-{{Fill DateFrom Description}}
+{{ Fill DateFrom Description }}
 
 ```yaml
 Type: DateTime
@@ -54,7 +54,7 @@ Accept wildcard characters: False
 ```
 
 ### -DateTo
-{{Fill DateTo Description}}
+{{ Fill DateTo Description }}
 
 ```yaml
 Type: DateTime
@@ -69,7 +69,7 @@ Accept wildcard characters: False
 ```
 
 ### -DatesRange
-{{Fill DatesRange Description}}
+{{ Fill DatesRange Description }}
 
 ```yaml
 Type: String
@@ -84,13 +84,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -LoggerParameters
-{{Fill LoggerParameters Description}}
+### -DetectDC
+{{ Fill DetectDC Description }}
 
 ```yaml
-Type: IDictionary
+Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: RunAgainstDC
 
 Required: False
 Position: Named
@@ -99,24 +99,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Report
-{{Fill Report Description}}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-Accepted values: LogsClearedOther, UserUnlocked, UserChangesDetailed, GroupChangesDetailed, ComputerCreatedChanged, GroupMembershipChanges, ComputerDeleted, GroupEnumeration, GroupPolicyChanges, GroupCreateDelete, GroupChanges, UserLockouts, UserLogon, UserLogonKerberos, ComputerChangesDetailed, EventsReboots, UserStatus, LogsClearedSecurity, UserChanges
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -RunAgainstDC
-{{Fill RunAgainstDC Description}}
+### -ExtentedOutput
+{{ Fill ExtentedOutput Description }}
 
 ```yaml
 Type: SwitchParameter
@@ -130,8 +114,54 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -LoggerParameters
+{{ Fill LoggerParameters Description }}
+
+```yaml
+Type: IDictionary
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Quiet
+{{ Fill Quiet Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Report
+{{ Fill Report Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+Accepted values: UserChanges, UserChangesDetailed, ComputerChangesDetailed, UserStatus, UserLockouts, UserLogon, UserUnlocked, ComputerCreatedChanged, ComputerDeleted, UserLogonKerberos, GroupMembershipChanges, GroupEnumeration, GroupChanges, GroupCreateDelete, GroupChangesDetailed, GroupPolicyChanges, LogsClearedSecurity, LogsClearedOther, EventsReboots
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Servers
-{{Fill Servers Description}}
+{{ Fill Servers Description }}
 
 ```yaml
 Type: String[]
@@ -146,7 +176,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

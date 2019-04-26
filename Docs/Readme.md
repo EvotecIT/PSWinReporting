@@ -1,37 +1,34 @@
 ---
-Module Name: PsWinReporting
-Module Guid: 4b446d15-93e7-4eec-a6ee-d741f2ae2f3b
-Download Help Link: {{Please enter FwLink manually}}
-Help Version: {{Please enter version of help manually (X.X.X.X) format}}
+Module Name: PSWinReportingV2
+Module Guid: ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe
+Download Help Link: {{ Update Download Link }}
+Help Version: {{ Please enter version of help manually (X.X.X.X) format }}
 Locale: en-US
 ---
 
-# PsWinReporting Module
+# PSWinReportingV2 Module
 ## Description
-{{Manually Enter Description Here}}
+{{ Fill in the Description }}
 
-## PsWinReporting Cmdlets
-### [Add-TaskScheduledForwarder](Add-TaskScheduledForwarder.md)
-{{Fill in the Synopsis}}
+## PSWinReportingV2 Cmdlets
+### [Add-WinTaskScheduledForwarder](Add-WinTaskScheduledForwarder.md)
+{{ Fill in the Description }}
 
 ### [Find-Events](Find-Events.md)
-{{Fill in the Synopsis}}
+{{ Fill in the Description }}
 
-### [New-SubscriptionTemplates](New-SubscriptionTemplates.md)
-{{Fill in the Synopsis}}
+### [New-WinSubscriptionTemplates](New-WinSubscriptionTemplates.md)
+{{ Fill in the Description }}
 
-### [Remove-TaskScheduledForwarder](Remove-TaskScheduledForwarder.md)
-{{Fill in the Synopsis}}
+### [Remove-WinTaskScheduledForwarder](Remove-WinTaskScheduledForwarder.md)
+{{ Fill in the Description }}
 
-### [Set-SubscriptionTemplates](Set-SubscriptionTemplates.md)
-{{Fill in the Synopsis}}
+### [Start-WinNotifications](Start-WinNotifications.md)
+{{ Fill in the Description }}
 
-### [Start-ADReporting](Start-ADReporting.md)
-{{Fill in the Synopsis}}
+### [Start-WinReporting](Start-WinReporting.md)
+{{ Fill in the Description }}
 
-### [Start-Notifications](Start-Notifications.md)
-{{Fill in the Synopsis}}
-
-### [Start-SubscriptionService](Start-SubscriptionService.md)
-{{Fill in the Synopsis}}
+### [Start-WinSubscriptionService](Start-WinSubscriptionService.md)
+{{ Fill in the Description }}
 
