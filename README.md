@@ -13,18 +13,25 @@
 
 # PSWinReporting
 
-**PSWinReporting** is a little PowerShell module that solves problem of monitoring and reading **Windows Events**. It allows you to set up monitoring of **Domain Controllers** (and from 2.0 any other servers) for events that happen on them. By default it comes with **built-in Active Directory** events supports, but since **2.0** you can configure it to monitor basically anything. You can set up reporting on any types of events and have emails delivered with summary of hourly, daily, weekly, monthly or quarterly changes. It also supports sending notifications to Microsoft Teams, Slack, and Discord. Make sure to go thru related articles as they have all the KNOW HOW which is quite useful if you want to get everything from this module.
+**PSWinReporting** is a little PowerShell module that solves problem of monitoring and reading **Windows Events**. It allows you to set up monitoring of **Domain Controllers** (and from **2.X** any other servers) for events that happen on them. By default it comes with **built-in Active Directory** events supports, but since **2.0** you can configure it to monitor basically anything. You can set up reporting on any types of events and have emails delivered with summary of hourly, daily, weekly, monthly or quarterly changes. It also supports sending notifications to Microsoft Teams, Slack, and Discord. Make sure to go thru related articles as they have all the KNOW HOW which is quite useful if you want to get everything from this module.
 
 Full project description is available at my website - [Full project description](https://evotec.xyz/hub/scripts/pswinreporting-powershell-module/).
 
-## PSWinReporting - Master Edition
+Currently there are 2 branches of of PSWinReporting
 
-Master edition is complete rewrite and a new begining. It provides same functionality as **Legacy 1.7** version and then some more.
+- [x] Legacy branch - available in PS Gallery as [PSWinReporting](https://www.powershellgallery.com/packages/PSWinReporting/)
+- [ ] Master branch - available in PS Gallery as [PSWinReportingV2](https://www.powershellgallery.com/packages/PSWinReportingV2/)
+
+I've decided that both PowerShell modules can coexist together, especially foor scenarios for people who want to switch, but don't want to do it right away. This way you can keep using old version as is, and slowly fix your other stuff, or use new `Find-Events` command. Commands are slightly renamed for V2 release.
+
+## PSWinReportingV2 - Master Edition
+
+Master edition is complete rewrite and a new begining. It provides same functionality as **Legacy 1.X** version and then some more.
 
 - [x] Ability to translate report and have it suite your needs
 - [x] Ability to completly modify events monitoring
 - [x] Ability to monitor any servers, for any events using simple to use schema
-- [x] Ability to target multiple servers, computers at the same time
+- [x] Ability to target multiple servers, computers or files at the same time
 
 ### Built-in Active Directory Reports
 
@@ -75,9 +82,9 @@ PSWinReporting comes with predefined report times. This means you can simply use
 
 ## PSWinReporting - Legacy Edition
 
-***Legacy edition*** will continue it's life as ***1.7.X***. If you want to keep on using it, feel free, but it's highely encouraged to use ***2.x.x*** when it's fully functional with all features. Code is available as [Legacy Branch](https://github.com/EvotecIT/PSWinReporting/tree/Legacy). Following links can help understanding how it works and how to set it up:
+***Legacy edition*** will continue it's life as ***1.X.X***. If you want to keep on using it, feel free, but it's highely encouraged to use ***2.x.x*** when it's fully functional with all features. Code is available as [Legacy Branch](https://github.com/EvotecIT/PSWinReporting/tree/Legacy). Following links can help understanding how it works and how to set it up:
 
--   [Review of features coming in 2.0 along with some features description for the current version](https://evotec.xyz/pswinreporting-1-8-split-of-branches-legacy-vs-new-hope/) - Overview of configuration and features. 
+-   [Review of features coming in 2.0 along with some features description for the current version](https://evotec.xyz/pswinreporting-1-8-split-of-branches-legacy-vs-new-hope/) - Overview of configuration and features.
 -   [Review of new features in PSWinReporting 1.7](https://evotec.xyz/pswinreporting-forwarders-microsoft-teams-slack-microsoft-sql-and-more/) - Lots of changes, review required. Microsoft Teams, Slack, SQL and forwarders support
 -   [Review of new features in PSWinReporting 1.0](https://evotec.xyz/pswinreporting-1-0-is-out/) - Lots of changes, review required.
 -   [Last version of Get-EventsLibrary.ps1](https://evotec.xyz/get-eventslibrary-ps1-monitoring-events-powershell/) - This is actual code base for the old version. Just in caseâ€¦
