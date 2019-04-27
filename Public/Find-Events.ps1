@@ -2,15 +2,15 @@ function Find-Events {
     [CmdLetBinding(DefaultParameterSetName = 'Manual')]
     param(
         [parameter(ParameterSetName = "DateManual")]
-        [parameter(ParameterSetName = "Manual")][DateTime] $DateFrom,
+        [parameter(ParameterSetName = "Manual", Mandatory = $true)][DateTime] $DateFrom,
         [parameter(ParameterSetName = "DateManual")]
-        [parameter(ParameterSetName = "Manual")][DateTime] $DateTo,
+        [parameter(ParameterSetName = "Manual", Mandatory = $true)][DateTime] $DateTo,
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
-        [parameter(ParameterSetName = "DateRange")][alias('Server', 'ComputerName')][string[]] $Servers = $Env:COMPUTERNAME,
+        [parameter(ParameterSetName = "DateRange", Mandatory = $true)][alias('Server', 'ComputerName')][string[]] $Servers = $Env:COMPUTERNAME,
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
-        [parameter(ParameterSetName = "DateRange")][alias('RunAgainstDC')][switch] $DetectDC,
+        [parameter(ParameterSetName = "DateRange", Mandatory = $true)][alias('RunAgainstDC')][switch] $DetectDC,
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
         [parameter(ParameterSetName = "DateRange")][switch] $Quiet,
@@ -20,14 +20,12 @@ function Find-Events {
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
         [parameter(ParameterSetName = "DateRange")][switch] $ExtentedOutput,
-        [parameter(ParameterSetName = "Extended")][System.Collections.IDictionary] $Definitions,
-        [parameter(ParameterSetName = "Extended")][System.Collections.IDictionary] $Times,
-        [parameter(ParameterSetName = "Extended")][System.Collections.IDictionary] $Target
-
+        [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Definitions,
+        [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Times,
+        [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Target
     )
     DynamicParam {
         # Defines Report / Dates Range dynamically from HashTables and saved files
-
         $ParameterSetsAttributesDateManual = New-Object System.Management.Automation.ParameterAttribute
         $ParameterSetsAttributesDateManual.Mandatory = $true
         $ParameterSetsAttributesDateManual.ParameterSetName = 'DateManual'
@@ -62,7 +60,6 @@ function Find-Events {
         $RuntimeParamDic.Add('DatesRange', $DatesRangeRuntimeParam)
         return $RuntimeParamDic
     }
-
     Process {
         $ExecutionTime = Start-TimeLog
         ## Logging / Display to screen
