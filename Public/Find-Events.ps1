@@ -22,7 +22,9 @@ function Find-Events {
         [parameter(ParameterSetName = "DateRange")][switch] $ExtentedOutput,
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Definitions,
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Times,
-        [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Target
+        [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Target,
+        [parameter(ParameterSetName = "Extended", Mandatory = $false)][int] $EventID,
+        [parameter(ParameterSetName = "Extended", Mandatory = $false)][int64] $EventRecordID
     )
     DynamicParam {
         # Defines Report / Dates Range dynamically from HashTables and saved files
@@ -113,7 +115,11 @@ function Find-Events {
         }
 
         # Real deal
-        [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates
+        if ($EventRecordID -ne 0 -and $EventID -ne 0) {
+            [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -RecordID $EventRecordID
+        } else {
+            [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates
+        }
         foreach ($Entry in $ExtendedInput) {
             if ($Entry.Type -eq 'Computer') {
                 if (-not $Quiet) { $Logger.AddInfoRecord("Computer $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')") }
@@ -125,7 +131,12 @@ function Find-Events {
         #$ElapsedMiddle = Stop-TimeLog -Time $ExecutionTime -Option OneLiner -Continue
         #if (-not $Quiet) { $Logger.AddInfoRecord("Preparation - Time elapsed: $ElapsedMiddle") }
         # Scan all events and get everything at once
-        [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
+        if ($EventRecordID -ne 0 -and $EventId -ne 0) {
+            # ExtendedInput - Special Case
+            [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -EventID $EventID -RecordID $EventRecordID -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
+        } else {
+            [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
+        }
 
         foreach ($MyError in $AllErrors) {
             if (-not $Quiet) { $Logger.AddErrorRecord("Server $MyError") }

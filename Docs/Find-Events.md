@@ -32,7 +32,8 @@ Find-Events -Servers <String[]> [-DetectDC] [-Quiet] [-LoggerParameters <IDictio
 
 ### Extended
 ```
-Find-Events -Definitions <IDictionary> -Times <IDictionary> -Target <IDictionary> [<CommonParameters>]
+Find-Events -Definitions <IDictionary> -Times <IDictionary> -Target <IDictionary> [-EventID <Int32>]
+ [-EventRecordID <Int64>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -155,6 +156,36 @@ Parameter Sets: DateRange
 Aliases: RunAgainstDC
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -EventID
+{{ Fill EventID Description }}
+
+```yaml
+Type: Int32
+Parameter Sets: Extended
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -EventRecordID
+{{ Fill EventRecordID Description }}
+
+```yaml
+Type: Int64
+Parameter Sets: Extended
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

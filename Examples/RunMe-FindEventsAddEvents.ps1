@@ -107,10 +107,4 @@ $DefinitionsADSync = @{
     }
 }
 
-
 Add-EventsDefinitions -Definitions $DefinitionsADSync
-
-#$ConfigurationPath = "$Env:ALLUSERSPROFILE\Evotec\PSWinReporting\Definitions"
-#$Files = Get-ChildItem -LiteralPath $ConfigurationPath -Filter '*.xml'
-#$Files.FullName
-
