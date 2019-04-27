@@ -29,7 +29,7 @@ function Get-ServersList {
         $null = $ServersList.AddRange($Servers)
     }
     if ($Target.LocalFiles.Enabled) {
-        $Logger.AddInfoRecord("Preparing file list - defined event logs")
+        $Logger.AddInfoRecord("Preparing file list - defined event log files")
         $Files = Get-EventLogFileList -Sections $Target.LocalFiles
     }
     # Prepare list of servers and files to scan and their relation to LogName and EventIDs and DataTimes

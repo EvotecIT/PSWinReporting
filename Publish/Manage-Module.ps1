@@ -37,7 +37,7 @@ $Configuration = @{
     }
     Options     = @{
         Merge             = @{
-            Enabled        = $true
+            Enabled        = $false
             Sort           = 'ASC'
             FormatCodePSM1 = @{
                 Enabled           = $true

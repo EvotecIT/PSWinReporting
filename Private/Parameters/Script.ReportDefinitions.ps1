@@ -1,6 +1,6 @@
 ## Define reports
 $Script:ReportDefinitions = [ordered] @{
-    UserChanges             = @{
+    ADUserChanges             = @{
         Enabled   = $false
         SqlExport = @{
             EnabledGlobal         = $false
@@ -107,7 +107,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserChangesDetailed     = [ordered] @{
+    ADUserChangesDetailed     = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -142,7 +142,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    ComputerChangesDetailed = [ordered] @{
+    ADComputerChangesDetailed = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -174,7 +174,7 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    UserStatus              = [ordered] @{
+    ADUserStatus              = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -196,7 +196,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLockouts            = [ordered] @{
+    ADUserLockouts            = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -219,7 +219,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLogon               = [ordered]@{
+    ADUserLogon               = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -247,7 +247,7 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    UserUnlocked            = [ordered] @{
+    ADUserUnlocked            = [ordered] @{
         # 4767	A user account was unlocked
         # https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4767
         Enabled = $false
@@ -273,7 +273,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ComputerCreatedChanged  = [ordered] @{
+    ADComputerCreatedChanged  = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -316,7 +316,7 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    ComputerDeleted         = [ordered]@{
+    ADComputerDeleted         = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -338,7 +338,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLogonKerberos       = [ordered] @{
+    ADUserLogonKerberos       = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -369,7 +369,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupMembershipChanges  = [ordered]@{
+    ADGroupMembershipChanges  = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -395,7 +395,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupEnumeration        = [ordered] @{
+    ADGroupEnumeration        = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -419,7 +419,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupChanges            = [ordered]@{
+    ADGroupChanges            = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -449,7 +449,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupCreateDelete       = [ordered]@{
+    ADGroupCreateDelete       = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -473,7 +473,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupChangesDetailed    = [ordered] @{
+    ADGroupChangesDetailed    = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -512,7 +512,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    GroupPolicyChanges      = [ordered] @{
+    ADGroupPolicyChanges      = [ordered] @{
         Enabled                     = $false
         'Group Policy Name Changes' = @{
             Enabled     = $true
@@ -665,7 +665,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    LogsClearedSecurity     = [ordered]@{
+    ADLogsClearedSecurity     = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -702,7 +702,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    LogsClearedOther        = [ordered]@{
+    ADLogsClearedOther        = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -734,7 +734,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    EventsReboots           = [ordered]@{
+    ADEventsReboots           = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
