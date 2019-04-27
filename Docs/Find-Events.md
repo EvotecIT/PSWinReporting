@@ -12,6 +12,12 @@ schema: 2.0.0
 
 ## SYNTAX
 
+### Manual (Default)
+```
+Find-Events -DateFrom <DateTime> -DateTo <DateTime> [-Servers <String[]>] [-DetectDC] [-Quiet]
+ [-LoggerParameters <IDictionary>] [-ExtentedOutput] -Report <String[]> [<CommonParameters>]
+```
+
 ### DateManual
 ```
 Find-Events [-DateFrom <DateTime>] [-DateTo <DateTime>] [-Servers <String[]>] [-DetectDC] [-Quiet]
@@ -20,8 +26,13 @@ Find-Events [-DateFrom <DateTime>] [-DateTo <DateTime>] [-Servers <String[]>] [-
 
 ### DateRange
 ```
-Find-Events [-Servers <String[]>] [-DetectDC] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput]
+Find-Events -Servers <String[]> [-DetectDC] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput]
  -Report <String[]> -DatesRange <String> [<CommonParameters>]
+```
+
+### Extended
+```
+Find-Events -Definitions <IDictionary> -Times <IDictionary> -Target <IDictionary> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -43,6 +54,18 @@ PS C:\> {{ Add example code here }}
 
 ```yaml
 Type: DateTime
+Parameter Sets: Manual
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+```yaml
+Type: DateTime
 Parameter Sets: DateManual
 Aliases:
 
@@ -55,6 +78,18 @@ Accept wildcard characters: False
 
 ### -DateTo
 {{ Fill DateTo Description }}
+
+```yaml
+Type: DateTime
+Parameter Sets: Manual
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ```yaml
 Type: DateTime
@@ -84,15 +119,42 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Definitions
+{{ Fill Definitions Description }}
+
+```yaml
+Type: IDictionary
+Parameter Sets: Extended
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -DetectDC
 {{ Fill DetectDC Description }}
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: Manual, DateManual
 Aliases: RunAgainstDC
 
 Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: DateRange
+Aliases: RunAgainstDC
+
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -104,7 +166,7 @@ Accept wildcard characters: False
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: Manual, DateManual, DateRange
 Aliases:
 
 Required: False
@@ -119,7 +181,7 @@ Accept wildcard characters: False
 
 ```yaml
 Type: IDictionary
-Parameter Sets: (All)
+Parameter Sets: Manual, DateManual, DateRange
 Aliases:
 
 Required: False
@@ -134,7 +196,7 @@ Accept wildcard characters: False
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: Manual, DateManual, DateRange
 Aliases:
 
 Required: False
@@ -149,9 +211,9 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String[]
-Parameter Sets: (All)
+Parameter Sets: Manual, DateManual, DateRange
 Aliases:
-Accepted values: UserChanges, UserChangesDetailed, ComputerChangesDetailed, UserStatus, UserLockouts, UserLogon, UserUnlocked, ComputerCreatedChanged, ComputerDeleted, UserLogonKerberos, GroupMembershipChanges, GroupEnumeration, GroupChanges, GroupCreateDelete, GroupChangesDetailed, GroupPolicyChanges, LogsClearedSecurity, LogsClearedOther, EventsReboots
+Accepted values: ADUserChanges, ADUserChangesDetailed, ADComputerChangesDetailed, ADUserStatus, ADUserLockouts, ADUserLogon, ADUserUnlocked, ADComputerCreatedChanged, ADComputerDeleted, ADUserLogonKerberos, ADGroupMembershipChanges, ADGroupEnumeration, ADGroupChanges, ADGroupCreateDelete, ADGroupChangesDetailed, ADGroupPolicyChanges, ADLogsClearedSecurity, ADLogsClearedOther, ADEventsReboots
 
 Required: True
 Position: Named
@@ -165,10 +227,52 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String[]
-Parameter Sets: (All)
+Parameter Sets: Manual, DateManual
 Aliases: Server, ComputerName
 
 Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+```yaml
+Type: String[]
+Parameter Sets: DateRange
+Aliases: Server, ComputerName
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Target
+{{ Fill Target Description }}
+
+```yaml
+Type: IDictionary
+Parameter Sets: Extended
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Times
+{{ Fill Times Description }}
+
+```yaml
+Type: IDictionary
+Parameter Sets: Extended
+Aliases:
+
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False

@@ -11,24 +11,27 @@ Locale: en-US
 {{ Fill in the Description }}
 
 ## PSWinReportingV2 Cmdlets
+### [Add-EventsDefinitions](Add-EventsDefinitions.md)
+{{ Fill in the Synopsis }}
+
 ### [Add-WinTaskScheduledForwarder](Add-WinTaskScheduledForwarder.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Find-Events](Find-Events.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [New-WinSubscriptionTemplates](New-WinSubscriptionTemplates.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Remove-WinTaskScheduledForwarder](Remove-WinTaskScheduledForwarder.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Start-WinNotifications](Start-WinNotifications.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Start-WinReporting](Start-WinReporting.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 
 ### [Start-WinSubscriptionService](Start-WinSubscriptionService.md)
-{{ Fill in the Description }}
+{{ Fill in the Synopsis }}
 

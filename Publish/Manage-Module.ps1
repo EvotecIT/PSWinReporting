@@ -37,7 +37,7 @@ $Configuration = @{
     }
     Options     = @{
         Merge             = @{
-            Enabled        = $false
+            Enabled        = $true
             Sort           = 'ASC'
             FormatCodePSM1 = @{
                 Enabled           = $true
@@ -124,7 +124,7 @@ $Configuration = @{
     }
     Steps       = @{
         BuildModule        = $true
-        BuildDocumentation = $false
+        BuildDocumentation = $true
         PublishModule      = @{
             Enabled      = $false
             Prerelease   = ''
