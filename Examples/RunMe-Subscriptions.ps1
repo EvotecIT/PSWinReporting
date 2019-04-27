@@ -770,11 +770,13 @@ $Target = [ordered]@{
         }
     }
 }
+<#
 $LoggerParameters = @{
     ShowTime   = $true
     LogsDir    = 'C:\temp\logs'
     TimeFormat = 'yyyy-MM-dd HH:mm:ss'
 }
+#>
 
 Start-WinSubscriptionService #-LoggerParameters $LoggerParameters
 New-WinSubscriptionTemplates -Definitions $DefinitionsAD -Target $Target -AddTemplates #-LoggerParameters $LoggerParameters -AddTemplates
