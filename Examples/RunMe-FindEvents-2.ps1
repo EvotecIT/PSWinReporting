@@ -24,7 +24,7 @@ $Reports = @(
     #ADEventsReboots
 )
 
-#$Events = Find-Events -Report $Reports -DatesRange Last3days -Servers 'AD1', 'AD2' -Verbose
+$Events = Find-Events -Report $Reports -DatesRange Last3days -Servers 'AD1', 'AD2' -Verbose
 
 Dashboard -FilePath $PSScriptRoot\DashboardFromEvents.html -Name 'Dashimo - FindEvents' -Show {
     Tab -Name 'Computer Changes' {
