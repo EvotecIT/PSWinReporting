@@ -20,7 +20,7 @@ Full project description is available at my website - [Full project description]
 Currently there are 2 branches of of PSWinReporting
 
 - [x] Legacy branch - available in PS Gallery as [PSWinReporting](https://www.powershellgallery.com/packages/PSWinReporting/) - `Install-Module -Name 'PSWinReporting' -Force`
-- [ ] Master branch - available in PS Gallery as [PSWinReportingV2](https://www.powershellgallery.com/packages/PSWinReportingV2/) - `Install-Module -Name 'PSWinReportingV2' -Force`
+- [x] Master branch - available in PS Gallery as [PSWinReportingV2](https://www.powershellgallery.com/packages/PSWinReportingV2/) - `Install-Module -Name 'PSWinReportingV2' -Force`
 
 I've decided that both PowerShell modules can coexist together, especially foor scenarios for people who want to switch, but don't want to do it right away. This way you can keep using old version as is, and slowly fix your other stuff, or use new `Find-Events` command. Commands are slightly renamed for V2 release.
 
@@ -32,6 +32,11 @@ Master edition is complete rewrite and a new begining. It provides same function
 - [x] Ability to completly modify events monitoring
 - [x] Ability to monitor any servers, for any events using simple to use schema
 - [x] Ability to target multiple servers, computers or files at the same time
+
+At this moment there is no documentation for PSWinReportingV2 except for those articles below. Feel free to explore Examples if you're eager to try new version. Otherwise fallback to PSWinReporting **Legacy Edition**.
+
+- [x] [Find-Events - The only PowerShell Command you will ever need to find out who did what in Active Directory](https://evotec.xyz/the-only-powershell-command-you-will-ever-need-to-find-out-who-did-what-in-active-directory/)
+
 
 ### Built-in Active Directory Reports
 
