@@ -6,7 +6,7 @@ function Move-ArchivedLogs {
         [string] $DestinationPath
     )
     $NewSourcePath = "\\$ServerName\$($SourcePath.Replace(':\','$\'))"
-    $PathExists = Test-Path $NewSourcePath
+    $PathExists = Test-Path -LiteralPath $NewSourcePath
     if ($PathExists) {
         Write-Color @script:WriteParameters '[i] Moving log file from ', $NewSourcePath, ' to ', $DestinationPath -Color White, Yellow, White, Yellow
         Move-Item -Path $NewSourcePath -Destination $DestinationPath

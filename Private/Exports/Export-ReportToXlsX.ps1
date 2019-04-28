@@ -1,5 +1,6 @@
 
 function Export-ReportToXLSX {
+    [CmdletBinding()]
     param(
         [bool] $Report,
         [System.Collections.IDictionary] $ReportOptions,

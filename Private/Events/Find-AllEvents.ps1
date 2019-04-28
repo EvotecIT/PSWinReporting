@@ -1,11 +1,11 @@
 function Find-AllEvents {
+    [CmdletBinding()]
     param (
         [System.Collections.IDictionary] $ReportDefinitions,
         [string] $LogNameSearch,
         [switch] $All
     )
-    $EventsToProcess = @()
-    foreach ($report in $ReportDefinitions.ReportsAD.EventBased.GetEnumerator()) {
+    $EventsToProcess = foreach ($report in $ReportDefinitions.ReportsAD.EventBased.GetEnumerator()) {
         $ReportName = $report.Name
         $Enabled = $ReportDefinitions.ReportsAD.EventBased.$ReportName.Enabled
         $LogName = $ReportDefinitions.ReportsAD.EventBased.$ReportName.LogName
@@ -14,9 +14,10 @@ function Find-AllEvents {
 
         if ($Enabled -eq $true -or $All -eq $true) {
             if ($LogNameSearch -eq $LogName) {
-                $EventsToProcess += $Events
+                $Events
             }
         }
     }
+
     return $EventsToProcess
 }

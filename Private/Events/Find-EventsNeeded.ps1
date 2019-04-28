@@ -1,4 +1,5 @@
 function Find-EventsNeeded {
+    [CmdletBinding()]
     param (
         [Array] $Events,
         [alias('EventsNeeded')][Array] $EventIDs,

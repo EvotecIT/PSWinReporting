@@ -2,11 +2,15 @@ function Get-ServersListLimited {
     [CmdletBinding()]
     param(
         [System.Collections.IDictionary] $Target,
-        [int64] $RecordID
+        [int64] $RecordID,
+        [switch] $Quiet,
+        [string] $Who,
+        [string] $Whom,
+        [string] $NotWho,
+        [string] $NotWhom
     )
-    $ServersList = New-ArrayList
     if ($Target.Servers.Enabled) {
-        $Logger.AddInfoRecord("Preparing servers list - defined list")
+        if (-not $Quiet) { $Logger.AddInfoRecord("Preparing servers list - defined list") }
         [Array] $Servers = foreach ($Server in $Target.Servers.Keys | Where-Object { $_ -ne 'Enabled' }) {
 
             if ($Target.Servers.$Server -is [System.Collections.IDictionary]) {
@@ -19,14 +23,19 @@ function Get-ServersListLimited {
                 $Target.Servers.$Server
             }
         }
-        $null = $ServersList.AddRange($Servers)
     }
-    [Array] $ExtendedInput = foreach ($Server in $ServersList) {
+    [Array] $ExtendedInput = foreach ($Server in $Servers) {
         [PSCustomObject] @{
-            Server   = $Server.ComputerName
-            LogName  = $Server.LogName
-            RecordID = $RecordID
+            Server                 = $Server.ComputerName
+            LogName                = $Server.LogName
+            RecordID               = $RecordID
+            NamedDataFilter        = if ($NamedDataFilter.Count -ne 0) { $NamedDataFilter } else { }
+            NamedDataExcludeFilter = if ($NamedDataExcludeFilter.Count -ne 0) { $NamedDataExcludeFilter } else { }
         }
     }
-    , $ExtendedInput
+    if ($ExtendedInput.Count -gt 1) {
+        $ExtendedInput
+    } else {
+        , $ExtendedInput
+    }
 }

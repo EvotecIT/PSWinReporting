@@ -7,10 +7,10 @@ function Find-Events {
         [parameter(ParameterSetName = "Manual", Mandatory = $true)][DateTime] $DateTo,
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
-        [parameter(ParameterSetName = "DateRange", Mandatory = $true)][alias('Server', 'ComputerName')][string[]] $Servers = $Env:COMPUTERNAME,
+        [parameter(ParameterSetName = "DateRange", Mandatory = $false)][alias('Server', 'ComputerName')][string[]] $Servers = $Env:COMPUTERNAME,
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
-        [parameter(ParameterSetName = "DateRange", Mandatory = $true)][alias('RunAgainstDC')][switch] $DetectDC,
+        [parameter(ParameterSetName = "DateRange", Mandatory = $false)][alias('RunAgainstDC')][switch] $DetectDC,
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
         [parameter(ParameterSetName = "DateRange")][switch] $Quiet,
@@ -20,6 +20,18 @@ function Find-Events {
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
         [parameter(ParameterSetName = "DateRange")][switch] $ExtentedOutput,
+        [parameter(ParameterSetName = "Manual")]
+        [parameter(ParameterSetName = "DateManual")]
+        [parameter(ParameterSetName = "DateRange")][string] $Who,
+        [parameter(ParameterSetName = "Manual")]
+        [parameter(ParameterSetName = "DateManual")]
+        [parameter(ParameterSetName = "DateRange")][string] $Whom,
+        [parameter(ParameterSetName = "Manual")]
+        [parameter(ParameterSetName = "DateManual")]
+        [parameter(ParameterSetName = "DateRange")][string] $NotWho,
+        [parameter(ParameterSetName = "Manual")]
+        [parameter(ParameterSetName = "DateManual")]
+        [parameter(ParameterSetName = "DateRange")][string] $NotWhom,
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Definitions,
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Times,
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Target,
@@ -63,6 +75,9 @@ function Find-Events {
         return $RuntimeParamDic
     }
     Process {
+
+        #-NamedDataFilter @{'SubjectUserName' = $User; 'TargetUserName' = $User }
+
         $ExecutionTime = Start-TimeLog
         ## Logging / Display to screen
         if (-not $LoggerParameters) {
@@ -75,14 +90,12 @@ function Find-Events {
         if ($null -ne $Definitions -and $null -ne $Times -and $null -ne $Target) {
             # Using in case of Extendted Input - Mateusz asked for it.
             $Dates = Get-ChoosenDates -ReportTimes $Times
-        } elseif ($null -ne $Definitions -or $null -ne $Times -or $null -ne $Target) {
-            $Logger.AddErrorRecord('Wrong parameter choice.')
         } else {
             # Using standard case
             $Reports = $PSBoundParameters.Report
             $DatesRange = $PSBoundParameters.DatesRange
 
-            $Logger.AddInfoRecord("Preparing reports: $($Reports -join ',')")
+            if (-not $Quiet) { $Logger.AddInfoRecord("Preparing reports: $($Reports -join ',')") }
 
             # Bring defaults
             $Definitions = $Script:ReportDefinitions
@@ -116,9 +129,9 @@ function Find-Events {
 
         # Real deal
         if ($EventRecordID -ne 0 -and $EventID -ne 0) {
-            [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -RecordID $EventRecordID
+            [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -RecordID $EventRecordID -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
         } else {
-            [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates
+            [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
         }
         foreach ($Entry in $ExtendedInput) {
             if ($Entry.Type -eq 'Computer') {

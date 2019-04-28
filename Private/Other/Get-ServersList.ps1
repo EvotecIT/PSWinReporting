@@ -3,35 +3,42 @@ function Get-ServersList {
     param(
         [System.Collections.IDictionary] $Definitions,
         [System.Collections.IDictionary] $Target,
-        [System.Collections.IDictionary] $Dates
+        [System.Collections.IDictionary] $Dates,
+        [switch] $Quiet,
+        [string] $Who,
+        [string] $Whom,
+        [string] $NotWho,
+        [string] $NotWhom
     )
     # Get Servers
-    $ServersList = New-ArrayList
-    if ($Target.Servers.Enabled) {
-        $Logger.AddInfoRecord("Preparing servers list - defined list")
-        [Array] $Servers = foreach ($Server in $Target.Servers.Keys | Where-Object { $_ -ne 'Enabled' }) {
+    $ServersList = @( # = New-ArrayList
+        if ($Target.Servers.Enabled) {
+            if (-not $Quiet) { $Logger.AddInfoRecord("Preparing servers list - defined list") }
+            [Array] $Servers = foreach ($Server in $Target.Servers.Keys | Where-Object { $_ -ne 'Enabled' }) {
 
-            if ($Target.Servers.$Server -is [System.Collections.IDictionary]) {
-                [ordered] @{
-                    ComputerName = $Target.Servers.$Server.ComputerName
-                    LogName      = $Target.Servers.$Server.LogName
+                if ($Target.Servers.$Server -is [System.Collections.IDictionary]) {
+                    [ordered] @{
+                        ComputerName = $Target.Servers.$Server.ComputerName
+                        LogName      = $Target.Servers.$Server.LogName
+                    }
+
+                } elseif ($Target.Servers.$Server -is [Array] -or $Target.Servers.$Server -is [string]) {
+                    $Target.Servers.$Server
                 }
-
-            } elseif ($Target.Servers.$Server -is [Array] -or $Target.Servers.$Server -is [string]) {
-                $Target.Servers.$Server
             }
+            $Servers
         }
-        $null = $ServersList.AddRange($Servers)
-    }
-    if ($Target.DomainControllers.Enabled) {
-        $Logger.AddInfoRecord("Preparing servers list - domain controllers autodetection")
-        [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty).HostName
-        $null = $ServersList.AddRange($Servers)
-    }
+        if ($Target.DomainControllers.Enabled) {
+            if (-not $Quiet) { $Logger.AddInfoRecord("Preparing servers list - domain controllers autodetection") }
+            [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty).HostName
+            $Servers
+        }
+    )
     if ($Target.LocalFiles.Enabled) {
-        $Logger.AddInfoRecord("Preparing file list - defined event log files")
+        if (-not $Quiet) { $Logger.AddInfoRecord("Preparing file list - defined event log files") }
         $Files = Get-EventLogFileList -Sections $Target.LocalFiles
     }
+
     # Prepare list of servers and files to scan and their relation to LogName and EventIDs and DataTimes
     <#
         Server                                                    LogName         EventID                     Type
@@ -80,41 +87,72 @@ function Get-ServersList {
         }
         #$Logger.AddInfoRecord("Preparing to scan log $Log for Events:$($EventIDs -join ', ')")
 
+        #Add-ToHashTable -Hashtable $EventFilter -Key "NamedDataFilter" -Value $NamedDataFilter
+        #Add-ToHashTable -Hashtable $EventFilter -Key "NamedDataExcludeFilter" -Value $NamedDataExcludeFilter
+
+        $NamedDataFilter = @{}
+        if ($Who -ne '') {
+            $NamedDataFilter.SubjectUserName = $Who
+        }
+        if ($Whom -ne '') {
+            $NamedDataFilter.TargetUserName = $Whom
+        }
+
+        $NamedDataExcludeFilter = @{}
+        if ($NotWho -ne '') {
+            $NamedDataExcludeFilter.SubjectUserName = $NotWho;
+        }
+        if ($NotWhom -ne '') {
+            $NamedDataExcludeFilter.TargetUserName = $NotWhom
+        }
+
+
         $OutputServers = foreach ($Server in $ServersList) {
             if ($Server -is [System.Collections.IDictionary]) {
                 [PSCustomObject]@{
-                    Server   = $Server.ComputerName
-                    LogName  = $Server.LogName
-                    EventID  = $EventIDs | Sort-Object -Unique
-                    Type     = 'Computer'
-                    DateFrom = $Dates.DateFrom
-                    DateTo   = $Dates.DateTo
+                    Server                 = $Server.ComputerName
+                    LogName                = $Server.LogName
+                    EventID                = $EventIDs | Sort-Object -Unique
+                    Type                   = 'Computer'
+                    DateFrom               = $Dates.DateFrom
+                    DateTo                 = $Dates.DateTo
+                    NamedDataFilter        = if ($NamedDataFilter.Count -ne 0) { $NamedDataFilter } else { }
+                    NamedDataExcludeFilter = if ($NamedDataExcludeFilter.Count -ne 0) { $NamedDataExcludeFilter } else { }
+
                 }
             } elseif ($Server -is [Array] -or $Server -is [string]) {
                 foreach ($S in $Server) {
                     [PSCustomObject]@{
-                        Server   = $S
-                        LogName  = $Log
-                        EventID  = $EventIDs | Sort-Object -Unique
-                        Type     = 'Computer'
-                        DateFrom = $Dates.DateFrom
-                        DateTo   = $Dates.DateTo
+                        Server                 = $S
+                        LogName                = $Log
+                        EventID                = $EventIDs | Sort-Object -Unique
+                        Type                   = 'Computer'
+                        DateFrom               = $Dates.DateFrom
+                        DateTo                 = $Dates.DateTo
+                        NamedDataFilter        = if ($NamedDataFilter.Count -ne 0) { $NamedDataFilter } else { }
+                        NamedDataExcludeFilter = if ($NamedDataExcludeFilter.Count -ne 0) { $NamedDataExcludeFilter } else { }
                     }
                 }
             }
         }
         $OutputFiles = foreach ($File in $FIles) {
             [PSCustomObject]@{
-                Server   = $File
-                LogName  = $Log
-                EventID  = $EventIDs | Sort-Object -Unique
-                Type     = 'File'
-                DateFrom = $Dates.DateFrom
-                DateTo   = $Dates.DateTo
+                Server                 = $File
+                LogName                = $Log
+                EventID                = $EventIDs | Sort-Object -Unique
+                Type                   = 'File'
+                DateFrom               = $Dates.DateFrom
+                DateTo                 = $Dates.DateTo
+                NamedDataFilter        = if ($NamedDataFilter.Count -ne 0) { $NamedDataFilter } else { }
+                NamedDataExcludeFilter = if ($NamedDataExcludeFilter.Count -ne 0) { $NamedDataExcludeFilter } else { }
             }
         }
         $OutputServers
         $OutputFiles
     }
-    , $ExtendedInput
+    if ($ExtendedInput.Count -gt 1) {
+        $ExtendedInput
+    } else {
+        , $ExtendedInput
+    }
 }
