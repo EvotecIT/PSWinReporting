@@ -169,5 +169,8 @@ function Find-Events {
         foreach ($Report in $Script:ReportDefinitions.Keys) {
             $Script:ReportDefinitions[$Report].Enabled = $false
         }
+        foreach ($Time in $Script:ReportTimes.Keys) {
+            $Script:ReportTimes[$Time].Enabled = $false
+        }
     }
 }
