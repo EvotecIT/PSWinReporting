@@ -16,7 +16,7 @@ $Configuration = @{
             # Script module or binary module file associated with this manifest.
             RootModule      = 'PSWinReporting.psm1'
             # Version number of this module.
-            ModuleVersion   = '2.0.7'
+            ModuleVersion   = '2.0.8'
             # ID used to uniquely identify this module
             GUID            = 'ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe'
             # Author of this module
