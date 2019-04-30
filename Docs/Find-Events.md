@@ -15,19 +15,22 @@ schema: 2.0.0
 ### Manual (Default)
 ```
 Find-Events -DateFrom <DateTime> -DateTo <DateTime> [-Servers <String[]>] [-DetectDC] [-Quiet]
- [-LoggerParameters <IDictionary>] [-ExtentedOutput] -Report <String[]> [<CommonParameters>]
+ [-LoggerParameters <IDictionary>] [-ExtentedOutput] [-Who <String>] [-Whom <String>] [-NotWho <String>]
+ [-NotWhom <String>] -Report <String[]> [<CommonParameters>]
 ```
 
 ### DateManual
 ```
 Find-Events [-DateFrom <DateTime>] [-DateTo <DateTime>] [-Servers <String[]>] [-DetectDC] [-Quiet]
- [-LoggerParameters <IDictionary>] [-ExtentedOutput] -Report <String[]> [<CommonParameters>]
+ [-LoggerParameters <IDictionary>] [-ExtentedOutput] [-Who <String>] [-Whom <String>] [-NotWho <String>]
+ [-NotWhom <String>] -Report <String[]> [<CommonParameters>]
 ```
 
 ### DateRange
 ```
-Find-Events -Servers <String[]> [-DetectDC] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput]
- -Report <String[]> -DatesRange <String> [<CommonParameters>]
+Find-Events [-Servers <String[]>] [-DetectDC] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput]
+ [-Who <String>] [-Whom <String>] [-NotWho <String>] [-NotWhom <String>] -Report <String[]>
+ -DatesRange <String> [<CommonParameters>]
 ```
 
 ### Extended
@@ -111,7 +114,7 @@ Accept wildcard characters: False
 Type: String
 Parameter Sets: DateRange
 Aliases:
-Accepted values: PastHour, CurrentDayMinusDayX, CurrentDayMinuxDaysX, Last7days, CurrentMonth, CurrentDay, Last3days, Everything, PastDay, CurrentQuarter, PastMonth, PastQuarter, OnDay, CustomDate, CurrentHour, Last14days
+Accepted values: PastHour, CurrentHour, PastDay, CurrentDay, OnDay, PastMonth, CurrentMonth, PastQuarter, CurrentQuarter, CurrentDayMinusDayX, CurrentDayMinuxDaysX, CustomDate, Last3days, Last7days, Last14days, Everything
 
 Required: True
 Position: Named
@@ -140,22 +143,10 @@ Accept wildcard characters: False
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: Manual, DateManual
+Parameter Sets: Manual, DateManual, DateRange
 Aliases: RunAgainstDC
 
 Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: DateRange
-Aliases: RunAgainstDC
-
-Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -222,6 +213,36 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -NotWho
+{{ Fill NotWho Description }}
+
+```yaml
+Type: String
+Parameter Sets: Manual, DateManual, DateRange
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NotWhom
+{{ Fill NotWhom Description }}
+
+```yaml
+Type: String
+Parameter Sets: Manual, DateManual, DateRange
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Quiet
 {{ Fill Quiet Description }}
 
@@ -258,22 +279,10 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String[]
-Parameter Sets: Manual, DateManual
+Parameter Sets: Manual, DateManual, DateRange
 Aliases: Server, ComputerName
 
 Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-```yaml
-Type: String[]
-Parameter Sets: DateRange
-Aliases: Server, ComputerName
-
-Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -304,6 +313,36 @@ Parameter Sets: Extended
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Who
+{{ Fill Who Description }}
+
+```yaml
+Type: String
+Parameter Sets: Manual, DateManual, DateRange
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Whom
+{{ Fill Whom Description }}
+
+```yaml
+Type: String
+Parameter Sets: Manual, DateManual, DateRange
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
