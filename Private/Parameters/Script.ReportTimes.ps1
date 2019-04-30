@@ -1,4 +1,4 @@
-$Script:ReportTimes = @{
+$Script:ReportTimes = [ordered] @{
     # Report Per Hour
     PastHour             = @{
         Enabled = $false # if it's 23:22 it will report 22:00 till 23:00

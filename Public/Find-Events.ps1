@@ -62,7 +62,7 @@ function Find-Events {
         $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('Report', [string[]], $ReportAttrib)
 
         # Definitions for Dates Range
-        $DatesRange = $Script:ReportTimes.Keys
+        $DatesRange = (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
         $DatesRangeAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
         $DatesRangeAttrib.Add($ParamAttribDatesRange)
         $DatesRangeAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($DatesRange)))
@@ -102,19 +102,14 @@ function Find-Events {
 
             # Set Times
             $Times = $Script:ReportTimes
-            switch ($PSCmdlet.ParameterSetName) {
-                DateRange {
-                    $Times.$DatesRange.Enabled = $true
-                }
-                DateManual {
-                    if ($DateFrom -and $DateTo) {
-                        $Times.CustomDate.Enabled = $true
-                        $Times.CustomDate.DateFrom = $DateFrom
-                        $Times.CustomDate.DateTo = $DateTo
-                    } else {
-                        return
-                    }
-                }
+            if ($DatesRange) {
+                $Times.$DatesRange.Enabled = $true
+            } elseif ($DateFrom -and $DateTo) {
+                $Times.CustomDate.Enabled = $true
+                $Times.CustomDate.DateFrom = $DateFrom
+                $Times.CustomDate.DateTo = $DateTo
+            } else {
+                return
             }
 
             # Fixes ReportTimes

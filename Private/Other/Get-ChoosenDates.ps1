@@ -1,4 +1,5 @@
 function Get-ChoosenDates {
+    [CmdletBinding()]
     param(
         [System.Collections.IDictionary] $ReportTimes
     )
