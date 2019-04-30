@@ -26,10 +26,10 @@ I've decided that both PowerShell modules can coexist together, especially foor 
 
 ## PSWinReportingV2 - Master Edition
 
-Master edition is complete rewrite and a new begining. It provides same functionality as **Legacy 1.X** version and then some more.
+Master edition is complete rewrite and a new beginning. It provides same functionality as **Legacy 1.X** version and then some more.
 
 - [x] Ability to translate report and have it suite your needs
-- [x] Ability to completly modify events monitoring
+- [x] Ability to completely modify events monitoring
 - [x] Ability to monitor any servers, for any events using simple to use schema
 - [x] Ability to target multiple servers, computers or files at the same time
 
