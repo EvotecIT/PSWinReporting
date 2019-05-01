@@ -174,6 +174,42 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
+
+    ADOrganizationalUnitChangesDetailed = [ordered] @{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $true
+            Events      = 5136, 5137, 5139, 5141
+            LogName     = 'Security'
+            Filter      = @{
+                'ObjectClass' = 'organizationalUnit'
+            }
+            Functions   = @{
+                'OperationType' = 'ConvertFrom-OperationType'
+            }
+            <#
+            Fields      = [ordered] @{
+                'Computer'                 = 'Domain Controller'
+                'Action'                   = 'Action'
+                'OperationType'            = 'Action Detail'
+                'Who'                      = 'Who'
+                'Date'                     = 'When'
+                'ObjectDN'                 = 'Computer Object'
+                'AttributeLDAPDisplayName' = 'Field Changed'
+                'AttributeValue'           = 'Field Value'
+                # Common Fields
+                'RecordID'                 = 'Record ID'
+                'ID'                       = 'Event ID'
+                'GatheredFrom'             = 'Gathered From'
+                'GatheredLogName'          = 'Gathered LogName'
+            }
+            #>
+            SortBy      = 'Record ID'
+            Descending  = $false
+            IgnoreWords = @{}
+        }
+    }
+
     ADUserStatus              = [ordered] @{
         Enabled = $false
         Events  = @{

@@ -16,7 +16,7 @@ $Configuration = @{
             # Script module or binary module file associated with this manifest.
             RootModule      = 'PSWinReporting.psm1'
             # Version number of this module.
-            ModuleVersion   = '2.0.8'
+            ModuleVersion   = '2.0.10'
             # ID used to uniquely identify this module
             GUID            = 'ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe'
             # Author of this module
@@ -32,7 +32,12 @@ $Configuration = @{
             IconUri         = 'https://evotec.xyz/wp-content/uploads/2018/10/PSWinReporting.png'
             ProjectUri      = 'https://github.com/EvotecIT/PSWinReporting'
             #ReleaseNotes = ''
-            RequiredModules = @('PSEventViewer', 'PSSharedGoods', 'PSWriteExcel', 'PSWriteHTML')
+            RequiredModules = @(
+                @{ ModuleName = 'PSEventViewer'; ModuleVersion = "1.0.6"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
+                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "0.0.74"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
+                @{ ModuleName = 'PSWriteExcel'; ModuleVersion = "0.1"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
+                @{ ModuleName = 'PSWriteHTML'; ModuleVersion = '0.0.30'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
+            )
         }
     }
     Options     = @{
@@ -126,7 +131,7 @@ $Configuration = @{
         BuildModule        = $true
         BuildDocumentation = $false
         PublishModule      = @{
-            Enabled      = $true
+            Enabled      = $false
             Prerelease   = ''
             RequireForce = $false
         }
