@@ -14,29 +14,29 @@ schema: 2.0.0
 
 ### Manual (Default)
 ```
-Find-Events -DateFrom <DateTime> -DateTo <DateTime> [-Servers <String[]>] [-DetectDC] [-Quiet]
- [-LoggerParameters <IDictionary>] [-ExtentedOutput] [-Who <String>] [-Whom <String>] [-NotWho <String>]
- [-NotWhom <String>] -Report <String[]> [<CommonParameters>]
+Find-Events -DateFrom <DateTime> -DateTo <DateTime> [-Servers <String[]>] [-DetectDC]
+ [-Credential <PSCredential>] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput] [-Who <String>]
+ [-Whom <String>] [-NotWho <String>] [-NotWhom <String>] -Report <String[]> [<CommonParameters>]
 ```
 
 ### DateManual
 ```
-Find-Events [-DateFrom <DateTime>] [-DateTo <DateTime>] [-Servers <String[]>] [-DetectDC] [-Quiet]
- [-LoggerParameters <IDictionary>] [-ExtentedOutput] [-Who <String>] [-Whom <String>] [-NotWho <String>]
- [-NotWhom <String>] -Report <String[]> [<CommonParameters>]
+Find-Events [-DateFrom <DateTime>] [-DateTo <DateTime>] [-Servers <String[]>] [-DetectDC]
+ [-Credential <PSCredential>] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput] [-Who <String>]
+ [-Whom <String>] [-NotWho <String>] [-NotWhom <String>] -Report <String[]> [<CommonParameters>]
 ```
 
 ### DateRange
 ```
-Find-Events [-Servers <String[]>] [-DetectDC] [-Quiet] [-LoggerParameters <IDictionary>] [-ExtentedOutput]
- [-Who <String>] [-Whom <String>] [-NotWho <String>] [-NotWhom <String>] -Report <String[]>
- -DatesRange <String> [<CommonParameters>]
+Find-Events [-Servers <String[]>] [-DetectDC] [-Credential <PSCredential>] [-Quiet]
+ [-LoggerParameters <IDictionary>] [-ExtentedOutput] [-Who <String>] [-Whom <String>] [-NotWho <String>]
+ [-NotWhom <String>] -Report <String[]> -DatesRange <String> [<CommonParameters>]
 ```
 
 ### Extended
 ```
-Find-Events -Definitions <IDictionary> -Times <IDictionary> -Target <IDictionary> [-EventID <Int32>]
- [-EventRecordID <Int64>] [<CommonParameters>]
+Find-Events [-Credential <PSCredential>] -Definitions <IDictionary> -Times <IDictionary> -Target <IDictionary>
+ [-EventID <Int32>] [-EventRecordID <Int64>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -52,6 +52,21 @@ PS C:\> {{ Add example code here }}
 {{ Add example description here }}
 
 ## PARAMETERS
+
+### -Credential
+{{ Fill Credential Description }}
+
+```yaml
+Type: PSCredential
+Parameter Sets: (All)
+Aliases: Credentials
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### -DateFrom
 {{ Fill DateFrom Description }}
@@ -265,7 +280,7 @@ Accept wildcard characters: False
 Type: String[]
 Parameter Sets: Manual, DateManual, DateRange
 Aliases:
-Accepted values: ADUserChanges, ADUserChangesDetailed, ADComputerChangesDetailed, ADUserStatus, ADUserLockouts, ADUserLogon, ADUserUnlocked, ADComputerCreatedChanged, ADComputerDeleted, ADUserLogonKerberos, ADGroupMembershipChanges, ADGroupEnumeration, ADGroupChanges, ADGroupCreateDelete, ADGroupChangesDetailed, ADGroupPolicyChanges, ADLogsClearedSecurity, ADLogsClearedOther, ADEventsReboots
+Accepted values: ADUserChanges, ADUserChangesDetailed, ADComputerChangesDetailed, ADOrganizationalUnitChangesDetailed, ADUserStatus, ADUserLockouts, ADUserLogon, ADUserUnlocked, ADComputerCreatedChanged, ADComputerDeleted, ADUserLogonKerberos, ADGroupMembershipChanges, ADGroupEnumeration, ADGroupChanges, ADGroupCreateDelete, ADGroupChangesDetailed, ADGroupPolicyChanges, ADLogsClearedSecurity, ADLogsClearedOther, ADEventsReboots
 
 Required: True
 Position: Named
