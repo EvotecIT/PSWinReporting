@@ -17,7 +17,7 @@
 
 The full project description is available on my website - [Full project description](https://evotec.xyz/hub/scripts/pswinreporting-powershell-module/).
 
-Currently, there are 2 branches of PSWinReporting
+Currently, there are 2 branches of PSWinReporting.
 
 - [x] Legacy branch - available in PS Gallery as [PSWinReporting](https://www.powershellgallery.com/packages/PSWinReporting/) - `Install-Module -Name 'PSWinReporting' -Force`
 - [x] Master branch - available in PS Gallery as [PSWinReportingV2](https://www.powershellgallery.com/packages/PSWinReportingV2/) - `Install-Module -Name 'PSWinReportingV2' -Force`
@@ -40,50 +40,50 @@ At this moment there is no documentation for PSWinReportingV2 except for those a
 
 ### Built-in Active Directory Reports
 
-PSWinReporting comes with predefined, built-in reports. Those are used for `Find-Events`. Those also come defined in example configuration script which you can use straight away after verifying everything is as per your requirement.
+PSWinReporting comes with predefined, built-in reports. Those are for `Find-Events`. Those also come defined in example configuration script which you can use straight away after verifying everything is as per your requirement.
 
-- [x] ComputerChangesDetailed
-- [x] ComputerCreatedChanged
-- [x] ComputerDeleted
+- [x] ADComputerChangesDetailed
+- [x] ADComputerCreatedChanged
+- [x] ADComputerDeleted
 - [ ] EventsReboots - least prepared report. Not really useful at this moment.
-- [x] GroupChanges
-- [x] GroupChangesDetailed
-- [x] GroupCreateDelete
-- [x] GroupEnumeration
-- [x] GroupMembershipChanges
-- [x] GroupPolicyChanges
-- [x] LogsClearedOther
-- [x] LogsClearedSecurity
-- [x] UserChanges
-- [x] UserChangesDetailed
-- [x] UserLockouts
-- [x] UserLogon
-- [x] UserLogonKerberos
-- [x] UserStatus
-- [x] UserUnlocked
-
+- [x] ADGroupChanges
+- [x] ADGroupChangesDetailed
+- [x] ADGroupCreateDelete
+- [x] ADGroupEnumeration
+- [x] ADGroupMembershipChanges
+- [x] ADGroupPolicyChanges
+- [x] ADLogsClearedOther
+- [x] ADLogsClearedSecurity
+- [x] ADUserChanges
+- [x] ADUserChangesDetailed
+- [x] ADUserLockouts
+- [x] ADUserLogon
+- [x] ADUserLogonKerberos
+- [x] ADUserStatus
+- [x] ADUserUnlocked
 
 ### Built-in Reporting Times
 
-PSWinReporting comes with predefined report times. This means you can use **True/False** to enable/disable report or in case of `Find-Events` choose it from a list
+PSWinReporting comes with predefined report times. This means you can use **True/False** to enable/disable period. In case of `Find-Events`, you can use defined times (checked only) from **DatesRange** parameter.
 
-- [x] CurrentDay
-- [x] CurrentDayMinusDayX
-- [x] CurrentDayMinuxDaysX
+- [ ] CurrentDay
+- [ ] CurrentDayMinusDayX
+- [ ] CurrentDayMinuxDaysX
 - [x] CurrentHour
 - [x] CurrentMonth
 - [x] CurrentQuarter
-- [x] CustomDate
+- [ ] CustomDate
 - [x] Everything
 - [x] Last14days
 - [x] Last3days
 - [x] Last7days
-- [x] OnDay
+- [ ] OnDay
 - [x] PastDay
 - [x] PastHour
 - [x] PastMonth
 - [x] PastQuarter
 
+Of course, you can also define **DateFrom**, **DateTo** parameters for custom use when using `Find-Events` command.
 
 ## PSWinReporting - Legacy Edition
 
