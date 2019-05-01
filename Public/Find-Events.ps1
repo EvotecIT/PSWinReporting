@@ -11,6 +11,9 @@ function Find-Events {
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
         [parameter(ParameterSetName = "DateRange", Mandatory = $false)][alias('RunAgainstDC')][switch] $DetectDC,
+        [ValidateNotNull()]
+        [alias('Credentials')][System.Management.Automation.PSCredential]
+        [System.Management.Automation.Credential()]$Credential = [System.Management.Automation.PSCredential]::Empty,
         [parameter(ParameterSetName = "Manual")]
         [parameter(ParameterSetName = "DateManual")]
         [parameter(ParameterSetName = "DateRange")][switch] $Quiet,
@@ -139,12 +142,20 @@ function Find-Events {
         #$ElapsedMiddle = Stop-TimeLog -Time $ExecutionTime -Option OneLiner -Continue
         #if (-not $Quiet) { $Logger.AddInfoRecord("Preparation - Time elapsed: $ElapsedMiddle") }
         # Scan all events and get everything at once
-        if ($EventRecordID -ne 0 -and $EventId -ne 0) {
-            # ExtendedInput - Special Case
-            [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -EventID $EventID -RecordID $EventRecordID -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
-        } else {
-            [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
+        $SplatEvents = @{
+            Verbose       = $Verbose
+            ExtendedInput = $ExtendedInput
+            ErrorVariable = 'AllErrors'
+            ErrorAction   = 'SilentlyContinue'
         }
+        if ($EventRecordID -ne 0 -and $EventId -ne 0) {
+            $SplatEvents.RecordID = $EventRecordID
+            $SplatEvents.ID = $EventID
+        }
+        if ($Credential -ne [System.Management.Automation.PSCredential]::Empty) {
+            $SplatEvents.Credential = $Credential
+        }
+        [Array] $AllEvents = Get-Events @SplatEvents
 
         foreach ($MyError in $AllErrors) {
             if (-not $Quiet) { $Logger.AddErrorRecord("Server $MyError") }
