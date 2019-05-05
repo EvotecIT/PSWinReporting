@@ -73,6 +73,10 @@ function Get-ServersList {
             }
         }
     }
+    if ($LogNames.Count -eq 0) {
+        $Logger.AddErrorRecord("Definitions provided don't contain any enabled report or subevents within report. Please check your definitions and try again.")
+        Exit
+    }
     [Array] $ExtendedInput = foreach ($Log in $LogNames | Sort-Object -Unique) {
         $EventIDs = foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
             if ($Definitions.$Report.Enabled) {

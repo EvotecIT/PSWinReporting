@@ -93,6 +93,10 @@ function Find-Events {
         if ($null -ne $Definitions -and $null -ne $Times -and $null -ne $Target) {
             # Using in case of Extendted Input - Mateusz asked for it.
             $Dates = Get-ChoosenDates -ReportTimes $Times
+            if ($Dates -is [Array]) {
+                $Logger.AddErrorRecord("Currently only 1 date range is supported. Please fix Times and try again")
+                return
+            }
         } else {
             # Using standard case
             $Reports = $PSBoundParameters.Report
@@ -117,6 +121,10 @@ function Find-Events {
 
             # Fixes ReportTimes
             $Dates = Get-ChoosenDates -ReportTimes $Times
+            if ($Dates -is [Array]) {
+                $Logger.AddErrorRecord("Currently only 1 date range is supported. Please fix Times and try again")
+                return
+            }
             # Fixes Definitions
             foreach ($Report in $Reports) {
                 $Definitions[$Report].Enabled = $true
