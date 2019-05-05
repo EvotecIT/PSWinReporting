@@ -1,6 +1,6 @@
 ## Define reports
 $Script:ReportDefinitions = [ordered] @{
-    ADUserChanges             = @{
+    ADUserChanges                       = @{
         Enabled   = $false
         SqlExport = @{
             EnabledGlobal         = $false
@@ -107,7 +107,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADUserChangesDetailed     = [ordered] @{
+    ADUserChangesDetailed               = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -142,7 +142,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    ADComputerChangesDetailed = [ordered] @{
+    ADComputerChangesDetailed           = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -174,43 +174,55 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-
     ADOrganizationalUnitChangesDetailed = [ordered] @{
-        Enabled = $false
-        Events  = @{
-            Enabled     = $true
-            Events      = 5136, 5137, 5139, 5141
-            LogName     = 'Security'
-            Filter      = @{
+        Enabled        = $true
+        OUEventsModify = @{
+            Enabled          = $true
+            Events           = 5136, 5137, 5139, 5141
+            LogName          = 'Security'
+            Filter           = @{
                 'ObjectClass' = 'organizationalUnit'
             }
-            Functions   = @{
+            Functions        = @{
                 'OperationType' = 'ConvertFrom-OperationType'
             }
-            <#
-            Fields      = [ordered] @{
+
+            Fields           = [ordered] @{
                 'Computer'                 = 'Domain Controller'
                 'Action'                   = 'Action'
                 'OperationType'            = 'Action Detail'
                 'Who'                      = 'Who'
                 'Date'                     = 'When'
-                'ObjectDN'                 = 'Computer Object'
+                'ObjectDN'                 = 'Organizational Unit'
                 'AttributeLDAPDisplayName' = 'Field Changed'
                 'AttributeValue'           = 'Field Value'
+                #'OldObjectDN'              = 'OldObjectDN'
+                #'NewObjectDN'              = 'NewObjectDN'
                 # Common Fields
                 'RecordID'                 = 'Record ID'
                 'ID'                       = 'Event ID'
                 'GatheredFrom'             = 'Gathered From'
                 'GatheredLogName'          = 'Gathered LogName'
             }
-            #>
-            SortBy      = 'Record ID'
-            Descending  = $false
-            IgnoreWords = @{}
+            Overwrite        = @{
+                'Action Detail#1' = 'Action', 'A directory service object was created.', 'Organizational Unit Created'
+                'Action Detail#2' = 'Action', 'A directory service object was deleted.', 'Organizational Unit Deleted'
+                'Action Detail#3' = 'Action', 'A directory service object was moved.', 'Organizational Unit Moved'
+                #'Organizational Unit' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
+                #'Field Changed'       = 'Action', 'A directory service object was moved.', ''
+                #'Field Value'         = 'Action', 'A directory service object was moved.', 'NewObjectDN'
+            }
+            OverwriteByField = @{
+                'Organizational Unit' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
+                #'Field Changed'       = 'Action', 'A directory service object was moved.', ''
+                'Field Value'         = 'Action', 'A directory service object was moved.', 'NewObjectDN'
+            }
+            SortBy           = 'Record ID'
+            Descending       = $false
+            IgnoreWords      = @{}
         }
     }
-
-    ADUserStatus              = [ordered] @{
+    ADUserStatus                        = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -232,7 +244,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADUserLockouts            = [ordered] @{
+    ADUserLockouts                      = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -255,7 +267,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADUserLogon               = [ordered]@{
+    ADUserLogon                         = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -283,7 +295,7 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    ADUserUnlocked            = [ordered] @{
+    ADUserUnlocked                      = [ordered] @{
         # 4767	A user account was unlocked
         # https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4767
         Enabled = $false
@@ -309,7 +321,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADComputerCreatedChanged  = [ordered] @{
+    ADComputerCreatedChanged            = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -352,7 +364,7 @@ $Script:ReportDefinitions = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    ADComputerDeleted         = [ordered]@{
+    ADComputerDeleted                   = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -374,7 +386,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADUserLogonKerberos       = [ordered] @{
+    ADUserLogonKerberos                 = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -405,7 +417,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADGroupMembershipChanges  = [ordered]@{
+    ADGroupMembershipChanges            = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -431,7 +443,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADGroupEnumeration        = [ordered] @{
+    ADGroupEnumeration                  = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -455,7 +467,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADGroupChanges            = [ordered]@{
+    ADGroupChanges                      = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -485,7 +497,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADGroupCreateDelete       = [ordered]@{
+    ADGroupCreateDelete                 = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -509,7 +521,7 @@ $Script:ReportDefinitions = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ADGroupChangesDetailed    = [ordered] @{
+    ADGroupChangesDetailed              = [ordered] @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -548,7 +560,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    ADGroupPolicyChanges      = [ordered] @{
+    ADGroupPolicyChanges                = [ordered] @{
         Enabled                     = $false
         'Group Policy Name Changes' = @{
             Enabled     = $true
@@ -701,7 +713,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    ADLogsClearedSecurity     = [ordered]@{
+    ADLogsClearedSecurity               = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -729,16 +741,16 @@ $Script:ReportDefinitions = [ordered] @{
                 # Allows to overwrite field content on the fly, either only on IF or IF ELSE
                 # IF <VALUE> -eq <VALUE> THEN <VALUE> (3 VALUES)
                 # IF <VALUE> -eq <VALUE> THEN <VALUE> ELSE <VALUE> (4 VALUES)
-                # If you need to use IF multiple times for same field use spaces to distinguish HashTable Key.
+                # If you need to use IF multiple times for same field use #1, #2 and so on to distinguish HashTable Key.
 
                 'Backup Path' = 'Backup Path', '', 'N/A'
-                #'Backup Path ' = 'Backup Path', 'C:\Windows\System32\Winevt\Logs\Archive-Security-2018-11-24-09-25-36-988.evtx', 'MMMM'
+                #'Backup Path#1' = 'Backup Path', 'C:\Windows\System32\Winevt\Logs\Archive-Security-2018-11-24-09-25-36-988.evtx', 'MMMM'
                 'Who'         = 'Event ID', 1105, 'Automatic Backup'  # if event id 1105 set field to Automatic Backup
                 #'Test' = 'Event ID', 1106, 'Test', 'Mama mia'
             }
         }
     }
-    ADLogsClearedOther        = [ordered]@{
+    ADLogsClearedOther                  = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -770,7 +782,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
-    ADEventsReboots           = [ordered]@{
+    ADEventsReboots                     = [ordered]@{
         Enabled = $false
         Events  = @{
             Enabled     = $true
