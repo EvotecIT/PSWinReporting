@@ -15,12 +15,17 @@ function Get-EventsTranslation {
         foreach ($Filter in $EventsDefinition.Filter.Keys) {
             $Value = $EventsDefinition.Filter[$Filter]
             $Events = foreach ($V in $Value) {
-                $Events | Where-Object { $_.$Filter -eq $V }
+                # $Events | Where-Object { $_.$Filter -eq $V }
+                foreach ($_ in $Events) {
+                    if ($_.$Filter -eq $V) {
+                        $_
+                    }
+                }
             }
         }
     }
     $MyValue = foreach ($Event in $Events) {
-        $IgnoredFound = $false
+        # $IgnoredFound = $false
         $HashTable = @{}
         foreach ($EventProperty in $Event.PSObject.Properties) {
 
@@ -71,11 +76,9 @@ function Get-EventsTranslation {
         if ($null -ne $EventsDefinition.Overwrite) {
             foreach ($Entry in $EventsDefinition.Overwrite.Keys) {
                 $OverwriteObject = $EventsDefinition.Overwrite.$Entry
-                # This allows for having multiple values in Overwrite by using additional empty spaces in definition
-                $StrippedEntry = Remove-WhiteSpace -Text $Entry
+                # This allows for having multiple values in Overwrite by using #1 or #2 and so on.
+                $StrippedEntry = $Entry -replace '#[0-9]{1,2}', ''
                 if ($OverwriteObject.Count -eq 3) {
-                    #Write-Color $Entry, ' - ',  $HashTable[$Entry], ' - ', $HashTable.$Entry, ' - ', $HashTable.($OverwriteObject[0]) -Color Red
-                    #Write-Color $OverwriteObject[0], ' - ', $OverwriteObject[1], ' - ', $OverwriteObject[2] -Color Yellow
                     if ($HashTable.($OverwriteObject[0]) -eq $OverwriteObject[1]) {
                         $HashTable.$StrippedEntry = $OverwriteObject[2]
                     }
@@ -84,6 +87,28 @@ function Get-EventsTranslation {
                         $HashTable.$StrippedEntry = $OverwriteObject[2]
                     } else {
                         $HashTable.$StrippedEntry = $OverwriteObject[3]
+                    }
+                }
+            }
+        }
+        # This overwrites values based on parameters. It's useful for cleanup or special cases.
+        # It acts similar to the one above, however it allows you to replace one value with another value from the hashtable.
+        # For example replacing EventID field with RecordID -  so 5174 with 812333
+        # For whatever reason you would need to do that.
+        if ($null -ne $EventsDefinition.OverwriteByField) {
+            foreach ($Entry in $EventsDefinition.OverwriteByField.Keys) {
+                $OverwriteObject = $EventsDefinition.OverwriteByField.$Entry
+                # This allows for having multiple values in Overwrite by using #1 or #2 and so on.
+                $StrippedEntry = $Entry -replace '#[0-9]{1,2}', ''
+                if ($OverwriteObject.Count -eq 3) {
+                    if ($HashTable.($OverwriteObject[0]) -eq $OverwriteObject[1]) {
+                        $HashTable.$StrippedEntry = $HashTable.($OverwriteObject[2])
+                    }
+                } elseif ($OverwriteObject.Count -eq 4) {
+                    if ($HashTable.($OverwriteObject[0]) -eq $OverwriteObject[1]) {
+                        $HashTable.$StrippedEntry = $HashTable.($OverwriteObject[2])
+                    } else {
+                        $HashTable.$StrippedEntry = $HashTable.($OverwriteObject[3])
                     }
                 }
             }
