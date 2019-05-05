@@ -212,6 +212,9 @@ $Script:ReportDefinitions = [ordered] @{
                 #'Field Changed'       = 'Action', 'A directory service object was moved.', ''
                 #'Field Value'         = 'Action', 'A directory service object was moved.', 'NewObjectDN'
             }
+            # This Overwrite works in a way where you can swap one value with another value from another field within same Event
+            # It's useful if you have an event that already has some fields used but empty and you wnat to utilize them
+            # for some content
             OverwriteByField = @{
                 'Organizational Unit' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
                 #'Field Changed'       = 'Action', 'A directory service object was moved.', ''
