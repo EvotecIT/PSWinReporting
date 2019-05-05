@@ -61,6 +61,7 @@ PSWinReporting comes with predefined, built-in reports. Those are for `Find-Even
 - [x] ADUserLogonKerberos
 - [x] ADUserStatus
 - [x] ADUserUnlocked
+- [X] ADOrganizationalUnitChangesDetailed (added in 2.0.10)
 
 ### Built-in Reporting Times
 
