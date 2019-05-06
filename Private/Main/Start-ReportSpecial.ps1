@@ -81,39 +81,34 @@ function Start-ReportSpecial {
 
 
     if ($Options.AsDynamicHTML.Enabled) {
-        $ReportFileName = Set-ReportFile -Path $Options.AsDynamicHTML.Path -FileNamePattern $Options.AsDynamicHTML.FilePattern -DateFormat $Options.AsDynamicHTML.DateFormat
+        $DynamicHTMLPath = Set-ReportFile -Path $Options.AsDynamicHTML.Path -FileNamePattern $Options.AsDynamicHTML.FilePattern -DateFormat $Options.AsDynamicHTML.DateFormat
 
-        $DynamicHTML = New-HTML -TitleText $Options.AsDynamicHTML.Title `
-            -UseCssLinks:$Options.AsDynamicHTML.EmbedCSS `
-            -UseJavaScriptLinks:$Options.AsDynamicHTML.EmbedJS {
-
+        $null = New-HTML -TitleText $Options.AsDynamicHTML.Title -UseCssLinks:$Options.AsDynamicHTML.EmbedCSS -UseJavaScriptLinks:$Options.AsDynamicHTML.EmbedJS {
             foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
                 $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
                 if ($Definitions.$ReportName.Enabled) {
-                    New-HTMLContent -HeaderText $ReportNameTitle -CanCollapse {
-                        New-HTMLColumn -Columns 1 {
+                    New-HTMLSection -HeaderText $ReportNameTitle -CanCollapse {
+                        New-HTMLPanel {
                             if ($null -ne $Results.$ReportName) {
                                 New-HTMLTable -DataTable $Results.$ReportName -HideFooter
                             }
                         }
                     }
                 }
+            }
+        } -FilePath $DynamicHTMLPath
 
+        try {
+            if ($Options.SendMail.Attach.DynamicHTML) {
+                $AttachDynamicHTML += $DynamicHTMLPath
+                $AttachedReports += $DynamicHTMLPath
             }
+        } catch {
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            $Logger.AddErrorRecord("Error saving file $ReportHTMLPath.")
+            $Logger.AddErrorRecord("Error: $ErrorMessage")
         }
-        if ($null -ne $DynamicHTML) {
-            try {
-                [string] $DynamicHTMLPath = Save-HTML -HTML $DynamicHTML -FilePath $ReportFileName
-                if ($Options.SendMail.Attach.DynamicHTML) {
-                    $AttachDynamicHTML += $DynamicHTMLPath
-                    $AttachedReports += $DynamicHTMLPath
-                }
-            } catch {
-                $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-                $Logger.AddErrorRecord("Error saving file $ReportHTMLPath.")
-                $Logger.AddErrorRecord("Error: $ErrorMessage")
-            }
-        }
+
     }
     if ($Options.AsExcel.Enabled) {
         $Logger.AddInfoRecord('Prepare Microsoft Excel (.XLSX) file with Events')
@@ -146,30 +141,50 @@ function Start-ReportSpecial {
         }
     }
     if ($Options.AsHTML.Enabled -and $Options.AsHTML.OpenAsFile) {
-        if ($ReportHTMLPath -ne '' -and (Test-Path -LiteralPath $ReportHTMLPath)) {
-            Invoke-Item -LiteralPath $ReportHTMLPath
+        try {
+            if ($ReportHTMLPath -ne '' -and (Test-Path -LiteralPath $ReportHTMLPath)) {
+                Invoke-Item -LiteralPath $ReportHTMLPath
+            }
+        } catch {
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            $Logger.AddErrorRecord("Error opening file $ReportHTMLPath.")
         }
     }
     if ($Options.AsDynamicHTML.Enabled -and $Options.AsDynamicHTML.OpenAsFile) {
-        if ($DynamicHTMLPath -ne '' -and (Test-Path -LiteralPath $DynamicHTMLPath)) {
-            Invoke-Item -LiteralPath $DynamicHTMLPath
+        try {
+            if ($DynamicHTMLPath -ne '' -and (Test-Path -LiteralPath $DynamicHTMLPath)) {
+                Invoke-Item -LiteralPath $DynamicHTMLPath
+            }
+        } catch {
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            $Logger.AddErrorRecord("Error opening file $DynamicHTMLPath.")
         }
     }
     if ($Options.AsExcel.Enabled -and $Options.AsExcel.OpenAsFile) {
-        if ($ReportFilePathXLSX -ne '' -and (Test-Path -LiteralPath $ReportFilePathXLSX)) {
-            Invoke-Item -LiteralPath $ReportFilePathXLSX
+        try {
+            if ($ReportFilePathXLSX -ne '' -and (Test-Path -LiteralPath $ReportFilePathXLSX)) {
+                Invoke-Item -LiteralPath $ReportFilePathXLSX
+            }
+        } catch {
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            $Logger.AddErrorRecord("Error opening file $ReportFilePathXLSX.")
         }
     }
     if ($Options.AsCSV.Enabled -and $Options.AsCSV.OpenAsFile) {
         foreach ($CSV in $AttachCSV) {
-            if ($CSV -ne '' -and (Test-Path -LiteralPath $CSV)) {
-                Invoke-Item -LiteralPath $CSV
+            try {
+                if ($CSV -ne '' -and (Test-Path -LiteralPath $CSV)) {
+                    Invoke-Item -LiteralPath $CSV
+                }
+            } catch {
+                $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+                $Logger.AddErrorRecord("Error opening file $CSV.")
             }
         }
     }
 
-    $AttachedReports = $AttachedReports |  Where-Object { $_ } | Sort-Object -Unique
-
+    # $AttachedReports = $AttachedReports |  Where-Object { $_ } | Sort-Object -Unique
+    $AttachedReports = $AttachedReports | Sort-Object -Unique
 
     # Sending email - finalizing package
     if ($Options.SendMail.Enabled) {

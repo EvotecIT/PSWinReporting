@@ -257,7 +257,7 @@ $Options = @{
     }
 }
 $DefinitionsAD = [ordered] @{
-    UserChanges             = @{
+    UserChanges                       = @{
         Enabled   = $true
         SqlExport = @{
             EnabledGlobal         = $false
@@ -364,7 +364,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserChangesDetailed     = [ordered] @{
+    UserChangesDetailed               = [ordered] @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -399,7 +399,7 @@ $DefinitionsAD = [ordered] @{
             }
         }
     }
-    ComputerChangesDetailed = [ordered] @{
+    ComputerChangesDetailed           = [ordered] @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -431,7 +431,58 @@ $DefinitionsAD = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    UserStatus              = @{
+    OrganizationalUnitChangesDetailed = [ordered] @{
+        Enabled        = $true
+        OUEventsModify = @{
+            Enabled          = $true
+            Events           = 5136, 5137, 5139, 5141
+            LogName          = 'Security'
+            Filter           = @{
+                'ObjectClass' = 'organizationalUnit'
+            }
+            Functions        = @{
+                'OperationType' = 'ConvertFrom-OperationType'
+            }
+
+            Fields           = [ordered] @{
+                'Computer'                 = 'Domain Controller'
+                'Action'                   = 'Action'
+                'OperationType'            = 'Action Detail'
+                'Who'                      = 'Who'
+                'Date'                     = 'When'
+                'ObjectDN'                 = 'Organizational Unit'
+                'AttributeLDAPDisplayName' = 'Field Changed'
+                'AttributeValue'           = 'Field Value'
+                #'OldObjectDN'              = 'OldObjectDN'
+                #'NewObjectDN'              = 'NewObjectDN'
+                # Common Fields
+                'RecordID'                 = 'Record ID'
+                'ID'                       = 'Event ID'
+                'GatheredFrom'             = 'Gathered From'
+                'GatheredLogName'          = 'Gathered LogName'
+            }
+            Overwrite        = @{
+                'Action Detail#1' = 'Action', 'A directory service object was created.', 'Organizational Unit Created'
+                'Action Detail#2' = 'Action', 'A directory service object was deleted.', 'Organizational Unit Deleted'
+                'Action Detail#3' = 'Action', 'A directory service object was moved.', 'Organizational Unit Moved'
+                #'Organizational Unit' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
+                #'Field Changed'       = 'Action', 'A directory service object was moved.', ''
+                #'Field Value'         = 'Action', 'A directory service object was moved.', 'NewObjectDN'
+            }
+            # This Overwrite works in a way where you can swap one value with another value from another field within same Event
+            # It's useful if you have an event that already has some fields used but empty and you wnat to utilize them
+            # for some content
+            OverwriteByField = @{
+                'Organizational Unit' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
+                #'Field Changed'       = 'Action', 'A directory service object was moved.', ''
+                'Field Value'         = 'Action', 'A directory service object was moved.', 'NewObjectDN'
+            }
+            SortBy           = 'Record ID'
+            Descending       = $false
+            IgnoreWords      = @{}
+        }
+    }
+    UserStatus                        = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -453,7 +504,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLockouts            = @{
+    UserLockouts                      = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -476,7 +527,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLogon               = @{
+    UserLogon                         = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -504,7 +555,7 @@ $DefinitionsAD = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    UserUnlocked            = @{
+    UserUnlocked                      = @{
         # 4767	A user account was unlocked
         # https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4767
         Enabled = $true
@@ -530,7 +581,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    ComputerCreatedChanged  = @{
+    ComputerCreatedChanged            = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -573,7 +624,7 @@ $DefinitionsAD = [ordered] @{
             IgnoreWords = @{}
         }
     }
-    ComputerDeleted         = @{
+    ComputerDeleted                   = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -595,7 +646,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    UserLogonKerberos       = @{
+    UserLogonKerberos                 = @{
         Enabled = $false
         Events  = @{
             Enabled     = $false
@@ -626,7 +677,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupMembershipChanges  = @{
+    GroupMembershipChanges            = @{
         Enabled  = $true
         Events   = @{
             Enabled     = $true
@@ -664,7 +715,7 @@ $DefinitionsAD = [ordered] @{
             }
         }
     }
-    GroupEnumeration        = @{
+    GroupEnumeration                  = @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -688,7 +739,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupChanges            = @{
+    GroupChanges                      = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -718,7 +769,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupCreateDelete       = @{
+    GroupCreateDelete                 = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -742,7 +793,7 @@ $DefinitionsAD = [ordered] @{
             SortBy      = 'When'
         }
     }
-    GroupChangesDetailed    = [ordered] @{
+    GroupChangesDetailed              = [ordered] @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -781,7 +832,7 @@ $DefinitionsAD = [ordered] @{
             }
         }
     }
-    GroupPolicyChanges      = [ordered] @{
+    GroupPolicyChanges                = [ordered] @{
         Enabled                     = $true
         'Group Policy Name Changes' = @{
             Enabled     = $true
@@ -934,7 +985,7 @@ $DefinitionsAD = [ordered] @{
             }
         }
     }
-    LogsClearedSecurity     = @{
+    LogsClearedSecurity               = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -971,7 +1022,7 @@ $DefinitionsAD = [ordered] @{
             }
         }
     }
-    LogsClearedOther        = @{
+    LogsClearedOther                  = @{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -1003,7 +1054,7 @@ $DefinitionsAD = [ordered] @{
             }
         }
     }
-    EventsReboots           = @{
+    EventsReboots                     = @{
         Enabled = $false
         Events  = @{
             Enabled     = $true
@@ -1015,7 +1066,6 @@ $DefinitionsAD = [ordered] @{
         }
     }
 }
-
 $Target = [ordered]@{
     Servers           = [ordered] @{
         Enabled = $true
