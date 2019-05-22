@@ -13,8 +13,8 @@ function New-SubscriptionTemplates {
         return
     }
     Write-Color 'Found Servers ', ([string] $Servers) -Color White, Yellow
-    # $xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-Collector.xml"
-    $XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-Collector.xml"
+    $xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-Collector.xml"
+    #$XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-Collector.xml"
     if (Test-Path $xmlTemplate) {
         Write-Color 'Found Template ', $xmlTemplate -Color White, Yellow
         $ListTemplates = New-ArrayList

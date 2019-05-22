@@ -15,22 +15,24 @@
 
 This `PowerShell Module`, which started as an event library `(Get-EventsLibrary.ps1)`, has now grown up and became full fledged PowerShell Module. This module has multiple functionalities but one of the signature features of this module is ability to parse Security (mostly) logs on `Domain Controllers`. But that's not all. You can set up reporting on it and have emails delivered with summary of **hourly**, **daily**, **weekly**, **monthly** or **quarterly** changes. Changes that happen on your **Active Directory** Domain. Changes that your Service Desk agents, or other administrators do. And with new versions… well you can do a lot of stuff. Just read below. Make sure to go thru related articles as they have all the KNOW HOW which is quite useful if you want to get everything from this module. Module is published on [Powershell Gallery](https://www.powershellgallery.com/packages/PSWinReporting/).
 
-This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to keep on using it, feel free, but it's highely encouraged to use ***2.x.x*** when it's fully functional with all features. 
+This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to keep on using it, feel free, but it's highely encouraged to use ***2.x.x*** when it's fully functional with all features.
 
 
 ## ChangeLog
 
+- 1.8.1.2 - 22.05.2019
+  - Fixed problem with Template for Forwarding Collector
 - 1.8.1.1 - 19.03.2019
   - Fixed IPV6 display
 - 1.8.1 - 18.03.2019
-  - Added SendMailOnlyOnEvents feature. 
+  - Added SendMailOnlyOnEvents feature.
   - Fixed SQL Server issue when DB name was containing `-` (Update-Module PSSharedGooods is required)
 - 1.8.0 - 10.03.2019
   - Update to configuration and overview of some features
   - All information provied in blog post: https://evotec.xyz/pswinreporting-1-8-split-of-branches-legacy-vs-new-hope/
 - 1.7.7 - 21.02.2019
   - Fix for long RecordID
-  - Fix of colors for Teams 
+  - Fix of colors for Teams
   - Fix for Teams Summary visible in activity pane
 - 1.7.6 - XX.02.2019
   - Fixes for PDC detection
