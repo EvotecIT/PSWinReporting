@@ -1,12 +1,12 @@
 function Add-TaskScheduledForwarder {
     [CmdletBinding()]
     param(
-        $TaskPath = '\Event Viewer Tasks\',
-        $TaskName = 'ForwardedEvents',
-        $Author = 'Evotec',
-        $URI = '\Event Viewer Tasks\ForwardedEvents',
-        $Command = 'powershell.exe',
-        $Argument = @('-windowstyle hidden', 'C:\Support\GitHub\PSWinReporting\Examples\Trigger.ps1', "-EventID $(eventID) -eventRecordID '$(eventRecordID)' -eventChannel '$(eventChannel)' -eventSeverity $(eventSeverity)")
+        [string] $TaskPath = '\Event Viewer Tasks\',
+        [string] $TaskName = 'ForwardedEvents',
+        [string] $Author = 'Evotec',
+        [string] $URI = '\Event Viewer Tasks\ForwardedEvents',
+        [string] $Command = 'powershell.exe',
+        [string[]]$Argument = @('-windowstyle hidden', 'C:\Support\GitHub\PSWinReporting\Examples\Trigger.ps1', "-EventID $(eventID) -eventRecordID '$(eventRecordID)' -eventChannel '$(eventChannel)' -eventSeverity $(eventSeverity)")
 
     )
     $XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-ScheduledTask.xml"
