@@ -13,7 +13,6 @@ function Add-TaskScheduledForwarder {
     #$xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-ScheduledTask.xml"
     if (Test-Path $xmlTemplate) {
         Write-Color 'Found Template ', $xmlTemplate -Color White, Yellow
-        $ListTemplates = New-ArrayList
         if (Test-Path $xmlTemplate) {
             $ScheduledTaskXML = "$ENV:TEMP\PSWinReportingSchedluledTask.xml"
             Copy-Item -Path $xmlTemplate $ScheduledTaskXML
@@ -21,11 +20,7 @@ function Add-TaskScheduledForwarder {
             Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'RegistrationInfo' -Node 'Author' -Value $Author
             Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'Actions', 'Exec' -Node 'Command' -Value $Command
             Set-XML -FilePath $ScheduledTaskXML -Paths 'Task', 'Actions', 'Exec' -Node 'Arguments' -Value ([string] $Argument)
-            #  Invoke-Item $ScheduledTaskXML
-
             $xml = (get-content $ScheduledTaskXML | out-string)
-            #  $xml
-
             Register-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName -xml $xml
             Write-Color 'Loaded template ', $ScheduledTaskXML -Color White, Yellow
         }
