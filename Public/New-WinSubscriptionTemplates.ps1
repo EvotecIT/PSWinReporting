@@ -19,7 +19,8 @@ function New-WinSubscriptionTemplates {
             $Logger.AddInfoRecord("File $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')")
         }
     }
-    $XmlTemplate = "$((Get-Item $PSScriptRoot).Parent.FullName)\Templates\Template-Collector.xml"
+    $xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReportingV2)[0]).ModuleBase)\Templates\Template-Collector.xml"
+    #$XmlTemplate = "$((Get-Item $PSScriptRoot).Parent.FullName)\Templates\Template-Collector.xml"
     if (Test-Path -LiteralPath $xmlTemplate) {
         $Logger.AddInfoRecord("Found Template $xmlTemplate")
         $SubscriptionCount = 0
