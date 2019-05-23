@@ -1,7 +1,7 @@
 function New-SubscriptionTemplates {
     [CmdletBinding()]
     param (
-        $ReportDefinitions
+        [System.Collections.IDictionary] $ReportDefinitions
     )
     $Events = Get-EventsData -ReportDefinitions $ReportDefinitions -LogName 'Security'
     $Systems = Get-EventsData -ReportDefinitions $ReportDefinitions -LogName 'System'
