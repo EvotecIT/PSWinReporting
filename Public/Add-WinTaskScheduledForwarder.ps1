@@ -13,7 +13,9 @@ function Add-WinTaskScheduledForwarder {
         $LoggerParameters = $Script:LoggerParameters
     }
     $Logger = Get-Logger @LoggerParameters
-    $XmlTemplate = "$PSScriptRoot\..\Templates\Template-ScheduledTask.xml"
+    #$XmlTemplate = "$PSScriptRoot\..\Templates\Template-ScheduledTask.xml"
+    $xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReportingV2)[0]).ModuleBase)\Templates\Template-ScheduledTask.xml"
+
     if (Test-Path -LiteralPath $xmlTemplate) {
         $Logger.AddInfoRecord("Found Template $xmlTemplate")
         $ScheduledTaskXML = "$ENV:TEMP\PSWinReportingSchedluledTask.xml"
