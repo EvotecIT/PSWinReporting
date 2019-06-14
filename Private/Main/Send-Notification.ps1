@@ -22,7 +22,7 @@ function Send-Notificaton {
                 $FactsTeams = @()
                 $FactsDiscord = @()
                 foreach ($Property in $event.PSObject.Properties) {
-                    if ($Property.Value -ne $null -and $Property.Value -ne '') {
+                    if ($null -ne $Property.Value -and $Property.Value -ne '') {
                         if ($Property.Name -eq 'When') {
                             $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
                             $FactsSlack += @{ title = $Property.Name; value = $Property.Value.DateTime; short = $true }
