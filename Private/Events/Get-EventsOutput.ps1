@@ -5,7 +5,7 @@ function Get-EventsOutput {
         [Array] $AllEvents,
         [switch] $Quiet
     )
-    $Results = @{}
+    $Results = @{ }
 
     # Prepare the results based on chosen criteria
     foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
@@ -13,7 +13,7 @@ function Get-EventsOutput {
             #$ReportNameTitle = Format-AddSpaceToSentence -Text $Report -ToLowerCase
             if (-not $Quiet) { $Logger.AddInfoRecord("Running $Report") }
             $TimeExecution = Start-TimeLog
-            foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'  }) {
+            $Results.$Report = foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
                 if ($Definitions.$Report.$SubReport.Enabled) {
                     if (-not $Quiet) { $Logger.AddInfoRecord("Running $Report with subsection $SubReport") }
                     [string] $EventsType = $Definitions.$Report.$SubReport.LogName
@@ -21,7 +21,7 @@ function Get-EventsOutput {
                     [Array] $EventsFound = Find-EventsNeeded -Events $AllEvents -EventIDs $EventsNeeded -EventsType $EventsType
                     [Array] $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $Definitions.$Report.$SubReport
                     if (-not $Quiet) { $Logger.AddInfoRecord("Ending $Report with subsection $SubReport events found $($EventsFound.Count)") }
-                    $Results.$Report = $EventsFound
+                    $EventsFound
                 }
             }
             $ElapsedTimeReport = Stop-TimeLog -Time $TimeExecution -Option OneLiner
