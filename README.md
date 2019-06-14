@@ -33,6 +33,18 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 - [x] Ability to monitor any servers, for any events using simple to use schema
 - [x] Ability to target multiple servers, computers or files at the same time
 
+
+### Changelog
+
+- 2.0.11 - 2019-06-15
+  - Find-Events
+    - Fix for Group Policy Events
+    - Fix for Subevents within Events overwritting values
+    - Fix for output when using Definitions/Times/Servers (1 definition returns an Array, 2 or more returns hashtable of Arrays)
+- 2.0.10 - 2019-05-06
+  - Fixes for reporting
+  - Adding subscriptions
+
 At this moment there is no documentation for PSWinReportingV2 except for those articles below. Feel free to explore Examples if you're eager to try the new version — otherwise fallback to PSWinReporting **Legacy Edition**.
 
 - [x] [Find-Events - The only PowerShell Command you will ever need to find out who did what in Active Directory](https://evotec.xyz/the-only-powershell-command-you-will-ever-need-to-find-out-who-did-what-in-active-directory/)
