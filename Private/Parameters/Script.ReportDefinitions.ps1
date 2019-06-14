@@ -175,7 +175,7 @@ $Script:ReportDefinitions = [ordered] @{
         }
     }
     ADOrganizationalUnitChangesDetailed = [ordered] @{
-        Enabled        = $true
+        Enabled        = $false
         OUEventsModify = @{
             Enabled          = $true
             Events           = 5136, 5137, 5139, 5141
