@@ -172,7 +172,8 @@ function Find-Events {
         if (-not $Quiet) { $Logger.AddInfoRecord("Events scanned found $($AllEvents.Count) - Time elapsed: $Elapsed") }
 
         $Results = Get-EventsOutput -Definitions $Definitions -AllEvents $AllEvents -Quiet:$Quiet
-        if ((Get-ObjectCount -Object $Reports) -eq 1) {
+        if ($Results.Count -eq 1) {
+            #if ((Get-ObjectCount -Object $Reports) -eq 1) {
             # if there is only one report to return, return Array
             $Results[$Reports]
         } else {
