@@ -147,6 +147,10 @@ function Find-Events {
         } else {
             [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
         }
+        if (-not $ExtendedInput) {
+            $Logger.AddErrorRecord("There are no logs/servers to scan. Please fix Targets and try again.")
+            return
+        }
         foreach ($Entry in $ExtendedInput) {
             if ($Entry.Type -eq 'Computer') {
                 if (-not $Quiet) { $Logger.AddInfoRecord("Computer $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')") }
