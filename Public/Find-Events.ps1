@@ -93,8 +93,12 @@ function Find-Events {
         if ($null -ne $Definitions -and $null -ne $Times -and $null -ne $Target) {
             # Using in case of Extendted Input - Mateusz asked for it.
             $Dates = Get-ChoosenDates -ReportTimes $Times
+            if (-not $Dates) {
+                $Logger.AddErrorRecord("Not a single date was choosen for scan. Please fix Times and try again.")
+                return
+            }
             if ($Dates -is [Array]) {
-                $Logger.AddErrorRecord("Currently only 1 date range is supported. Please fix Times and try again")
+                $Logger.AddErrorRecord("Currently only 1 date range is supported. Please fix Times and try again.")
                 return
             }
         } else {
@@ -121,6 +125,10 @@ function Find-Events {
 
             # Fixes ReportTimes
             $Dates = Get-ChoosenDates -ReportTimes $Times
+            if (-not $Dates) {
+                $Logger.AddErrorRecord("Not a single date was choosen for scan. Please fix Times and try again.")
+                return
+            }
             if ($Dates -is [Array]) {
                 $Logger.AddErrorRecord("Currently only 1 date range is supported. Please fix Times and try again")
                 return
