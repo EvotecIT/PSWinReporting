@@ -40,11 +40,12 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
   - Find-Events
     - Fix for Target not having anything to run
     - Fix for Files being passed even thou - not existing
+    - Fix for Reports variable not being available during non-standard runs
 
 - 2.0.11 - 2019-06-15
   - Find-Events
     - Fix for Group Policy Events
-    - Fix for Subevents within Events overwritting values
+    - Fix for Subevents within Events overwriting values
     - Fix for output when using Definitions/Times/Servers (1 definition returns an Array, 2 or more returns hashtable of Arrays)
 - 2.0.10 - 2019-05-06
   - Fixes for reporting

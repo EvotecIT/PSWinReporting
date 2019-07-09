@@ -64,7 +64,7 @@ function Get-ServersList {
     #>
 
     # Get LogNames
-    [Array] $LogNames = foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
+    [Array] $LogNames = foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
         if ($Definitions.$Report.Enabled) {
             foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
                 if ($Definitions.$Report.$SubReport.Enabled) {
@@ -78,7 +78,7 @@ function Get-ServersList {
         Exit
     }
     [Array] $ExtendedInput = foreach ($Log in $LogNames | Sort-Object -Unique) {
-        $EventIDs = foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'}) {
+        $EventIDs = foreach ($Report in  $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
             if ($Definitions.$Report.Enabled) {
                 foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled' }) {
                     if ($Definitions.$Report.$SubReport.Enabled) {
@@ -94,7 +94,7 @@ function Get-ServersList {
         #Add-ToHashTable -Hashtable $EventFilter -Key "NamedDataFilter" -Value $NamedDataFilter
         #Add-ToHashTable -Hashtable $EventFilter -Key "NamedDataExcludeFilter" -Value $NamedDataExcludeFilter
 
-        $NamedDataFilter = @{}
+        $NamedDataFilter = @{ }
         if ($Who -ne '') {
             $NamedDataFilter.SubjectUserName = $Who
         }
@@ -102,7 +102,7 @@ function Get-ServersList {
             $NamedDataFilter.TargetUserName = $Whom
         }
 
-        $NamedDataExcludeFilter = @{}
+        $NamedDataExcludeFilter = @{ }
         if ($NotWho -ne '') {
             $NamedDataExcludeFilter.SubjectUserName = $NotWho;
         }

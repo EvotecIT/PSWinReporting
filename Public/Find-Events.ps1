@@ -101,6 +101,13 @@ function Find-Events {
                 $Logger.AddErrorRecord("Currently only 1 date range is supported. Please fix Times and try again.")
                 return
             }
+            # Fixes Reports variable
+            $Reports = foreach ($Report in $Definitions.Keys) {
+                if ($Definitions[$Report].Enabled -eq $true){
+                    $Report
+                }
+            }
+
         } else {
             # Using standard case
             $Reports = $PSBoundParameters.Report
