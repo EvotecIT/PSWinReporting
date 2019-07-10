@@ -1,4 +1,3 @@
-
 function Protect-ArchivedLogs {
     [CmdletBinding()]
     param (

@@ -135,7 +135,7 @@ $Configuration = @{
         }
         BuildDocumentation = $false
         PublishModule      = @{
-            Enabled      = $true
+            Enabled      = $false
             Prerelease   = ''
             RequireForce = $false
         }

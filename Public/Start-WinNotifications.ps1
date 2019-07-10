@@ -86,8 +86,8 @@ function Start-WinNotifications {
                     $Logger.AddInfoRecord("Running $Report with subsection $SubReport")
                     [string] $EventsType = $Definitions.$Report.$SubReport.LogName
                     [Array] $EventsNeeded = $Definitions.$Report.$SubReport.Events
-                    [Array] $EventsFound = Find-EventsNeeded -Events $AllEvents -EventIDs $EventsNeeded -EventsType $EventsType
-                    [Array] $EventsFound = Get-EventsTranslation -Events $EventsFound -EventsDefinition $Definitions.$Report.$SubReport
+                    #[Array] $EventsFound = Find-EventsNeeded -Events $AllEvents -EventIDs $EventsNeeded -EventsType $EventsType
+                    [Array] $EventsFound = Get-EventsTranslation -Events $AllEvents -EventsDefinition $Definitions.$Report.$SubReport -EventIDs $EventsNeeded -EventsType $EventsType
                     $Logger.AddInfoRecord("Ending $Report with subsection $SubReport events found $($EventsFound.Count)")
                     $Results.$Report = $EventsFound
                 }

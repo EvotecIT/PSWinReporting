@@ -1,4 +1,3 @@
-
 function New-EventQuery {
     [CmdletBinding()]
     param (

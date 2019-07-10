@@ -171,7 +171,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
             SortBy      = 'Record ID'
             Descending  = $false
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     ADOrganizationalUnitChangesDetailed = [ordered] @{
@@ -222,7 +222,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
             SortBy           = 'Record ID'
             Descending       = $false
-            IgnoreWords      = @{}
+            IgnoreWords      = @{ }
         }
     }
     ADUserStatus                        = [ordered] @{
@@ -231,7 +231,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 4722, 4725, 4767, 4723, 4724, 4726
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
@@ -253,7 +253,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 4740
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'         = 'Domain Controller'
                 'Action'           = 'Action'
@@ -295,7 +295,7 @@ $Script:ReportDefinitions = [ordered] @{
                 'GatheredFrom'       = 'Gathered From'
                 'GatheredLogName'    = 'Gathered LogName'
             }
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     ADUserUnlocked                      = [ordered] @{
@@ -306,8 +306,8 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 4767
             LogName     = 'Security'
-            IgnoreWords = @{}
-            Functions   = @{}
+            IgnoreWords = @{ }
+            Functions   = @{ }
             Fields      = [ordered] @{
                 'Computer'         = 'Domain Controller'
                 'Action'           = 'Action'
@@ -364,7 +364,7 @@ $Script:ReportDefinitions = [ordered] @{
                 'GatheredFrom'        = 'Gathered From'
                 'GatheredLogName'     = 'Gathered LogName'
             }
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     ADComputerDeleted                   = [ordered]@{
@@ -373,7 +373,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 4743 # deleted
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
@@ -395,7 +395,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 4768
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Functions   = @{
                 'IpAddress' = 'Clean-IpAddress'
             }
@@ -739,7 +739,7 @@ $Script:ReportDefinitions = [ordered] @{
                 #'Test' = 'Test'
             }
             SortBy      = 'When'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Overwrite   = @{
                 # Allows to overwrite field content on the fly, either only on IF or IF ELSE
                 # IF <VALUE> -eq <VALUE> THEN <VALUE> (3 VALUES)
@@ -759,7 +759,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 104
             LogName     = 'System'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'     = 'Domain Controller'
                 'Action'       = 'Action'
@@ -793,6 +793,143 @@ $Script:ReportDefinitions = [ordered] @{
             LogName     = 'System'
             IgnoreWords = @{
 
+            }
+        }
+    }
+    NetworkAccessAuthenticationPolicy   = [ordered]@{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $true
+            Events      = 6272, 6273
+            LogName     = 'Security'
+            IgnoreWords = @{ }
+            Fields      = [ordered] @{
+                'Action'                        = 'Action'
+
+                'SubjectUserSid'                = 'SecurityID'
+                'Computer'                      = 'Compuer'
+
+                'SubjectUserName'               = 'AccountName'
+                'SubjectDomainName'             = 'Account Domain'
+
+                'CalledStationID'               = 'CalledStationID'
+                'CallingStationID'              = 'CallingStationID'
+
+                # NAS
+                'NASIPv4Address'                = 'NASIPv4Address'
+                'NASIPv6Address'                = 'NASIPv6Address'
+                'NASIdentifier'                 = 'NASIdentifier'
+                'NASPortType'                   = 'NASPortType'
+                'NASPort'                       = 'NASPort'
+
+                # Radius Client
+                'ClientName'                    = 'ClientFriendlyName'
+                'ClientIPAddress'               = 'ClientFriendlyIPAddress'
+
+                # Authentication Details
+                'ProxyPolicyName'               = 'ConnectionRequestPolicyName'
+                'NetworkPolicyName'             = 'NetworkPolicyName'
+                'AuthenticationProvider'        = 'AuthenticationProvider'
+                'AuthenticationServer'          = 'AuthenticationServer'
+                'AuthenticationType'            = 'AuthenticationType'
+                'EAPType'                       = 'EAPType'
+
+                #'LoggingResult'          = 'LoggingResult' # Useless
+                'Reason'                        = 'Reason'
+                'ReasonCode'                    = 'ReasonCode'
+
+
+                #'Version'                = 'Version'
+                'FullyQualifiedSubjectUserName' = 'Who'
+                'Date'                          = 'When'
+                # Common Fields
+                'ID'                            = 'Event ID'
+                'RecordID'                      = 'Record ID'
+                'GatheredFrom'                  = 'Gathered From'
+                'GatheredLogName'               = 'Gathered LogName'
+            }
+            SortBy      = 'When'
+        }
+    }
+    "OSCrash"                           = [ordered]@{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $true
+            Events      = 6008
+            LogName     = 'System'
+            IgnoreWords = @{ }
+            Fields      = @{
+                "Computer"        = "Computer"
+                "Date"            = "Date"
+                "MachineName"     = "ObjectAffected"
+                "NoNameB3"        = "EventLevel"
+                "NoNameB4"        = "EventActionDetails"
+                "EventAction"     = "EventAction"
+                "ID"              = "Event ID"
+                "RecordID"        = "Record ID"
+                "GatheredFrom"    = "Gathered From"
+                "GatheredLogName" = "Gathered LogName"
+            }
+            Overwrite   = @{
+                "EventAction#1" = "Event ID" , 6008, "System Crash"
+            }
+        }
+    }
+    "OSStartupShutdownCrash"            = [ordered]@{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $true
+            Events      = 12, 13, 41, 4608, 4621
+            LogName     = 'System'
+            IgnoreWords = @{ }
+            Fields      = @{
+                "Computer"        = "Computer"
+                "Date"            = "Date"
+                "MachineName"     = "ObjectAffected"
+                "NoNameB4"        = "EventLevel"
+                "NoNameB5"        = "EventActionDetails"
+                "EventAction"     = "EventAction"
+                "NoNameB7"        = "EventSource"
+                "ID"              = "Event ID"
+                "RecordID"        = "Record ID"
+                "GatheredFrom"    = "Gathered From"
+                "GatheredLogName" = "Gathered LogName"
+            }
+            Overwrite   = @{
+                "EventAction#1" = "Event ID", 12, "System Start"
+                "EventAction#2" = "Event ID", 13, "System Shutdown"
+                "EventAction#3" = "Event ID", 41, "System Dirty Reboot"
+                "EventAction#4" = "Event ID", 4608, "Windows is starting up"
+                "EventAction#5" = "Event ID", 4621, "Administrator recovered system from CrashOnAuditFail"
+            }
+        }
+    }
+    "OSStartupShutdownDetailed"         = [ordered]@{
+        Enabled = $false
+        Events  = @{
+            Enabled     = $true
+            Events      = 1001,1074
+            LogName     = 'System'
+            IgnoreWords = @{ }
+            Fields      = @{
+                "Computer"        = "Computer"
+                "StartTime"       = "Date"
+                "MachineName"     = "ObjectAffected"
+                "UserId"          = "SubjectUserSid"
+                "NoNameB3"        = "EventLevel"
+                "NoNameB4"        = "ShutdownDescription"
+                "NoNameB6"        = "EventActionDetails"
+                "EventAction"     = "EventAction"
+                "NoNameB5"        = "ShutdownCode"
+                "NoNameB7"        = "ShutdownComment"
+                "ID"              = "Event ID"
+                "RecordID"        = "Record ID"
+                "GatheredFrom"    = "Gathered From"
+                "GatheredLogName" = "Gathered LogName"
+            }
+            Overwrite   = @{
+                "EventAction#1" = "Event ID", 1001, "Application crash"
+                "EventAction#2" = "Event ID", 1074, "Shutdown initiated"
             }
         }
     }
