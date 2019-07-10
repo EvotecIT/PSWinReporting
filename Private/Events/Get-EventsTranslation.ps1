@@ -2,8 +2,19 @@ function Get-EventsTranslation {
     [CmdletBinding()]
     param(
         [Array] $Events,
-        [System.Collections.IDictionary] $EventsDefinition  # HashTable/OrderedDictionary
+        [System.Collections.IDictionary] $EventsDefinition,
+        [Array] $EventIDs,
+        [string] $EventsType
     )
+    # Filter out events that are not needed, leave only those that match EventID and EventLogName
+    $Events = foreach ($Event in $Events) {
+        if ($Event.LogName -eq $EventsType) {
+            if ($EventIDs -contains $Event.ID) {
+                $Event
+            }
+        }
+    }
+
     if ($EventsDefinition.Filter) {
         # Filter is special, if there is just one object on the right side
         # If there are more objects filter will pick all values on the right side and display them as required
@@ -26,7 +37,7 @@ function Get-EventsTranslation {
     }
     $MyValue = foreach ($Event in $Events) {
         # $IgnoredFound = $false
-        $HashTable = @{}
+        $HashTable = @{ }
         foreach ($EventProperty in $Event.PSObject.Properties) {
 
             # $EventProperty.Name is value on the left side
