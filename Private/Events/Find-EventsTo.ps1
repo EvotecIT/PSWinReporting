@@ -2,12 +2,11 @@ function Find-EventsTo {
     [CmdletBinding()]
     param (
         [Array] $Events,
-        [alias('IgnoreWords', 'PriorityWords')] $DataSet,
+        [alias('IgnoreWords', 'PriorityWords')][System.Collections.IDictionary] $DataSet,
         [switch] $Ignore,
         [switch] $Prioritize
     )
-    if ((Get-ObjectCount -Object $DataSet) -eq 0) { return $Events }
-
+    if ($DataSet.Count -eq 0) { return $Events }
     $EventsToReturn = foreach ($Event in $Events) {
         $Found = $false
         foreach ($Set in $DataSet.GetEnumerator()) {
