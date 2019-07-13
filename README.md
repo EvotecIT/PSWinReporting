@@ -1,15 +1,23 @@
-﻿<center>
+﻿
+<p align="center">
+  <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/v/PSWinReportingV2.svg"></a>
+  <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/vpre/PSWinReportingV2.svg?label=powershell%20gallery%20preview&colorB=yellow"></a>
+  <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/github/license/EvotecIT/PSWinReporting.svg"></a>
+</p>
 
-[![PowerShellGallery Version](https://img.shields.io/powershellgallery/v/PSWinReportingV2.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
+<p align="center">
+  <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/p/PSWinReportingV2.svg"></a>
+  <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/github/languages/top/evotecit/PSWinReporting.svg"></a>
+  <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/github/languages/code-size/evotecit/PSWinReporting.svg"></a>
+  <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/powershellgallery/dt/PSWinReporting.svg"></a>
+</p>
 
-[![PowerShellGallery Platform](https://img.shields.io/powershellgallery/p/PSWinReportingV2.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
-[![PowerShellGallery Preview Version](https://img.shields.io/powershellgallery/vpre/PSWinReportingV2.svg?label=powershell%20gallery%20preview&colorB=yellow&style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
+<p align="center">
+  <a href="https://twitter.com/PrzemyslawKlys"><img src="https://img.shields.io/twitter/follow/PrzemyslawKlys.svg?label=Twitter%20%40PrzemyslawKlys&style=social"></a>
+  <a href="https://evotec.xyz/hub"><img src="https://img.shields.io/badge/Blog-evotec.xyz-2A6496.svg"></a>
+  <a href="https://www.linkedin.com/in/pklys"><img src="https://img.shields.io/badge/LinkedIn-pklys-0077B5.svg?logo=LinkedIn"></a>
+</p>
 
-![Top Language](https://img.shields.io/github/languages/top/evotecit/PSWinReporting.svg?style=for-the-badge)
-![Code](https://img.shields.io/github/languages/code-size/evotecit/PSWinReporting.svg?style=for-the-badge)
-[![PowerShellGallery Downloads](https://img.shields.io/powershellgallery/dt/PSWinReportingV2.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/PSWinReportingV2)
-
-</center>
 
 # PSWinReporting
 
