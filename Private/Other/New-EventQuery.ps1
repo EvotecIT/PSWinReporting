@@ -15,7 +15,6 @@ function New-EventQuery {
     #>
     Write-Verbose "New-EventQuery - Events Count: $($Events.Count)"
     $values = New-ArrayList
-    #  Add-ToArray -List $Values -Element '<![CDATA[ <QueryList><Query Id="0" Path="Security">'
     Add-ToArray -List $Values -Element '<QueryList><Query Id="0" Path="Security">'
     Add-ToArray -List $Values -Element "<Select Path=`"$Type`">*[System[("
     foreach ($E in $Events) {
@@ -23,9 +22,8 @@ function New-EventQuery {
         Add-ToArray -List $Values -Element "or"
     }
     Remove-FromArray -List $values -LastElement
-    #Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>]]>'
     Add-ToArray -List $Values -Element ')]]</Select></Query></QueryList>'
     $FinalQuery = ([string] $Values)
     Write-Verbose $FinalQuery
-    return ([string] $Values) #.Replace(' ', '').Replace('or', ' or ').Replace('SelectPath', 'Select Path')
+    return ([string] $Values)
 }
