@@ -40,7 +40,36 @@ function Find-Events {
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Target,
         [parameter(ParameterSetName = "Extended", Mandatory = $false)][int] $EventID,
         [parameter(ParameterSetName = "Extended", Mandatory = $false)][int64] $EventRecordID
+        <#,
+        [ArgumentCompleter(
+            {
+                param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+                ((Get-EventsDefinitions).Keys)
+            }
+        )]
+        [ValidateScript(
+            {
+                $_ -in (((Get-EventsDefinitions).Keys))
+            }
+        )]
+        [parameter(ParameterSetName = "Manual")]
+        [parameter(ParameterSetName = "DateManual")]
+        [parameter(ParameterSetName = "DateRange")][string] $Report,
+        [ArgumentCompleter(
+            {
+                param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+                (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
+            }
+        )]
+        [ValidateScript(
+            {
+                $_ -in (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
+            }
+        )]
+        [parameter(ParameterSetName = "DateRange")][string] $DatesRange
+        #>
     )
+
     DynamicParam {
         # Defines Report / Dates Range dynamically from HashTables and saved files
         $ParameterSetsAttributesDateManual = New-Object System.Management.Automation.ParameterAttribute
@@ -77,6 +106,7 @@ function Find-Events {
         $RuntimeParamDic.Add('DatesRange', $DatesRangeRuntimeParam)
         return $RuntimeParamDic
     }
+
     Process {
 
         #-NamedDataFilter @{'SubjectUserName' = $User; 'TargetUserName' = $User }
@@ -103,7 +133,7 @@ function Find-Events {
             }
             # Fixes Reports variable
             $Reports = foreach ($Report in $Definitions.Keys) {
-                if ($Definitions[$Report].Enabled -eq $true){
+                if ($Definitions[$Report].Enabled -eq $true) {
                     $Report
                 }
             }
