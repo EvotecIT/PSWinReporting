@@ -6,7 +6,8 @@ function Get-EventsTranslation {
         [Array] $EventIDs,
         [string] $EventsType
     )
-    # Filter out events that are not needed, leave only those that match EventID and EventLogName
+
+    <# Moved inside one loop, saving time, leaving it just in case
     $Events = foreach ($Event in $Events) {
         if ($Event.LogName -eq $EventsType) {
             if ($EventIDs -contains $Event.ID) {
@@ -14,30 +15,120 @@ function Get-EventsTranslation {
             }
         }
     }
+    #>
 
-    if ($EventsDefinition.Filter) {
-        # Filter is special, if there is just one object on the right side
-        # If there are more objects filter will pick all values on the right side and display them as required
+    if ($EventsDefinition.Filter.Count -gt 0) {
+        # Filter works by passing each event by filter.
+        # When first filter is passed, next filter only works on the limited output from first filter
+        # If first filter removes everything there's nothing left to deal with
+        # For example if there's just one  filter that will limit 60 events to 20 events
+        # Next filter is processed with only 20 events in place
+
+        # Let's take a look at following example
+        # That means (Providername -like 'Microsoft-Windows-Kernel-*' or 'ProviderName -like 'Microsoft-Windows-Kernel-*') -and (GatheredFrom -eq 'AD1')
+        #$Filter = @{
+        #    'ProviderName#Like' = 'Microsoft-Windows-Kernel-*', 'Event*'
+        #    'GatheredFrom'      = 'AD1'
+        #}
+
+        # This for example means (ObjectClass -eq 'GroupPolicyContainer') -and (AttributeLDAPDisplayName -eq 'cn' -or AttributeLDAPDisplayName -eq 'displayName')
         #Filter = @{
         #    'ObjectClass' = 'groupPolicyContainer'
         #    'AttributeLDAPDisplayName' = 'cn','displayName'
         #}
 
-        foreach ($Filter in $EventsDefinition.Filter.Keys) {
-            $Value = $EventsDefinition.Filter[$Filter]
-            $Events = foreach ($V in $Value) {
-                # $Events | Where-Object { $_.$Filter -eq $V }
+        foreach ($Entry in $EventsDefinition.Filter.Keys) {
+            $EveryFilter = $EventsDefinition.Filter[$Entry]
+            $StrippedFilter = $Entry -replace '#[0-9]{1,2}', ''
+            [Array] $Splitter = $StrippedFilter.Split('#')
+            if ($Splitter.Count -gt 1) {
+                $PropertyName = $Splitter[0]
+                $Operator = $Splitter[1]
+            } else {
+                $PropertyName = $StrippedFilter
+                $Operator = 'eq'
+            }
+            $Events = foreach ($V in $EveryFilter) {
                 foreach ($_ in $Events) {
-                    if ($_.$Filter -eq $V) {
-                        $_
+                    if ($Operator -eq 'eq') {
+                        if ($_.$PropertyName -eq $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'like') {
+                        if ($_.$PropertyName -like $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'ne') {
+                        if ($_.$PropertyName -ne $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'gt') {
+                        if ($_.$PropertyName -gt $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'lt') {
+                        if ($_.$PropertyName -lt $V) {
+                            $_
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+    if ($EventsDefinition.FilterOr.Count -gt 0) {
+        # FilterOr works by passing each event by filter. This means if you have 5 filters
+        # Each event will be verified whether it should stay or not.
+        # If none matches Event is discarded
+
+        $Events = foreach ($_ in $Events) {
+            foreach ($Entry in $EventsDefinition.FilterOr.Keys) {
+                $StrippedFilter = $Entry -replace '#[0-9]{1,2}', ''
+                [Array] $Splitter = $StrippedFilter.Split('#')
+                if ($Splitter.Count -gt 1) {
+                    $PropertyName = $Splitter[0]
+                    $Operator = $Splitter[1]
+                } else {
+                    $PropertyName = $StrippedFilter
+                    $Operator = 'eq'
+                }
+                $Value = $EventsDefinition.FilterOr[$Entry]
+                foreach ($V in $Value) {
+                    if ($Operator -eq 'eq') {
+                        if ($_.$PropertyName -eq $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'like') {
+                        if ($_.$PropertyName -like $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'ne') {
+                        if ($_.$PropertyName -ne $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'gt') {
+                        if ($_.$PropertyName -gt $V) {
+                            $_
+                        }
+                    } elseif ($Operator -eq 'lt') {
+                        if ($_.$PropertyName -lt $V) {
+                            $_
+                        }
                     }
                 }
             }
         }
     }
     $MyValue = foreach ($Event in $Events) {
+        # Filter out events that are not needed, leave only those that match EventID and EventLogName
+        if (($Event.LogName -eq $EventsType) -and ($Event.ID -in $EventIDs)) {
+            #Continue
+        } else {
+            # Skip
+            continue
+        }
         # $IgnoredFound = $false
-        $HashTable = @{ }
+        $HashTable = [ordered] @{ }
         foreach ($EventProperty in $Event.PSObject.Properties) {
 
             # $EventProperty.Name is value on the left side
@@ -86,19 +177,49 @@ function Get-EventsTranslation {
         # This overwrites values based on parameters. It's useful for cleanup or special cases.
         if ($null -ne $EventsDefinition.Overwrite) {
             foreach ($Entry in $EventsDefinition.Overwrite.Keys) {
-                $OverwriteObject = $EventsDefinition.Overwrite.$Entry
+                [Array] $OverwriteObject = $EventsDefinition.Overwrite.$Entry
                 # This allows for having multiple values in Overwrite by using #1 or #2 and so on.
-                $StrippedEntry = $Entry -replace '#[0-9]{1,2}', ''
+                $StrippedFilter = $Entry -replace '#[0-9]{1,2}', ''
+                [Array] $Splitter = $StrippedFilter.Split('#')
+                if ($Splitter.Count -gt 1) {
+                    $PropertyName = $Splitter[0]
+                    $Operator = $Splitter[1]
+                } else {
+                    $PropertyName = $StrippedFilter
+                    $Operator = 'eq'
+                }
                 if ($OverwriteObject.Count -eq 3) {
-                    if ($HashTable.($OverwriteObject[0]) -eq $OverwriteObject[1]) {
-                        $HashTable.$StrippedEntry = $OverwriteObject[2]
+                    if ($Operator -eq 'eq') {
+                        if ($HashTable[($OverwriteObject[0])] -eq $OverwriteObject[1]) {
+                            $HashTable[$PropertyName] = $OverwriteObject[2]
+                        }
+                    } elseif ($Operator -eq 'ne') {
+
+                    } elseif ($Operator -eq 'like') {
+
+                    } elseif ($Operator -eq 'gt') {
+
+                    } elseif ($Operator -eq 'lt') {
+
                     }
                 } elseif ($OverwriteObject.Count -eq 4) {
-                    if ($HashTable.($OverwriteObject[0]) -eq $OverwriteObject[1]) {
-                        $HashTable.$StrippedEntry = $OverwriteObject[2]
-                    } else {
-                        $HashTable.$StrippedEntry = $OverwriteObject[3]
+                    if ($Operator -eq 'eq') {
+                        if ($HashTable[($OverwriteObject[0])] -eq $OverwriteObject[1]) {
+                            $HashTable[$PropertyName] = $OverwriteObject[2]
+                        } else {
+                            $HashTable[$PropertyName] = $OverwriteObject[3]
+                        }
+                    } elseif ($Operator -eq 'ne') {
+
+                    } elseif ($Operator -eq 'like') {
+
+                    } elseif ($Operator -eq 'gt') {
+
+                    } elseif ($Operator -eq 'lt') {
+
                     }
+                } elseif ($OverwriteObject.Couint -eq 1) {
+                    $HashTable[$PropertyName] = $HashTable[($OverwriteObject[0])]
                 }
             }
         }
@@ -108,19 +229,52 @@ function Get-EventsTranslation {
         # For whatever reason you would need to do that.
         if ($null -ne $EventsDefinition.OverwriteByField) {
             foreach ($Entry in $EventsDefinition.OverwriteByField.Keys) {
-                $OverwriteObject = $EventsDefinition.OverwriteByField.$Entry
+                [Array] $OverwriteObject = $EventsDefinition.OverwriteByField.$Entry
                 # This allows for having multiple values in Overwrite by using #1 or #2 and so on.
-                $StrippedEntry = $Entry -replace '#[0-9]{1,2}', ''
+                $StrippedFilter = $Entry -replace '#[0-9]{1,2}', ''
+                [Array] $Splitter = $StrippedFilter.Split('#')
+                if ($Splitter.Count -gt 1) {
+                    $PropertyName = $Splitter[0]
+                    $Operator = $Splitter[1]
+                } else {
+                    $PropertyName = $StrippedFilter
+                    $Operator = 'eq'
+                }
+
                 if ($OverwriteObject.Count -eq 3) {
-                    if ($HashTable.($OverwriteObject[0]) -eq $OverwriteObject[1]) {
-                        $HashTable.$StrippedEntry = $HashTable.($OverwriteObject[2])
+                    if ($Operator -eq 'eq') {
+                        if ($HashTable[($OverwriteObject[0])] -eq $OverwriteObject[1]) {
+                            $HashTable[$PropertyName] = $HashTable[($OverwriteObject[2])]
+                        }
+                    } elseif ($Operator -eq 'ne') {
+                        if ($HashTable[($OverwriteObject[0])] -ne $OverwriteObject[1]) {
+                            $HashTable[$PropertyName] = $HashTable[($OverwriteObject[2])]
+                        }
+                    } elseif ($Operator -eq 'like') {
+
+                    } elseif ($Operator -eq 'gt') {
+
+                    } elseif ($Operator -eq 'lt') {
+
                     }
                 } elseif ($OverwriteObject.Count -eq 4) {
-                    if ($HashTable.($OverwriteObject[0]) -eq $OverwriteObject[1]) {
-                        $HashTable.$StrippedEntry = $HashTable.($OverwriteObject[2])
-                    } else {
-                        $HashTable.$StrippedEntry = $HashTable.($OverwriteObject[3])
+                    if ($Operator -eq 'eq') {
+                        if ($HashTable[($OverwriteObject[0])] -eq $OverwriteObject[1]) {
+                            $HashTable[$PropertyName] = $HashTable[($OverwriteObject[2])]
+                        } else {
+                            $HashTable[$PropertyName] = $HashTable[($OverwriteObject[3])]
+                        }
+                    } elseif ($Operator -eq 'ne') {
+
+                    } elseif ($Operator -eq 'like') {
+
+                    } elseif ($Operator -eq 'gt') {
+
+                    } elseif ($Operator -eq 'lt') {
+
                     }
+                } elseif ($OverwriteObject.Count -eq 1) {
+                    $HashTable[$PropertyName] = $HashTable[($OverwriteObject[0])]
                 }
             }
         }

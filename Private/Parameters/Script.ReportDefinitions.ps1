@@ -113,7 +113,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 5136, 5137, 5139, 5141
             LogName     = 'Security'
-            Filter      = @{
+            Filter      = [ordered] @{
                 'ObjectClass' = 'user'
             }
             Functions   = @{
@@ -180,7 +180,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled          = $true
             Events           = 5136, 5137, 5139, 5141
             LogName          = 'Security'
-            Filter           = @{
+            Filter           = [ordered] @{
                 'ObjectClass' = 'organizationalUnit'
             }
             Functions        = @{
@@ -204,7 +204,7 @@ $Script:ReportDefinitions = [ordered] @{
                 'GatheredFrom'             = 'Gathered From'
                 'GatheredLogName'          = 'Gathered LogName'
             }
-            Overwrite        = @{
+            Overwrite        = [ordered] @{
                 'Action Detail#1' = 'Action', 'A directory service object was created.', 'Organizational Unit Created'
                 'Action Detail#2' = 'Action', 'A directory service object was deleted.', 'Organizational Unit Deleted'
                 'Action Detail#3' = 'Action', 'A directory service object was moved.', 'Organizational Unit Moved'
@@ -215,7 +215,7 @@ $Script:ReportDefinitions = [ordered] @{
             # This Overwrite works in a way where you can swap one value with another value from another field within same Event
             # It's useful if you have an event that already has some fields used but empty and you wnat to utilize them
             # for some content
-            OverwriteByField = @{
+            OverwriteByField = [ordered] @{
                 'Organizational Unit' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
                 #'Field Changed'       = 'Action', 'A directory service object was moved.', ''
                 'Field Value'         = 'Action', 'A directory service object was moved.', 'NewObjectDN'
@@ -396,7 +396,7 @@ $Script:ReportDefinitions = [ordered] @{
             Events      = 4768
             LogName     = 'Security'
             IgnoreWords = @{ }
-            Functions   = @{
+            Functions   = [ordered] @{
                 'IpAddress' = 'Clean-IpAddress'
             }
             Fields      = [ordered] @{
@@ -452,7 +452,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 4798, 4799
             LogName     = 'Security'
-            IgnoreWords = @{
+            IgnoreWords = [ordered] @{
                 #'Who' = '*ANONYMOUS*'
             }
             Fields      = [ordered] @{
@@ -530,7 +530,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
-            Filter      = @{
+            Filter      = [ordered] @{
                 # Filter is special
                 # if there is just one object on the right side it will filter on that field
                 # if there are more objects filter will pick all values on the right side and display them (using AND)
@@ -569,7 +569,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
-            Filter      = @{
+            Filter      = [ordered] @{
                 # Filter is special, if there is just one object on the right side
                 # If there are more objects filter will pick all values on the right side and display them as required
                 'ObjectClass'              = 'groupPolicyContainer'
@@ -619,7 +619,7 @@ $Script:ReportDefinitions = [ordered] @{
             Enabled     = $true
             Events      = 5136, 5137, 5141
             LogName     = 'Security'
-            Filter      = @{
+            Filter      = [ordered] @{
                 # Filter is special, if there is just one object on the right side
                 # If there are more objects filter will pick all values on the right side and display them as required
                 'ObjectClass'              = 'groupPolicyContainer'
@@ -740,7 +740,7 @@ $Script:ReportDefinitions = [ordered] @{
             }
             SortBy      = 'When'
             IgnoreWords = @{ }
-            Overwrite   = @{
+            Overwrite   = [ordered] @{
                 # Allows to overwrite field content on the fly, either only on IF or IF ELSE
                 # IF <VALUE> -eq <VALUE> THEN <VALUE> (3 VALUES)
                 # IF <VALUE> -eq <VALUE> THEN <VALUE> ELSE <VALUE> (4 VALUES)
@@ -782,17 +782,6 @@ $Script:ReportDefinitions = [ordered] @{
                 # If you need to use IF multiple times for same field use spaces to distinguish HashTable Key.
 
                 'Backup Path' = 'Backup Path', '', 'N/A'
-            }
-        }
-    }
-    ADEventsReboots                     = [ordered]@{
-        Enabled = $false
-        Events  = @{
-            Enabled     = $true
-            Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
-            LogName     = 'System'
-            IgnoreWords = @{
-
             }
         }
     }
@@ -858,78 +847,90 @@ $Script:ReportDefinitions = [ordered] @{
             Events      = 6008
             LogName     = 'System'
             IgnoreWords = @{ }
-            Fields      = @{
+
+            Fields      = [ordered] @{
                 "Computer"        = "Computer"
-                "Date"            = "Date"
+                'Date'            = 'When'
                 "MachineName"     = "ObjectAffected"
-                "NoNameB3"        = "EventLevel"
-                "NoNameB4"        = "EventActionDetails"
-                "EventAction"     = "EventAction"
+                "EventAction"     = "Action"
+                #"NoNameB4"        = "EventLevel"
+                "Message"         = "ActionDetails"
+                "NoNameA1"        = "ActionDetailsDate"
+                "NoNameA0"        = "ActionDetailsTime"
+                #"NoNameB7"        = "EventSource"
                 "ID"              = "Event ID"
                 "RecordID"        = "Record ID"
                 "GatheredFrom"    = "Gathered From"
                 "GatheredLogName" = "Gathered LogName"
             }
+            #>
+
             Overwrite   = @{
-                "EventAction#1" = "Event ID" , 6008, "System Crash"
+                "Action#1" = "Event ID" , 6008, "System Crash"
             }
         }
     }
     "OSStartupShutdownCrash"            = [ordered]@{
         Enabled = $false
-        Events  = @{
-            Enabled     = $true
-            Events      = 12, 13, 41, 4608, 4621
-            LogName     = 'System'
-            IgnoreWords = @{ }
-            Fields      = @{
-                "Computer"        = "Computer"
-                "Date"            = "Date"
-                "MachineName"     = "ObjectAffected"
-                "NoNameB4"        = "EventLevel"
-                "NoNameB5"        = "EventActionDetails"
-                "EventAction"     = "EventAction"
-                "NoNameB7"        = "EventSource"
-                "ID"              = "Event ID"
-                "RecordID"        = "Record ID"
-                "GatheredFrom"    = "Gathered From"
-                "GatheredLogName" = "Gathered LogName"
+        Events  = [ordered] @{
+            Enabled          = $true
+            Events           = 12, 13, 41, 4608, 4621, 6008
+            #Events           = 13
+            LogName          = 'System'
+            IgnoreWords      = @{ }
+
+            Filter           = [ordered] @{
+                # This means each separate line is treated with AND and each entry in one line is treated with OR
+
+                'ProviderName' = 'Microsoft-Windows-Kernel-General', 'EventLog'
+                #'GatheredFrom' = 'AD1'
+                #'NoNameA4' = '66','65'
+                #'LevelDisplayName' = 'Warning'
+                #'ProviderName' = 'Microsoft-Windows-Kernel-General', 'EventLog'
+                #'ProviderName1'     = 'EventLog'
+                # Filter is special, if there is just one object on the right side
+                # If there are more objects filter will pick all values on the right side and display them as required
+                # 'ObjectClass'              = 'groupPolicyContainer'
+                #'OperationType'            = 'Value Added'
+                #  'AttributeLDAPDisplayName' = 'versionNumber'
             }
-            Overwrite   = @{
-                "EventAction#1" = "Event ID", 12, "System Start"
-                "EventAction#2" = "Event ID", 13, "System Shutdown"
-                "EventAction#3" = "Event ID", 41, "System Dirty Reboot"
-                "EventAction#4" = "Event ID", 4608, "Windows is starting up"
-                "EventAction#5" = "Event ID", 4621, "Administrator recovered system from CrashOnAuditFail"
+            FilterOr         = [ordered] @{
+                #'ProviderName#ne' = 'Microsoft-Windows-Kernel-General', 'EventLog'
+                #'ProviderName#Like' = 'Microsoft-Windows*'
+                #'ProviderName#2#Like' =
+                #'Id' = '13'
             }
-        }
-    }
-    "OSStartupShutdownDetailed"         = [ordered]@{
-        Enabled = $false
-        Events  = @{
-            Enabled     = $true
-            Events      = 1001,1074
-            LogName     = 'System'
-            IgnoreWords = @{ }
-            Fields      = @{
-                "Computer"        = "Computer"
-                "StartTime"       = "Date"
-                "MachineName"     = "ObjectAffected"
-                "UserId"          = "SubjectUserSid"
-                "NoNameB3"        = "EventLevel"
-                "NoNameB4"        = "ShutdownDescription"
-                "NoNameB6"        = "EventActionDetails"
-                "EventAction"     = "EventAction"
-                "NoNameB5"        = "ShutdownCode"
-                "NoNameB7"        = "ShutdownComment"
-                "ID"              = "Event ID"
-                "RecordID"        = "Record ID"
-                "GatheredFrom"    = "Gathered From"
-                "GatheredLogName" = "Gathered LogName"
+
+            Fields           = [ordered] @{
+                "Computer"              = "Computer"
+                'Date'                  = 'When'
+                "MachineName"           = "ObjectAffected"
+                "EventAction"           = "Action"
+                #"NoNameB4"        = "EventLevel"
+                "Message"               = "ActionDetails"
+                "NoNameA1"              = "ActionDetailsDate"
+                "NoNameA0"              = "ActionDetailsTime"
+                "ActionDetailsDateTime" = "ActionDetailsDateTime"
+                #"NoNameB7"        = "EventSource"
+                "ID"                    = "Event ID"
+                "RecordID"              = "Record ID"
+                "GatheredFrom"          = "Gathered From"
+                "GatheredLogName"       = "Gathered LogName"
             }
-            Overwrite   = @{
-                "EventAction#1" = "Event ID", 1001, "Application crash"
-                "EventAction#2" = "Event ID", 1074, "Shutdown initiated"
+
+            Overwrite        = [ordered] @{
+                "Action#1" = "Event ID", 12, "System Start"
+                "Action#2" = "Event ID", 13, "System Shutdown"
+                "Action#3" = "Event ID", 41, "System Dirty Reboot"
+                "Action#4" = "Event ID", 4608, "Windows is starting up"
+                "Action#5" = "Event ID", 4621, "Administrator recovered system from CrashOnAuditFail"
+                "Action#6" = "Event ID", 6008, "System Crash"
+
+            }
+            OverwriteByField = @{
+                # If StartTime -ne $null use StartTime in ActionDetailsDateTime
+                'ActionDetailsDateTime#1#ne' = 'StartTime', $null, 'StartTime'
+                'ActionDetailsDateTime#2#ne' = '#text', $null, '#text'
             }
         }
     }
