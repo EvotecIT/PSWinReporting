@@ -1,11 +1,11 @@
 # Collects all named paramters (all others end up in $Args)
 param(
-    $eventid = 4733,
-    $eventRecordID = 5844301,
+    $eventid = 4722,
+    $eventRecordID = 11372340,
     $eventChannel,
     $eventSeverity
 )
-Import-Module PSWinReportingV2 -Force
+Import-Module .\PSWinReportingV2.psd1 -Force
 
 $Options = @{
     Logging       = @{
@@ -16,51 +16,62 @@ $Options = @{
     }
     Notifications = @{
         Email          = @{
-            Enabled    = $false
-            Formatting = @{
-                CompanyBranding        = @{
-                    Logo   = 'https://evotec.xyz/wp-content/uploads/2015/05/Logo-evotec-012.png'
-                    Width  = '200'
-                    Height = ''
-                    Link   = 'https://evotec.xyz'
-                    Inline = $false
-                }
-                FontFamily             = 'Calibri Light'
-                FontSize               = '9pt'
-                FontHeadingFamily      = 'Calibri Light'
-                FontHeadingSize        = '12pt'
+            Enabled = $true
+            AsHTML  = @{
+                Enabled = $true
+                Formatting = @{
+                    CompanyBranding        = @{
+                        Logo   = 'https://evotec.xyz/wp-content/uploads/2015/05/Logo-evotec-012.png'
+                        Width  = '200'
+                        Height = ''
+                        Link   = 'https://evotec.xyz'
+                        Inline = $false
+                    }
+                    FontFamily             = 'Calibri Light'
+                    FontSize               = '9pt'
+                    FontHeadingFamily      = 'Calibri Light'
+                    FontHeadingSize        = '12pt'
 
-                FontTableHeadingFamily = 'Calibri Light'
-                FontTableHeadingSize   = '9pt'
+                    FontTableHeadingFamily = 'Calibri Light'
+                    FontTableHeadingSize   = '9pt'
 
-                FontTableDataFamily    = 'Calibri Light'
-                FontTableDataSize      = '9pt'
+                    FontTableDataFamily    = 'Calibri Light'
+                    FontTableDataSize      = '9pt'
 
-                Colors                 = @{
-                    # case sensitive
-                    Red   = 'removed', 'deleted', 'locked out', 'lockouts', 'disabled', 'Domain Admins', 'was cleared'
-                    Blue  = 'changed', 'changes', 'change', 'reset'
-                    Green = 'added', 'enabled', 'unlocked', 'created'
-                }
-                Styles                 = @{
-                    # case sensitive
-                    B = 'status', 'Domain Admins', 'Enterprise Admins', 'Schema Admins', 'was cleared', 'lockouts' # BOLD
-                    I = '' # Italian
-                    U = 'status'# Underline
-                }
-                Links                  = @{
+                    Colors                 = @{
+                        # case sensitive
+                        Red   = 'removed', 'deleted', 'locked out', 'lockouts', 'disabled', 'Domain Admins', 'was cleared'
+                        Blue  = 'changed', 'changes', 'change', 'reset'
+                        Green = 'added', 'enabled', 'unlocked', 'created'
+                    }
+                    Styles                 = @{
+                        # case sensitive
+                        B = 'status', 'Domain Admins', 'Enterprise Admins', 'Schema Admins', 'was cleared', 'lockouts' # BOLD
+                        I = '' # Italian
+                        U = 'status'# Underline
+                    }
+                    Links                  = @{
 
+                    }
                 }
             }
-            Default    = @{
+            Default = @{
                 Parameters = @{
+                    <#
                     From             = 'reminder@domain.pl'
-                    To               = 'przemyslaw.klys@evo.pl' #Arriva-se@support.domain.pl
+                    To               = 'przemyslaw.klys@evo.pl'
                     CC               = ''
                     BCC              = ''
                     ReplyTo          = ''
                     Server           = 'mail.pl'
-                    Password         = ''
+                    #>
+                    From             = '***REMOVED***'
+                    To               = 'przemyslaw.klys@evotec.pl'
+                    CC               = ''
+                    BCC              = ''
+                    ReplyTo          = ''
+                    Server           = '***REMOVED***'
+                    Password         = ***REMOVED***
                     PasswordAsSecure = $false
                     PasswordFromFile = $false
                     Port             = '587'
@@ -71,15 +82,15 @@ $Options = @{
                     Priority         = 'Low'
                 }
             }
-            High       = @{
+            High    = @{
                 Parameters = @{
-                    From             = 'reminder@domain.pl'
-                    To               = 'przemyslaw.klys@evo.pl' #Arriva-se@support.domain.pl
+                    From             = '***REMOVED***'
+                    To               = 'przemyslaw.klys@evotec.pl'
                     CC               = ''
                     BCC              = ''
                     ReplyTo          = ''
-                    Server           = 'mail.pl'
-                    Password         = ''
+                    Server           = '***REMOVED***'
+                    Password         = ***REMOVED***
                     PasswordAsSecure = $false
                     PasswordFromFile = $false
                     Port             = '587'
@@ -92,7 +103,7 @@ $Options = @{
             }
         }
         MicrosoftTeams = [ordered] @{
-            Enabled = $true
+            Enabled = $false
 
             Default = @{
                 Uri           = 'https://outlook.office.com/webhook/a5c7'
@@ -134,7 +145,7 @@ $Options = @{
             }
         }
         Slack          = [ordered] @{
-            Enabled = $true
+            Enabled = $false
 
             Default = @{
                 Channel       = '#general'
@@ -157,7 +168,7 @@ $Options = @{
             }
         }
         Discord        = [ordered] @{
-            Enabled = $true
+            Enabled = $false
 
             Default = @{
                 Uri           = 'https://discordapp.com/api/webhooks/51'
@@ -428,7 +439,7 @@ $DefinitionsAD = [ordered] @{
             }
             SortBy      = 'Record ID'
             Descending  = $false
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     OrganizationalUnitChangesDetailed = [ordered] @{
@@ -479,7 +490,7 @@ $DefinitionsAD = [ordered] @{
             }
             SortBy           = 'Record ID'
             Descending       = $false
-            IgnoreWords      = @{}
+            IgnoreWords      = @{ }
         }
     }
     UserStatus                        = @{
@@ -488,7 +499,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4722, 4725, 4767, 4723, 4724, 4726
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
@@ -510,7 +521,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4740
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'         = 'Domain Controller'
                 'Action'           = 'Action'
@@ -552,7 +563,7 @@ $DefinitionsAD = [ordered] @{
                 'GatheredFrom'       = 'Gathered From'
                 'GatheredLogName'    = 'Gathered LogName'
             }
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     UserUnlocked                      = @{
@@ -563,8 +574,8 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4767
             LogName     = 'Security'
-            IgnoreWords = @{}
-            Functions   = @{}
+            IgnoreWords = @{ }
+            Functions   = @{ }
             Fields      = [ordered] @{
                 'Computer'         = 'Domain Controller'
                 'Action'           = 'Action'
@@ -621,7 +632,7 @@ $DefinitionsAD = [ordered] @{
                 'GatheredFrom'        = 'Gathered From'
                 'GatheredLogName'     = 'Gathered LogName'
             }
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     ComputerDeleted                   = @{
@@ -630,7 +641,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4743 # deleted
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
@@ -652,7 +663,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $false
             Events      = 4768
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Functions   = @{
                 'IpAddress' = 'Clean-IpAddress'
             }
@@ -1008,7 +1019,7 @@ $DefinitionsAD = [ordered] @{
                 #'Test' = 'Test'
             }
             SortBy      = 'When'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Overwrite   = @{
                 # Allows to overwrite field content on the fly, either only on IF or IF ELSE
                 # IF <VALUE> -eq <VALUE> THEN <VALUE> (3 VALUES)
@@ -1028,7 +1039,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 104
             LogName     = 'System'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'     = 'Domain Controller'
                 'Action'       = 'Action'
@@ -1054,22 +1065,11 @@ $DefinitionsAD = [ordered] @{
             }
         }
     }
-    EventsReboots                     = @{
-        Enabled = $false
-        Events  = @{
-            Enabled     = $true
-            Events      = 1001, 1018, 1, 12, 13, 42, 41, 109, 1, 6005, 6006, 6008, 6013
-            LogName     = 'System'
-            IgnoreWords = @{
-
-            }
-        }
-    }
 }
 $Target = [ordered]@{
     Servers           = [ordered] @{
         Enabled = $true
-        Server1 = @{ ComputerName = 'EVO1'; LogName = 'ForwardedEvents' }
+        Server1 = @{ ComputerName = 'EVOWIN'; LogName = 'ForwardedEvents' }
         # Server2 = 'AD1', 'AD2'
         #Server3 = 'AD1.ad.evo.xyz'
     }
