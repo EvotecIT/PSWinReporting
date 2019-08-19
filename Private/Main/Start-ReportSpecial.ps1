@@ -46,9 +46,6 @@ function Start-ReportSpecial {
         $HtmlBody = Set-EmailReportBranding -FormattingParameters $Options.AsHTML.Formatting
         $HtmlBody += Set-EmailReportDetails -FormattingParameters $Options.AsHTML.Formatting -Dates $Dates -Warnings $Warnings
 
-        #$EmailBody += Export-ReportToHTML -Report $Definitions.ReportsAD.Custom.ServersData.Enabled -ReportTable $ServersAD -ReportTableText 'Following AD servers were detected in forest'
-        #$EmailBody += Export-ReportToHTML -Report $Definitions.ReportsAD.Custom.FilesData.Enabled -ReportTable $TableEventLogFiles -ReportTableText 'Following files have been processed for events'
-        #$EmailBody += Export-ReportToHTML -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportTable $EventLogTable -ReportTableText 'Following event log sizes were reported'
         foreach ($ReportName in $Definitions.Keys) {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName -ToLowerCase
             $HtmlBody += Export-ReportToHTML -Report $Definitions.$ReportName.Enabled -ReportTable $Results.$ReportName -ReportTableText "Following $ReportNameTitle happened"
@@ -63,7 +60,6 @@ function Start-ReportSpecial {
         $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $Options.AsHTML.Formatting -ConfigurationParameters $Options -Logger $Logger -SkipNewLines
 
         $HTML = $HtmlHead + $HtmlBody
-        #$ReportHTMLPath = Set-ReportFileName -ReportOptions $Options -ReportExtension 'html'
         $ReportHTMLPath = Set-ReportFile -Path $Options.AsHTML.Path -FileNamePattern $Options.AsHTML.FilePattern -DateFormat $Options.AsHTML.DateFormat
         try {
             $HTML | Out-File -Encoding Unicode -FilePath $ReportHTMLPath -ErrorAction Stop
@@ -113,9 +109,6 @@ function Start-ReportSpecial {
     if ($Options.AsExcel.Enabled) {
         $Logger.AddInfoRecord('Prepare Microsoft Excel (.XLSX) file with Events')
         $ReportFilePathXLSX = Set-ReportFile -Path $Options.AsExcel.Path -FileNamePattern $Options.AsExcel.FilePattern -DateFormat $Options.AsExcel.DateFormat
-        # $ReportFilePathXLSX = Set-ReportFileName -ReportOptions $Options -ReportExtension "xlsx"
-        #Export-ReportToXLSX -Report $Definitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName "Processed Servers" -ReportTable $ServersAD
-        #Export-ReportToXLSX -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $Options -ReportFilePath $ReportFilePathXLSX -ReportName "Event log sizes" -ReportTable $EventLogTable
 
         foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
             $ReportNameTitle = Format-AddSpaceToSentence -Text $ReportName
@@ -129,8 +122,6 @@ function Start-ReportSpecial {
     if ($Options.AsCSV.Enabled) {
         $ReportFilePathCSV = @()
         $Logger.AddInfoRecord('Prepare CSV files with Events')
-        #$ReportFilePathCSV += Export-ReportToCSV -Report $Definitions.ReportsAD.Custom.ServersData.Enabled -ReportOptions $Options -Extension "csv" -ReportName "ReportServers" -ReportTable $ServersAD
-        #$ReportFilePathCSV += Export-ReportToCSV -Report $Definitions.ReportsAD.Custom.EventLogSize.Enabled -ReportOptions $Options -Extension "csv" -ReportName "ReportEventLogSize" -ReportTable $EventLogTable
 
         foreach ($ReportName in $Definitions.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
             $ReportFilePathCSV += Export-ToCSV -Report $Definitions.$ReportName.Enabled -ReportName $ReportName -ReportTable $Results.$ReportName -Path $Options.AsCSV.Path -FilePattern $Options.AsCSV.FilePattern -DateFormat $Options.AsCSV.DateFormat
@@ -183,7 +174,7 @@ function Start-ReportSpecial {
         }
     }
 
-    # $AttachedReports = $AttachedReports |  Where-Object { $_ } | Sort-Object -Unique
+
     $AttachedReports = $AttachedReports | Sort-Object -Unique
 
     # Sending email - finalizing package
