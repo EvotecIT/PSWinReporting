@@ -33,10 +33,10 @@ $Configuration = @{
             ProjectUri      = 'https://github.com/EvotecIT/PSWinReporting'
             #ReleaseNotes = ''
             RequiredModules = @(
-                @{ ModuleName = 'PSEventViewer'; ModuleVersion = "1.0.6"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
-                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "0.0.81"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
-                @{ ModuleName = 'PSWriteExcel'; ModuleVersion = "0.1.2"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
-                @{ ModuleName = 'PSWriteHTML'; ModuleVersion = '0.0.44'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
+                @{ ModuleName = 'PSEventViewer'; RequiredVersion = "1.0.6"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
+                @{ ModuleName = 'PSSharedGoods'; RequiredVersion = "0.0.86"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
+                @{ ModuleName = 'PSWriteExcel'; RequiredVersion = "0.1.2"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
+                @{ ModuleName = 'PSWriteHTML'; RequiredVersion = '0.0.48'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
             )
         }
     }

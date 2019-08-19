@@ -49,6 +49,13 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
     - Fix for Target not having anything to run
     - Fix for Files being passed even thou - not existing
     - Fix for Reports variable not being available during non-standard runs
+  - Removed definitions
+    - [x] ADEventsReboots
+  - Added definitions
+    - [x] OSStartupShutdownCrash
+    - [x] OSCrash
+    - [x] NetworkAccessAuthenticationPolicy
+  - Changed .psd1 required modules to have specific required version. Less likely things will be broken during update of other modules.
 
 - 2.0.11 - 2019-06-15
   - Find-Events
@@ -71,7 +78,6 @@ PSWinReporting comes with predefined, built-in reports. Those are for `Find-Even
 - [x] ADComputerChangesDetailed
 - [x] ADComputerCreatedChanged
 - [x] ADComputerDeleted
-- [ ] EventsReboots - least prepared report. Not really useful at this moment.
 - [x] ADGroupChanges
 - [x] ADGroupChangesDetailed
 - [x] ADGroupCreateDelete
@@ -88,6 +94,9 @@ PSWinReporting comes with predefined, built-in reports. Those are for `Find-Even
 - [x] ADUserStatus
 - [x] ADUserUnlocked
 - [X] ADOrganizationalUnitChangesDetailed (added in 2.0.10)
+- [x] OSStartupShutdownCrash (added in 2.0.12) - covers startup, shutdown and crashes - probably needs some work on the engine later on to allow field merging
+- [x] OSCrash (added in 2.0.12) - covers system crashes
+- [x] NetworkAccessAuthenticationPolicy (added in 2.0.12) - covers authorizations approved/denied for WIFI and ETHERNET
 
 ### Built-in Reporting Times
 
