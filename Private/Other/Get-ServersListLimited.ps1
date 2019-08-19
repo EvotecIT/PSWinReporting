@@ -12,13 +12,11 @@ function Get-ServersListLimited {
     if ($Target.Servers.Enabled) {
         if (-not $Quiet) { $Logger.AddInfoRecord("Preparing servers list - defined list") }
         [Array] $Servers = foreach ($Server in $Target.Servers.Keys | Where-Object { $_ -ne 'Enabled' }) {
-
             if ($Target.Servers.$Server -is [System.Collections.IDictionary]) {
                 [ordered] @{
                     ComputerName = $Target.Servers.$Server.ComputerName
                     LogName      = $Target.Servers.$Server.LogName
                 }
-
             } elseif ($Target.Servers.$Server -is [Array] -or $Target.Servers.$Server -is [string]) {
                 $Target.Servers.$Server
             }
