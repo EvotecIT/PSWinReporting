@@ -57,16 +57,8 @@ $Options = @{
             }
             Default = @{
                 Parameters = @{
-                    <#
-                    From             = 'reminder@domain.pl'
-                    To               = 'przemyslaw.klys@evo.pl'
-                    CC               = ''
-                    BCC              = ''
-                    ReplyTo          = ''
-                    Server           = 'mail.pl'
-                    #>
-                    From             = ''
-                    To               = ''
+                    From             = 'notifications@domain.pl'
+                    To               = 'przemyslaw.klys@domain.pl'
                     CC               = ''
                     BCC              = ''
                     ReplyTo          = ''
@@ -84,8 +76,8 @@ $Options = @{
             }
             High    = @{
                 Parameters = @{
-                    From             = ''
-                    To               = ''
+                    From             = 'notifications@domain.pl'
+                    To               = 'przemyslaw.klys@domain.pl'
                     CC               = ''
                     BCC              = ''
                     ReplyTo          = ''
