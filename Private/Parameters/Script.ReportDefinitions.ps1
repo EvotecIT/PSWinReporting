@@ -13,7 +13,6 @@ $Script:ReportDefinitions = [ordered] @{
             SqlTableCreate        = $true
             SqlTableAlterIfNeeded = $false # if table mapping is defined doesn't do anything
             SqlCheckBeforeInsert  = 'EventRecordID', 'DomainController' # Based on column name
-
             SqlTableMapping       = [ordered] @{
                 'Event ID'               = 'EventID,[int]'
                 'Who'                    = 'EventWho'

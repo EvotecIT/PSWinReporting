@@ -7,10 +7,8 @@ $Configuration = @{
 
         DirectoryProjects = 'C:\Support\GitHub'
         DirectoryModules  = "$Env:USERPROFILE\Documents\WindowsPowerShell\Modules"
-
         FunctionsToExport = 'Public'
         AliasesToExport   = 'Public'
-
         Manifest          = @{
             Path            = "C:\Support\GitHub\PSWinReportingV2\PSWinReportingV2.psd1"
             # Script module or binary module file associated with this manifest.
@@ -141,5 +139,4 @@ $Configuration = @{
         }
     }
 }
-
 New-PrepareModule -Configuration $Configuration -Verbose
