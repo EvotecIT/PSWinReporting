@@ -88,7 +88,7 @@ function Send-Notificaton {
                     Write-Color @script:WriteParameters -Text "[i] Discord output: ", $Data -Color White, Yellow
                 }
                 if ($Options.Notifications.MSSQL.Enabled) {
-                    $SqlQuery = Send-SqlInsert -Object $Events -SqlSettings $Options.Notifications.MSSQL -Verbose:$Options.Debug.Verbose
+                    $SqlQuery = Send-SqlInsert -Object $Event -SqlSettings $Options.Notifications.MSSQL -Verbose:$Options.Debug.Verbose
                     foreach ($Query in $SqlQuery) {
                         Write-Color @script:WriteParameters -Text '[i] ', 'MS SQL Output: ', $Query -Color White, White, Yellow
                     }
@@ -102,17 +102,11 @@ function Send-Notificaton {
                         $HtmlBody = Set-EmailReportBranding -FormattingParameters $Options.Notifications.Email.AsHTML.Formatting
                         #$HtmlBody += Set-EmailReportDetails -FormattingParameters $Options.AsHTML.Formatting -Dates $Dates -Warnings $Warnings
 
-                        $HtmlBody += Export-ReportToHTML -Report $true -ReportTable $Events -ReportTableText "Quick notification event"
-
-                        # Do Cleanup of Emails
-                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
-                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
-                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
-                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
-                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
+                        $HtmlBody += Export-ReportToHTML -Report $true -ReportTable $Event -ReportTableText "Quick notification event"
                         $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $Options.Notifications.Email.AsHTML.Formatting -ConfigurationParameters $Options -Logger $Logger -SkipNewLines
 
                         $HTML = $HtmlHead + $HtmlBody
+                        $EmailBody = $HTML
                         #$ReportHTMLPath = Set-ReportFileName -ReportOptions $Options -ReportExtension 'html'
                         $ReportHTMLPath = Set-ReportFile -Path $Env:TEMP -FileNamePattern 'PSWinReporting.html' -DateFormat $null
                         try {
