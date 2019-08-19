@@ -6,7 +6,6 @@ param(
 
 Import-Module .\PSWinReportingV2.psd1 -Force
 
-
 ## Define reports
 $DefinitionsAD = [ordered] @{
     ADUserChanges                       = @{
