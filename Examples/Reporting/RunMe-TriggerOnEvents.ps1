@@ -65,39 +65,39 @@ $Options = @{
                     ReplyTo          = ''
                     Server           = 'mail.pl'
                     #>
-                    From             = 'reminder@euvic.pl'
-                    To               = 'przemyslaw.klys@evotec.pl'
+                    From             = ''
+                    To               = ''
                     CC               = ''
                     BCC              = ''
                     ReplyTo          = ''
-                    Server           = 'mail.euvic.pl'
-                    Password         = 'StaryKonikMocnoSpi7711'
-                    PasswordAsSecure = $false
-                    PasswordFromFile = $false
-                    Port             = '587'
-                    Login            = 'rpassword'
-                    EnableSSL        = 1
-                    Encoding         = 'Unicode'
-                    Subject          = '[Reporting Evotec] Event Changes for period <<DateFrom>> to <<DateTo>>'
-                    Priority         = 'Low'
-                }
-            }
-            High    = @{
-                Parameters = @{
-                    From             = 'reminder@euvic.pl'
-                    To               = 'przemyslaw.klys@evotec.pl'
-                    CC               = ''
-                    BCC              = ''
-                    ReplyTo          = ''
-                    Server           = 'mail.euvic.pl'
-                    Password         = 'StaryKonikMocnoSpi7711'
+                    Server           = ''
+                    Password         = ''
                     PasswordAsSecure = $false
                     PasswordFromFile = $false
                     Port             = '587'
                     Login            = ''
                     EnableSSL        = 1
                     Encoding         = 'Unicode'
-                    Subject          = '[Reporting Evotec] Event Changes for period <<DateFrom>> to <<DateTo>>'
+                    Subject          = '[Reporting Evotec] Event notification on trigger'
+                    Priority         = 'Low'
+                }
+            }
+            High    = @{
+                Parameters = @{
+                    From             = ''
+                    To               = ''
+                    CC               = ''
+                    BCC              = ''
+                    ReplyTo          = ''
+                    Server           = ''
+                    Password         = ''
+                    PasswordAsSecure = $false
+                    PasswordFromFile = $false
+                    Port             = '587'
+                    Login            = ''
+                    EnableSSL        = 1
+                    Encoding         = 'Unicode'
+                    Subject          = '[Reporting Evotec] Event notification on trigger'
                     Priority         = 'High'
                 }
             }

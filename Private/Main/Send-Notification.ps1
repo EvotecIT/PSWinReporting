@@ -122,7 +122,7 @@ function Send-Notificaton {
                             $Logger.AddErrorRecord("Error: $ErrorMessage")
                         }
 
-                        $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
+                        $TemporarySubject = $Options.Notifications.Email.$Priority.Parameters.Subject #-replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
                         $Logger.AddInfoRecord('Sending email with reports')
                         if ($Options.Notifications.Email.AsHTML.Formatting.CompanyBranding.Inline) {
                             $SendMail = Send-Email -EmailParameters $Options.Notifications.Email.$Priority.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.Notifications.Email.AsHTML.Formatting.CompanyBranding.Logo } -Logger $Logger
@@ -134,7 +134,7 @@ function Send-Notificaton {
                         } else {
                             $Logger.AddInfoRecord("Error sending message: $($SendMail.Error)")
                         }
-                        #Remove-ReportsFiles -KeepReports $false -ReportFiles
+                        Remove-ReportsFiles -KeepReports $false -ReportFiles $ReportHTMLPath
                     }
                 }
             }
