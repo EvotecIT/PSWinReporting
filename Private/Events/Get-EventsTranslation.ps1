@@ -6,17 +6,6 @@ function Get-EventsTranslation {
         [Array] $EventIDs,
         [string] $EventsType
     )
-
-    <# Moved inside one loop, saving time, leaving it just in case
-    $Events = foreach ($Event in $Events) {
-        if ($Event.LogName -eq $EventsType) {
-            if ($EventIDs -contains $Event.ID) {
-                $Event
-            }
-        }
-    }
-    #>
-
     if ($EventsDefinition.Filter.Count -gt 0) {
         # Filter works by passing each event by filter.
         # When first filter is passed, next filter only works on the limited output from first filter
