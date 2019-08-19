@@ -5,7 +5,7 @@ function Send-Notificaton {
         [Parameter(Mandatory = $true)][alias('ReportOptions')][System.Collections.IDictionary] $Options,
         [string] $Priority = 'Default'
     )
-    Begin {}
+    Begin { }
     Process {
         if ($Events -ne $null) {
             foreach ($Event in $Events) {
@@ -44,9 +44,9 @@ function Send-Notificaton {
                         -Title "$MessageTitle - $ActivityTitle"  `
                         -Fields $FactsSlack `
                         -Fallback $ActivityTitle |
-                        New-SlackMessage -Channel $SlackChannel `
-                        -IconEmoji :bomb:  |
-                        Send-SlackMessage -Uri $Slack.Uri -Verbose
+                    New-SlackMessage -Channel $SlackChannel `
+                        -IconEmoji :bomb: |
+                    Send-SlackMessage -Uri $Slack.Uri -Verbose
 
                     Write-Color @script:WriteParameters -Text "[i] Slack output: ", $Data -Color White, Yellow
                 }
@@ -94,54 +94,57 @@ function Send-Notificaton {
                     }
                 }
                 if ($Options.Notifications.Email.Enabled) {
-                    # Prepare email body
-                    $Logger.AddInfoRecord('Prepare email head and body')
-                    $HtmlHead = Set-EmailHead -FormattingOptions $Options.AsHTML.Formatting
-                    $HtmlBody = Set-EmailReportBranding -FormattingParameters $Options.AsHTML.Formatting
-                    #$HtmlBody += Set-EmailReportDetails -FormattingParameters $Options.AsHTML.Formatting -Dates $Dates -Warnings $Warnings
 
-                    $HtmlBody += Export-ReportToHTML -Report $true-ReportTable $Events -ReportTableText "Quick notification event"
+                    if ($Options.Notifications.Email.AsHTML.Enabled) {
+                        # Prepare email body
+                        $Logger.AddInfoRecord('Prepare email head and body')
+                        $HtmlHead = Set-EmailHead -FormattingOptions $Options.Notifications.Email.AsHTML.Formatting
+                        $HtmlBody = Set-EmailReportBranding -FormattingParameters $Options.Notifications.Email.AsHTML.Formatting
+                        #$HtmlBody += Set-EmailReportDetails -FormattingParameters $Options.AsHTML.Formatting -Dates $Dates -Warnings $Warnings
 
-                    # Do Cleanup of Emails
-                    #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
-                    #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
-                    #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
-                    #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
-                    #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
-                    $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $Options.AsHTML.Formatting -ConfigurationParameters $Options -Logger $Logger -SkipNewLines
+                        $HtmlBody += Export-ReportToHTML -Report $true -ReportTable $Events -ReportTableText "Quick notification event"
 
-                    $HTML = $HtmlHead + $HtmlBody
-                    #$ReportHTMLPath = Set-ReportFileName -ReportOptions $Options -ReportExtension 'html'
-                    $ReportHTMLPath = Set-ReportFile -Path $Env:TEMP -FileNamePattern 'PSWinReporting.html' -DateFormat $null
-                    try {
-                        $HTML | Out-File -Encoding Unicode -FilePath $ReportHTMLPath -ErrorAction Stop
-                        $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
-                        if ($Options.SendMail.Attach.HTML) {
-                            $AttachHTML += $ReportHTMLPath
-                            $AttachedReports += $ReportHTMLPath
+                        # Do Cleanup of Emails
+                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateDays**' -ReplaceWith $time.Elapsed.Days
+                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateHours**' -ReplaceWith $time.Elapsed.Hours
+                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMinutes**' -ReplaceWith $time.Elapsed.Minutes
+                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateSeconds**' -ReplaceWith $time.Elapsed.Seconds
+                        #$HtmlBody = Set-EmailWordReplacements -Body $HtmlBody -Replace '**TimeToGenerateMilliseconds**' -ReplaceWith $time.Elapsed.Milliseconds
+                        $HtmlBody = Set-EmailFormatting -Template $HtmlBody -FormattingParameters $Options.Notifications.Email.AsHTML.Formatting -ConfigurationParameters $Options -Logger $Logger -SkipNewLines
+
+                        $HTML = $HtmlHead + $HtmlBody
+                        #$ReportHTMLPath = Set-ReportFileName -ReportOptions $Options -ReportExtension 'html'
+                        $ReportHTMLPath = Set-ReportFile -Path $Env:TEMP -FileNamePattern 'PSWinReporting.html' -DateFormat $null
+                        try {
+                            $HTML | Out-File -Encoding Unicode -FilePath $ReportHTMLPath -ErrorAction Stop
+                            $Logger.AddInfoRecord("Saving report to file: $ReportHTMLPath")
+                            if ($Options.SendMail.Attach.HTML) {
+                                $AttachHTML += $ReportHTMLPath
+                                $AttachedReports += $ReportHTMLPath
+                            }
+                        } catch {
+                            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+                            $Logger.AddErrorRecord("Error saving file $ReportHTMLPath.")
+                            $Logger.AddErrorRecord("Error: $ErrorMessage")
                         }
-                    } catch {
-                        $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-                        $Logger.AddErrorRecord("Error saving file $ReportHTMLPath.")
-                        $Logger.AddErrorRecord("Error: $ErrorMessage")
-                    }
 
-                    $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
-                    $Logger.AddInfoRecord('Sending email with reports')
-                    if ($Options.Notifications.Email.Formatting.CompanyBranding.Inline) {
-                        $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.AsHTML.Formatting.CompanyBranding.Logo} -Logger $Logger
-                    } else {
-                        $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -Logger $Logger
+                        $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
+                        $Logger.AddInfoRecord('Sending email with reports')
+                        if ($Options.Notifications.Email.AsHTML.Formatting.CompanyBranding.Inline) {
+                            $SendMail = Send-Email -EmailParameters $Options.Notifications.Email.$Priority.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.Notifications.Email.AsHTML.Formatting.CompanyBranding.Logo } -Logger $Logger
+                        } else {
+                            $SendMail = Send-Email -EmailParameters $Options.Notifications.Email.$Priority.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -Logger $Logger
+                        }
+                        if ($SendMail.Status) {
+                            $Logger.AddInfoRecord('Email successfully sent')
+                        } else {
+                            $Logger.AddInfoRecord("Error sending message: $($SendMail.Error)")
+                        }
+                        #Remove-ReportsFiles -KeepReports $false -ReportFiles
                     }
-                    if ($SendMail.Status) {
-                        $Logger.AddInfoRecord('Email successfully sent')
-                    } else {
-                        $Logger.AddInfoRecord("Error sending message: $($SendMail.Error)")
-                    }
-                    Remove-ReportFiles -KeepReports $false -ReportFiles
                 }
             }
         }
     }
-    End {}
+    End { }
 }
