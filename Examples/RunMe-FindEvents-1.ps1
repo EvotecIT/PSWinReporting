@@ -1,6 +1,6 @@
 Import-Module .\PSWinReportingV2.psd1 -Force
 
-$Events = Find-Events -Report ADUserLogon -DatesRange PastHour -Servers 'AD1' -Verbose
+$Events = Find-Events -DatesRange PastHour -Servers 'AD1' -Verbose
 $Events | Format-Table -AutoSize
 
 $Events = Find-Events -Report ADGroupMembershipChanges -DatesRange PastHour -Servers 'AD1' -Verbose
