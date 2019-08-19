@@ -56,6 +56,7 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
     - [x] OSCrash
     - [x] NetworkAccessAuthenticationPolicy
   - Changed .psd1 required modules to have specific required version. Less likely things will be broken during update of other modules.
+  - Fixes for Reporting based on ForwardedEvents
 
 - 2.0.11 - 2019-06-15
   - Find-Events
