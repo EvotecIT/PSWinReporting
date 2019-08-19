@@ -1,7 +1,7 @@
 ﻿function Get-EventsDefinitions {
     [CmdLetBinding()]
     param(
-        $Definitions
+        [System.Collections.IDictionary] $Definitions
     )
     [string] $ConfigurationPath = "$Env:ALLUSERSPROFILE\Evotec\PSWinReporting\Definitions"
     try {
@@ -14,7 +14,7 @@
     if ($null -ne $Files) {
         try {
             foreach ($File in $Files) {
-                $AllDefinitions += Import-CliXML -LiteralPath $File.FullName
+                $AllDefinitions += Import-Clixml -LiteralPath $File.FullName
             }
             if ($Definitions) {
                 $AllDefinitions += $Definitions
