@@ -33,6 +33,7 @@ function Get-ServersListLimited {
     }
     if ($ExtendedInput.Count -gt 1) {
         $ExtendedInput
+
     } else {
         , $ExtendedInput
     }
