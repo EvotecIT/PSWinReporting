@@ -44,7 +44,7 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 
 ### Changelog
 
-- 2.0.12 - Unreleased
+- 2.0.13 - 2019-08.30
   - Find-Events
     - Fix for Target not having anything to run
     - Fix for Files being passed even thou - not existing
@@ -57,6 +57,9 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
     - [x] NetworkAccessAuthenticationPolicy
   - Changed .psd1 required modules to have specific required version. Less likely things will be broken during update of other modules.
   - Fixes for Reporting based on ForwardedEvents
+
+- 2.0.12 - 2019-07-09
+  - Small fixes
 
 - 2.0.11 - 2019-06-15
   - Find-Events

@@ -14,7 +14,7 @@ $Configuration = @{
             # Script module or binary module file associated with this manifest.
             RootModule      = 'PSWinReporting.psm1'
             # Version number of this module.
-            ModuleVersion   = '2.0.12'
+            ModuleVersion   = '2.0.13'
             # ID used to uniquely identify this module
             GUID            = 'ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe'
             # Author of this module
@@ -32,9 +32,9 @@ $Configuration = @{
             #ReleaseNotes = ''
             RequiredModules = @(
                 @{ ModuleName = 'PSEventViewer'; RequiredVersion = "1.0.6"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
-                @{ ModuleName = 'PSSharedGoods'; RequiredVersion = "0.0.86"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
+                @{ ModuleName = 'PSSharedGoods'; RequiredVersion = "0.0.91"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
                 @{ ModuleName = 'PSWriteExcel'; RequiredVersion = "0.1.2"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
-                @{ ModuleName = 'PSWriteHTML'; RequiredVersion = '0.0.48'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
+                @{ ModuleName = 'PSWriteHTML'; RequiredVersion = '0.0.50'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
             )
         }
     }
@@ -133,7 +133,7 @@ $Configuration = @{
         }
         BuildDocumentation = $false
         PublishModule      = @{
-            Enabled      = $false
+            Enabled      = $true
             Prerelease   = ''
             RequireForce = $false
         }
