@@ -1,6 +1,6 @@
-﻿
+
 <p align="center">
-  <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/v/PSWinReportingV2.svg"></a>
+  <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><a href="https://opencollective.com/evotec" alt="Financial Contributors on Open Collective"><img src="https://opencollective.com/evotec/all/badge.svg?label=financial+contributors" /></a> <img src="https://img.shields.io/powershellgallery/v/PSWinReportingV2.svg"></a>
   <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/vpre/PSWinReportingV2.svg?label=powershell%20gallery%20preview&colorB=yellow"></a>
   <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/github/license/EvotecIT/PSWinReporting.svg"></a>
 </p>
@@ -175,3 +175,34 @@ Features:
 ### Example - Slack
 
 ![image](https://evotec.xyz/wp-content/uploads/2018/09/img_5b9e7041638f5.png)
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/EvotecIT/PSWinReporting/graphs/contributors"><img src="https://opencollective.com/evotec/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/evotec/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/evotec"><img src="https://opencollective.com/evotec/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/evotec/contribute)]
+
+<a href="https://opencollective.com/evotec/organization/0/website"><img src="https://opencollective.com/evotec/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/1/website"><img src="https://opencollective.com/evotec/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/2/website"><img src="https://opencollective.com/evotec/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/3/website"><img src="https://opencollective.com/evotec/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/4/website"><img src="https://opencollective.com/evotec/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/5/website"><img src="https://opencollective.com/evotec/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/6/website"><img src="https://opencollective.com/evotec/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/7/website"><img src="https://opencollective.com/evotec/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/8/website"><img src="https://opencollective.com/evotec/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/evotec/organization/9/website"><img src="https://opencollective.com/evotec/organization/9/avatar.svg"></a>
+
