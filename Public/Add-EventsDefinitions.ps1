@@ -6,7 +6,7 @@
         [switch] $Force
     )
     # This checks if new definition can be merged.
-    $AllDefinitions = Get-EventsDefintions -Definitions $Definitions
+    $AllDefinitions = Get-EventsDefinitions -Definitions $Definitions
     if ($null -ne $AllDefinitions) {
         [string] $ConfigurationPath = "$Env:ALLUSERSPROFILE\Evotec\PSWinReporting\Definitions"
         $null = New-Item -Type Directory -Path $ConfigurationPath -Force

@@ -42,6 +42,9 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 
 ### Changelog
 
+- 2.0.16 - 12.01.2019
+  - Fix for typos
+
 - 2.0.15 - 11.01.2020
   - Simplified, enhanced `New-WinSubscriptionTemplates` (see examples)
   - Some engine fixes
