@@ -54,7 +54,7 @@
     RequiredModules   = @(@{ModuleName = 'PSEventViewer'; GUID = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc'; ModuleVersion = '1.0.12'; }, 
         @{ModuleName = 'PSSharedGoods'; GUID = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe'; ModuleVersion = '0.0.115'; }, 
         @{ModuleName = 'PSWriteExcel'; GUID = '82232c6a-27f1-435d-a496-929f7221334b'; ModuleVersion = '0.1.4'; }, 
-        @{ModuleName = 'PSWriteHTML'; GUID = 'a7bdf640-f5cb-4acf-9de0-365b322d245c'; ModuleVersion = '0.0.72'; })
+        @{ModuleName = 'PSWriteHTML'; GUID = 'a7bdf640-f5cb-4acf-9de0-365b322d245c'; ModuleVersion = '0.0.71'; })
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
