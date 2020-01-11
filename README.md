@@ -20,6 +20,10 @@ This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to
 
 ## ChangeLog
 
+- 1.8.1.4 - 11.01.2020
+  - Update of dependencies
+  - Fix for SQL issues
+
 - 1.8.1.2 - 22.05.2019
   - Fixed problem with Template for Forwarding Collector
 - 1.8.1.1 - 19.03.2019

@@ -55,13 +55,12 @@ function Start-RescanEvents {
 
     $EventLogFiles = Get-CongfigurationEvents -Sections $ReportOptions.RescanFiles
 
-    $Events = @()
     $Dates = Get-ChoosenDates -ReportTimes $ReportTimes
-    foreach ($Date in $Dates) {
+    $Events = foreach ($Date in $Dates) {
         foreach ($File in $EventLogFiles) {
             Write-Color @script:WriteParameters '[i] Scanning file ', $File, ' for events between ', $Dates.DateFrom, ' and ', $Dates.DateTo  -Color White, Yellow, White, Green, White, Green
-            $Events += Get-Events -Path $File -ID $EventsToProcessSecurity -LogName 'Security' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
-            $Events += Get-Events -Path $File -ID $EventsToProcessSystem -LogName 'System' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
+            Get-Events -Path $File -ID $EventsToProcessSecurity -LogName 'Security' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
+            Get-Events -Path $File -ID $EventsToProcessSystem -LogName 'System' -Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
         }
     }
     ### USER EVENTS STARTS ###

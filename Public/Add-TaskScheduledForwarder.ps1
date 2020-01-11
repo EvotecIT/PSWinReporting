@@ -9,8 +9,8 @@ function Add-TaskScheduledForwarder {
         [string[]]$Argument = @('-windowstyle hidden', 'C:\Support\GitHub\PSWinReporting\Examples\Trigger.ps1', "-EventID $(eventID) -eventRecordID '$(eventRecordID)' -eventChannel '$(eventChannel)' -eventSeverity $(eventSeverity)")
 
     )
-    $XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-ScheduledTask.xml"
-    #$xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-ScheduledTask.xml"
+    #$XmlTemplate = "$((get-item $PSScriptRoot).Parent.FullName)\Templates\Template-ScheduledTask.xml"
+    $xmlTemplate = "$($($(Get-Module -ListAvailable PSWinReporting)[0]).ModuleBase)\Templates\Template-ScheduledTask.xml"
     if (Test-Path $xmlTemplate) {
         Write-Color 'Found Template ', $xmlTemplate -Color White, Yellow
         if (Test-Path $xmlTemplate) {

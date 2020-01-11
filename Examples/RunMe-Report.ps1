@@ -213,7 +213,7 @@ $ReportDefinitions = @{
                 ExportToSql      = @{
                     Use                   = $true
                     SqlServer             = 'EVOWIN'
-                    SqlDatabase           = 'SSA-E18'
+                    SqlDatabase           = 'SSAE18'
                     SqlTable              = 'dbo.[EventsUserStatus]'
                     # Left side is data in PSWinReporting. Right Side is ColumnName in SQL
                     # Changing makes sense only for right side...
@@ -343,7 +343,7 @@ $ReportDefinitions = @{
         }
         Custom            = @{
             EventLogSize = @{
-                Enabled          = $true
+                Enabled          = $false
                 EnabledSqlGlobal = $false
                 Logs             = 'Security', 'Application', 'System'
                 SortBy           = ''
