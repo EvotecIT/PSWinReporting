@@ -222,7 +222,6 @@ function Find-Events {
 
         $Results = Get-EventsOutput -Definitions $Definitions -AllEvents $AllEvents -Quiet:$Quiet
         if ($Results.Count -eq 1) {
-            #if ((Get-ObjectCount -Object $Reports) -eq 1) {
             # if there is only one report to return, return Array
             $Results[$Reports]
         } else {

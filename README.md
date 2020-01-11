@@ -1,5 +1,4 @@
-﻿
-<p align="center">
+﻿<p align="center">
   <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/v/PSWinReportingV2.svg"></a>
   <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/vpre/PSWinReportingV2.svg?label=powershell%20gallery%20preview&colorB=yellow"></a>
   <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/github/license/EvotecIT/PSWinReporting.svg"></a>
@@ -9,7 +8,8 @@
   <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/p/PSWinReportingV2.svg"></a>
   <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/github/languages/top/evotecit/PSWinReporting.svg"></a>
   <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/github/languages/code-size/evotecit/PSWinReporting.svg"></a>
-  <a href="https://github.com/EvotecIT/PSWinReporting"><img src="https://img.shields.io/powershellgallery/dt/PSWinReporting.svg"></a>
+  <a href="https://www.powershellgallery.com/packages/PSWinReporting"><img src="https://img.shields.io/powershellgallery/dt/PSWinReporting.svg?label=downloads%20PSWinReporting"></a>
+  <a href="https://www.powershellgallery.com/packages/PSWinReportingV2"><img src="https://img.shields.io/powershellgallery/dt/PSWinReportingv2?label=downloads%20PSWinReportingV2"></a>
 </p>
 
 <p align="center">
@@ -17,7 +17,6 @@
   <a href="https://evotec.xyz/hub"><img src="https://img.shields.io/badge/Blog-evotec.xyz-2A6496.svg"></a>
   <a href="https://www.linkedin.com/in/pklys"><img src="https://img.shields.io/badge/LinkedIn-pklys-0077B5.svg?logo=LinkedIn"></a>
 </p>
-
 
 # PSWinReporting
 
@@ -41,10 +40,16 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 - [x] Ability to monitor any servers, for any events using simple to use schema
 - [x] Ability to target multiple servers, computers or files at the same time
 
-
 ### Changelog
 
-- 2.0.13 - 2019-08.30
+- 2.0.15 - Unreleased
+  - Simplified, enhanced `New-WinSubscriptionTemplates` (see examples)
+  - Some engine fixes
+
+- 2.0.14 - 11.09.2019
+  - Fixed New-WinSubscriptionTemplates
+
+- 2.0.13 - 30.08.2019
   - Find-Events
     - Fix for Target not having anything to run
     - Fix for Files being passed even thou - not existing
@@ -58,15 +63,15 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
   - Changed .psd1 required modules to have specific required version. Less likely things will be broken during update of other modules.
   - Fixes for Reporting based on ForwardedEvents
 
-- 2.0.12 - 2019-07-09
+- 2.0.12 - 09.07.2019
   - Small fixes
 
-- 2.0.11 - 2019-06-15
+- 2.0.11 - 15.06..2019
   - Find-Events
     - Fix for Group Policy Events
     - Fix for Subevents within Events overwriting values
     - Fix for output when using Definitions/Times/Servers (1 definition returns an Array, 2 or more returns hashtable of Arrays)
-- 2.0.10 - 2019-05-06
+- 2.0.10 - 06.05.2019
   - Fixes for reporting
   - Adding subscriptions
 

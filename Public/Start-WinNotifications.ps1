@@ -16,7 +16,7 @@ function Start-WinNotifications {
     }
     $Logger = Get-Logger @LoggerParameters
 
-    $Results = @{}
+    $Results = @{ }
 
     $Logger.AddInfoRecord("Executed Trigger for ID: $eventid and RecordID: $eventRecordID")
     $Logger.AddInfoRecord("Using Microsoft Teams: $($Options.Notifications.MicrosoftTeams.Enabled)")
@@ -81,7 +81,7 @@ function Start-WinNotifications {
             #$ReportNameTitle = Format-AddSpaceToSentence -Text $Report -ToLowerCase
             $Logger.AddInfoRecord("Running $Report")
             $TimeExecution = Start-TimeLog
-            foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport'  }) {
+            foreach ($SubReport in $Definitions.$Report.Keys | Where-Object { $_ -notcontains 'Enabled', 'SqlExport' }) {
                 if ($Definitions.$Report.$SubReport.Enabled) {
                     $Logger.AddInfoRecord("Running $Report with subsection $SubReport")
                     [string] $EventsType = $Definitions.$Report.$SubReport.LogName
@@ -101,8 +101,8 @@ function Start-WinNotifications {
         if ($Results.$ReportName) {
             if ($null -ne $Definitions.$ReportName.Priority) {
                 foreach ($Priority in $Definitions.$ReportName.Priority.Keys) {
-                    $MyValue = Find-EventsTo -Prioritize -Events $Results.$ReportName -DataSet  $Definitions.$ReportName.Priority.$Priority
-                    if ((Get-ObjectCount -Object $MyValue) -gt 0) {
+                    [Array] $MyValue = Find-EventsTo -Prioritize -Events $Results.$ReportName -DataSet  $Definitions.$ReportName.Priority.$Priority
+                    if ($MyValue.Count) {
                         $Logger.AddInfoRecord("Sending event with $Priority priority.")
                         Send-Notificaton -Events $MyValue -Options $Options -Priority $Priority
                         $FoundPriorityEvent = $true

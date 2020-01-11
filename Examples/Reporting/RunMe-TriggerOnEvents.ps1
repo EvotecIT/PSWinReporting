@@ -5,7 +5,8 @@ param(
     $eventChannel,
     $eventSeverity
 )
-Import-Module .\PSWinReportingV2.psd1 -Force
+
+Import-Module "$PSScriptRoot\..\..\PSWinReportingV2.psd1" -Force
 
 $Options = @{
     Logging       = @{

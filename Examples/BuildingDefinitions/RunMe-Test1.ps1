@@ -119,9 +119,4 @@ $Times = @{
 }
 
 $Mm = Find-Events -Definitions $ReportDefinitions -Times $Times -Target $Target
-$mm | Out-HtmlView -ScrollX -DisablePaging
-
-return
-foreach ($_ in $MM) {
-    ($_.PSObject.Properties.Name).Count
-}
+$mm | Out-HtmlView -ScrollX -DisablePaging -AllProperties

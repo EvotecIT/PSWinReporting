@@ -23,7 +23,7 @@ function Start-ReportSpecial {
         }
     }
     # Scan all events and get everything at once
-    $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
+    [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
 
     $Logger.AddInfoRecord("Found $($AllEvents.Count) events.")
     foreach ($Errors in $AllErrors) {
@@ -31,9 +31,9 @@ function Start-ReportSpecial {
     }
 
     if ($Options.RemoveDuplicates.Enabled) {
-        $Logger.AddInfoRecord("Removing Duplicates from all events. Current list contains $(Get-ObjectCount -Object $AllEvents) events")
+        $Logger.AddInfoRecord("Removing Duplicates from all events. Current list contains $($AllEvents.Count) events")
         $AllEvents = Remove-DuplicateObjects -Object $AllEvents -Property $Options.RemoveDuplicates.Properties
-        $Logger.AddInfoRecord("Removed Duplicates Following $(Get-ObjectCount -Object $AllEvents) events will be analyzed further")
+        $Logger.AddInfoRecord("Removed Duplicates - following $($AllEvents.Count) events will be analyzed further")
     }
 
     $Results = Get-EventsOutput -Definitions $Definitions -AllEvents $AllEvents
@@ -191,7 +191,7 @@ function Start-ReportSpecial {
         $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
         $Logger.AddInfoRecord('Sending email with reports')
         if ($Options.AsHTML.Formatting.CompanyBranding.Inline) {
-            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.AsHTML.Formatting.CompanyBranding.Logo} -Logger $Logger
+            $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.AsHTML.Formatting.CompanyBranding.Logo } -Logger $Logger
         } else {
             $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -Logger $Logger
         }

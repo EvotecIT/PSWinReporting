@@ -1,7 +1,7 @@
 ﻿Import-Module .\PSWinReportingV2.psd1 -Force
 
 $ReportDefinitions = [ordered] @{
-    "OSStartupShutdownDetailed"         = [ordered]@{
+    "OSStartupShutdownDetailed" = [ordered]@{
         Enabled = $true
         Events  = @{
             Enabled     = $true
@@ -122,9 +122,3 @@ $Times = @{
 
 $Mm = Find-Events -Definitions $ReportDefinitions -Times $Times -Target $Target
 $mm | Out-HtmlView -AllProperties -ScrollX -DisablePaging
-
-#| ft -a
-return
-foreach ($_ in $MM) {
-    ($_.PSObject.Properties.Name).Count
-}

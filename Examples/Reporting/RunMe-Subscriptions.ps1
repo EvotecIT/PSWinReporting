@@ -1,5 +1,4 @@
-Import-Module ..\PSWinReportingV2.psd1 -Force
-Import-Module PSSharedGoods #-Force
+Import-Module "$PSScriptRoot\..\PSWinReportingV2.psd1" -Force
 
 $DefinitionsAD = [ordered] @{
     UserChanges                       = @{
@@ -173,7 +172,7 @@ $DefinitionsAD = [ordered] @{
             }
             SortBy      = 'Record ID'
             Descending  = $false
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     OrganizationalUnitChangesDetailed = [ordered] @{
@@ -224,7 +223,7 @@ $DefinitionsAD = [ordered] @{
             }
             SortBy           = 'Record ID'
             Descending       = $false
-            IgnoreWords      = @{}
+            IgnoreWords      = @{ }
         }
     }
     UserStatus                        = @{
@@ -233,7 +232,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4722, 4725, 4767, 4723, 4724, 4726
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
@@ -255,7 +254,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4740
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'         = 'Domain Controller'
                 'Action'           = 'Action'
@@ -297,7 +296,7 @@ $DefinitionsAD = [ordered] @{
                 'GatheredFrom'       = 'Gathered From'
                 'GatheredLogName'    = 'Gathered LogName'
             }
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     UserUnlocked                      = @{
@@ -308,8 +307,8 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4767
             LogName     = 'Security'
-            IgnoreWords = @{}
-            Functions   = @{}
+            IgnoreWords = @{ }
+            Functions   = @{ }
             Fields      = [ordered] @{
                 'Computer'         = 'Domain Controller'
                 'Action'           = 'Action'
@@ -366,7 +365,7 @@ $DefinitionsAD = [ordered] @{
                 'GatheredFrom'        = 'Gathered From'
                 'GatheredLogName'     = 'Gathered LogName'
             }
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
         }
     }
     ComputerDeleted                   = @{
@@ -375,7 +374,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 4743 # deleted
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'        = 'Domain Controller'
                 'Action'          = 'Action'
@@ -397,7 +396,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $false
             Events      = 4768
             LogName     = 'Security'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Functions   = @{
                 'IpAddress' = 'Clean-IpAddress'
             }
@@ -741,7 +740,7 @@ $DefinitionsAD = [ordered] @{
                 #'Test' = 'Test'
             }
             SortBy      = 'When'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Overwrite   = @{
                 # Allows to overwrite field content on the fly, either only on IF or IF ELSE
                 # IF <VALUE> -eq <VALUE> THEN <VALUE> (3 VALUES)
@@ -761,7 +760,7 @@ $DefinitionsAD = [ordered] @{
             Enabled     = $true
             Events      = 104
             LogName     = 'System'
-            IgnoreWords = @{}
+            IgnoreWords = @{ }
             Fields      = [ordered] @{
                 'Computer'     = 'Domain Controller'
                 'Action'       = 'Action'
@@ -802,13 +801,13 @@ $DefinitionsAD = [ordered] @{
 
 $Target = [ordered]@{
     Servers           = [ordered] @{
-        Enabled = $true
+        Enabled = $false
         # Server1 = @{ ComputerName = 'EVO1'; LogName = 'ForwardedEvents' }
         #Server2 = 'AD1', 'AD2'
         Server3 = 'AD1.ad.evotec.xyz', 'AD2'
     }
     DomainControllers = [ordered] @{
-        Enabled = $false
+        Enabled = $true
     }
     LocalFiles        = [ordered] @{
         Enabled     = $false
@@ -830,4 +829,4 @@ $LoggerParameters = @{
 #>
 
 Start-WinSubscriptionService #-LoggerParameters $LoggerParameters
-New-WinSubscriptionTemplates -Definitions $DefinitionsAD -Target $Target -AddTemplates #-LoggerParameters $LoggerParameters -AddTemplates
+New-WinSubscriptionTemplates -Target $Target -AddTemplates -Definitions $DefinitionsAD #-LoggerParameters $LoggerParameters -AddTemplates

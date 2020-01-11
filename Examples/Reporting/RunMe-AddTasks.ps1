@@ -1,5 +1,4 @@
-Import-Module .\PSWinReportingV2.psd1 -Force
-Import-Module PSSharedGoods
+Import-Module "$PSScriptRoot\..\..\PSWinReportingV2.psd1" -Force
 
 $TaskName = 'ForwardedEvents'
 $TaskPath = '\Event Viewer Tasks\'
