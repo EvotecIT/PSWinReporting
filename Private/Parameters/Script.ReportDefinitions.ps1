@@ -933,4 +933,6 @@ $Script:ReportDefinitions = [ordered] @{
             }
         }
     }
+    LdapBindingsDetails                 = $LdapBindingsDetails
+    LdapBindingsSummary                 = $LdapBindingsSummary
 }

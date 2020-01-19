@@ -42,6 +42,10 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 
 ### Changelog
 
+- 2.0.17 - 19.01.2019
+  - Added LdapBindingsDetails
+  - Added LdapBindingsSummary
+
 - 2.0.16 - 12.01.2019
   - Fix for typos
 

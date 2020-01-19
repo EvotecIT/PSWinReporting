@@ -12,7 +12,7 @@ $Configuration = @{
 
         Manifest          = @{
             # Version number of this module.
-            ModuleVersion   = '2.0.16'
+            ModuleVersion   = '2.0.17'
             # ID used to uniquely identify this module
             GUID            = 'ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe'
             # Author of this module
@@ -32,9 +32,9 @@ $Configuration = @{
             #ReleaseNotes = ''
             RequiredModules = @(
                 @{ ModuleName = 'PSEventViewer'; ModuleVersion = "1.0.12"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
-                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "0.0.115"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
+                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "0.0.119"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
                 @{ ModuleName = 'PSWriteExcel'; ModuleVersion = "0.1.4"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
-                @{ ModuleName = 'PSWriteHTML'; ModuleVersion = '0.0.71'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
+                @{ ModuleName = 'PSWriteHTML'; ModuleVersion = '0.0.72'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
             )
         }
     }
