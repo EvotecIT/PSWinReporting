@@ -32,7 +32,7 @@ $Configuration = @{
             #ReleaseNotes = ''
             RequiredModules = @(
                 @{ ModuleName = 'PSEventViewer'; ModuleVersion = "1.0.12"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
-                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "0.0.119"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
+                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "0.0.121"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
                 @{ ModuleName = 'PSWriteExcel'; ModuleVersion = "0.1.4"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
                 @{ ModuleName = 'PSWriteHTML'; ModuleVersion = '0.0.72'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
             )
