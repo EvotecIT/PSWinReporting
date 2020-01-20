@@ -12,7 +12,7 @@ $Configuration = @{
 
         Manifest          = @{
             # Version number of this module.
-            ModuleVersion   = '2.0.17'
+            ModuleVersion   = '2.0.18'
             # ID used to uniquely identify this module
             GUID            = 'ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe'
             # Author of this module
@@ -138,7 +138,7 @@ $Configuration = @{
         BuildModule        = @{
             Enable       = $true
             Merge        = $true
-            MergeMissing = $false
+            MergeMissing = $true
             Releases     = $true
         }
         BuildDocumentation = $false
