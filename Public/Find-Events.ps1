@@ -108,7 +108,13 @@ function Find-Events {
     }
 
     Process {
-
+        # This prevents duplication of reports on second script run
+        foreach ($Report in $Script:ReportDefinitions.Keys) {
+            $Script:ReportDefinitions[$Report].Enabled = $false
+        }
+        foreach ($Time in $Script:ReportTimes.Keys) {
+            $Script:ReportTimes[$Time].Enabled = $false
+        }
         #-NamedDataFilter @{'SubjectUserName' = $User; 'TargetUserName' = $User }
 
         $ExecutionTime = Start-TimeLog

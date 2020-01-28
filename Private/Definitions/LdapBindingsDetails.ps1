@@ -1,5 +1,5 @@
 ﻿$LdapBindingsDetails         = @{
-    Enabled = $true
+    Enabled = $false
     Events  = @{
         Enabled     = $true
         Events      = 2889
