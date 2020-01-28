@@ -42,6 +42,10 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 
 ### Changelog
 
+- 2.0.19 - 28.01.2020
+  - Fix for DatesRanges using cached values
+  - Fix for Ldap* reports always running even when not requested
+
 - 2.0.18 - 20.01.2020
   - Fix for detecting forest/domains
 
