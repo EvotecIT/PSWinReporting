@@ -18,27 +18,20 @@ function Send-Notificaton {
                 $Slack = Get-NotificationParameters -Type 'Slack' -Notifications $Options.Notifications.Slack -ActivityTitle $ActivityTitle -Priority $Priority
                 $Discord = Get-NotificationParameters -Type 'Discord' -Notifications $Options.Notifications.Discord -ActivityTitle $ActivityTitle -Priority $Priority
 
-                $FactsSlack = @()
-                $FactsTeams = @()
-                $FactsDiscord = @()
-                foreach ($Property in $event.PSObject.Properties) {
-                    if ($null -ne $Property.Value -and $Property.Value -ne '') {
-                        if ($Property.Name -eq 'When') {
-                            $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
-                            $FactsSlack += @{ title = $Property.Name; value = $Property.Value.DateTime; short = $true }
-                            $FactsDiscord += New-DiscordFact -Name $Property.Name -Value $Property.Value.DateTime -Inline $true
-                        } else {
-                            $FactsTeams += New-TeamsFact -Name $Property.Name -Value $Property.Value
-                            $FactsSlack += @{ title = $Property.Name; value = $Property.Value; short = $true }
-                            $FactsDiscord += New-DiscordFact -Name $Property.Name -Value $Property.Value -Inline $true
-                        }
-                    }
-                }
-
                 # Slack Notifications
                 if ($Options.Notifications.Slack.Enabled) {
                     $SlackChannel = $Options.Notifications.Slack.$Priority.Channel
                     $SlackColor = ConvertFrom-Color -Color $Slack.Color
+
+                    $FactsSlack = foreach ($Property in $event.PSObject.Properties) {
+                        if ($null -ne $Property.Value -and $Property.Value -ne '') {
+                            if ($Property.Name -eq 'When') {
+                                @{ title = $Property.Name; value = $Property.Value.DateTime; short = $true }
+                            } else {
+                                @{ title = $Property.Name; value = $Property.Value; short = $true }
+                            }
+                        }
+                    }
 
                     $Data = New-SlackMessageAttachment -Color $SlackColor `
                         -Title "$MessageTitle - $ActivityTitle"  `
@@ -52,6 +45,16 @@ function Send-Notificaton {
                 }
                 # Microsoft Teams Nofications
                 if ($Options.Notifications.MicrosoftTeams.Enabled) {
+
+                    $FactsTeams = foreach ($Property in $event.PSObject.Properties) {
+                        if ($null -ne $Property.Value -and $Property.Value -ne '') {
+                            if ($Property.Name -eq 'When') {
+                                New-TeamsFact -Name $Property.Name -Value $Property.Value.DateTime
+                            } else {
+                                New-TeamsFact -Name $Property.Name -Value $Property.Value
+                            }
+                        }
+                    }
 
                     $Section1 = New-TeamsSection `
                         -ActivityTitle $ActivityTitle `
@@ -71,6 +74,16 @@ function Send-Notificaton {
                 # Discord Notifications
                 if ($Options.Notifications.Discord.Enabled) {
                     $Thumbnail = New-DiscordImage -Url $Discord.ActivityImageLink
+
+                    $FactsDiscord = foreach ($Property in $event.PSObject.Properties) {
+                        if ($null -ne $Property.Value -and $Property.Value -ne '') {
+                            if ($Property.Name -eq 'When') {
+                                New-DiscordFact -Name $Property.Name -Value $Property.Value.DateTime -Inline $true
+                            } else {
+                                New-DiscordFact -Name $Property.Name -Value $Property.Value -Inline $true
+                            }
+                        }
+                    }
 
                     $Section1 = New-DiscordSection `
                         -Title $ActivityTitle `
