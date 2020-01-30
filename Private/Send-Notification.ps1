@@ -13,13 +13,13 @@ function Send-Notificaton {
                 $MessageTitle = 'Active Directory Changes'
                 [string] $ActivityTitle = $($Event.Action).Trim()
                 if ($ActivityTitle -like '*added*') {
-                    $Color = [RGBColors]::Green
+                    $Color = 'Green'
                     $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
                 } elseif ($ActivityTitle -like '*remove*') {
-                    $Color = [RGBColors]::Red
+                    $Color = 'Red'
                     $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
                 } else {
-                    $Color = [RGBColors]::Yellow
+                    $Color = 'Yellow'
                     $ActivityImageLink = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
                 }
 
@@ -44,9 +44,9 @@ function Send-Notificaton {
                     -Title "$MessageTitle - $ActivityTitle"  `
                     -Fields $FactsSlack `
                     -Fallback 'Your client is bad' |
-                    New-SlackMessage -Channel $ReportOptions.Notifications.Slack.Channel `
+                New-SlackMessage -Channel $ReportOptions.Notifications.Slack.Channel `
                     -IconEmoji :bomb: |
-                    Send-SlackMessage -Uri $ReportOptions.Notifications.Slack.URI
+                Send-SlackMessage -Uri $ReportOptions.Notifications.Slack.URI
 
                 Write-Color @script:WriteParameters -Text "[i] Slack output: ", $Data -Color White, Yellow
             }
@@ -81,6 +81,6 @@ function Send-Notificaton {
                 }
             }
         }
-    
+
     }
 }
