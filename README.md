@@ -20,7 +20,7 @@
 
 # PSWinReporting
 
-**PSWinReporting** is a little PowerShell module that solves the problem of monitoring and reading **Windows Events**. It allows you to set up monitoring of **Domain Controllers** (and from **2.X** any other servers) for events that happen on them. By default, it comes with **built-in Active Directory** events supports, but since **2.0** you can configure it to monitor anything. You can set up reporting on any types of events and have emails delivered with a summary of hourly, daily, weekly, monthly or quarterly changes. It also supports sending notifications to Microsoft Teams, Slack, and Discord. Make sure to go thru related articles as they have all the KNOW HOW which is quite useful if you want to get everything from this module.
+**PSWinReporting** is a little PowerShell module that solves the problem of monitoring and reading **Windows Events**. It allows you to set up monitoring of **Domain Controllers** (and from **2.X** any other servers) for events that happen on them. By default, it comes with **built-in Active Directory** events supports, but since **2.0** you can configure it to monitor anything. You can set up reporting on any types of events and have emails delivered with a summary of hourly, daily, weekly, monthly, or quarterly changes. It also supports sending notifications to Microsoft Teams, Slack, and Discord. Make sure to go thru related articles as they have all the KNOW HOW which is quite useful if you want to get everything from this module.
 
 The full project description is available on my website - [Full project description](https://evotec.xyz/hub/scripts/pswinreporting-powershell-module/).
 
@@ -29,7 +29,7 @@ Currently, there are 2 branches of PSWinReporting.
 - [x] Legacy branch - available in PS Gallery as [PSWinReporting](https://www.powershellgallery.com/packages/PSWinReporting/) - `Install-Module -Name 'PSWinReporting' -Force`
 - [x] Master branch - available in PS Gallery as [PSWinReportingV2](https://www.powershellgallery.com/packages/PSWinReportingV2/) - `Install-Module -Name 'PSWinReportingV2' -Force`
 
-I've decided that both PowerShell modules can coexist together, especially for scenarios for people who want to switch, but don't want to do it right away. This way you can keep using old version as is, and slowly fix your other stuff, or use new `Find-Events` command. I've slightly renamed the commands for V2 release.
+I've decided that both PowerShell modules can coexist together, especially for scenarios for people who want to switch, but don't want to do it right away. This way, you can keep using old version as is, and slowly fix your other stuff, or use new `Find-Events` command. I've slightly renamed the commands for V2 release.
 
 ## PSWinReportingV2 - Master Edition
 
