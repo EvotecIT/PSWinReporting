@@ -102,15 +102,15 @@ $Options = @{
                 Uri           = 'https://outlook.office.com/webhook/a5c7'
                 ActivityLinks = @{
                     Added   = @{
-                        Color = [RGBColors]::AliceBlue
+                        Color = 'AliceBlue'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
                     }
                     Removed = @{
-                        Color = [RGBColors]::Red
+                        Color = 'Red'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
                     }
                     Default = @{
-                        Color = [RGBColors]::Yellow
+                        Color = 'Yellow'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
                     }
                 }
@@ -119,19 +119,19 @@ $Options = @{
                 Uri           = 'https://outlook.office.com/webhook/a5d'
                 ActivityLinks = @{
                     Added   = @{
-                        Color = [RGBColors]::Bisque
+                        Color = 'Bisque'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
                     }
                     Removed = @{
-                        Color = [RGBColors]::IndianRed
+                        Color = 'IndianRed'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
                     }
                     Change  = @{
-                        Color = [RGBColors]::DarkSeaGreen
+                        Color = 'DarkSeaGreen'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20330.png'
                     }
                     Default = @{
-                        Color = [RGBColors]::Azure
+                        Color = 'Azure'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
                     }
                 }
@@ -146,15 +146,15 @@ $Options = @{
 
                 ActivityLinks = @{
                     Added   = @{
-                        Color = [RGBColors]::Blue
+                        Color = 'Blue'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
                     }
                     Removed = @{
-                        Color = [RGBColors]::Red
+                        Color = 'Red'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
                     }
                     Default = @{
-                        Color = [RGBColors]::Yellow
+                        Color = 'Yellow'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
                     }
                 }
@@ -170,15 +170,15 @@ $Options = @{
 
                 ActivityLinks = @{
                     Added   = @{
-                        Color = [RGBColors]::Blue
+                        Color = 'Blue'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
                     }
                     Removed = @{
-                        Color = [RGBColors]::Red
+                        Color = 'Red'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
                     }
                     Default = @{
-                        Color = [RGBColors]::Yellow
+                        Color = 'Yellow'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
                     }
                 }
@@ -190,15 +190,15 @@ $Options = @{
 
                 ActivityLinks = @{
                     Added   = @{
-                        Color = [RGBColors]::Blue
+                        Color = 'Blue'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20120.png'
                     }
                     Removed = @{
-                        Color = [RGBColors]::Red
+                        Color = 'Red'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20130.png'
                     }
                     Default = @{
-                        Color = [RGBColors]::Yellow
+                        Color = 'Yellow'
                         Link  = 'https://raw.githubusercontent.com/EvotecIT/PSTeams/master/Links/Asset%20140.png'
                     }
                 }

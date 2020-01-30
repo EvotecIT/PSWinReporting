@@ -1,5 +1,8 @@
 Import-Module .\PSWinReportingV2.psd1 -Force
 
+$Events = Find-Events -DatesRange CurrentHour -Servers 'AD1' -Report ADComputerDeleted
+$Events | Format-Table -AutoSize
+
 $Events = Find-Events -DatesRange PastHour -Servers 'AD1' -Verbose
 $Events | Format-Table -AutoSize
 
