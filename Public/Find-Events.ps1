@@ -39,7 +39,14 @@ function Find-Events {
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Times,
         [parameter(ParameterSetName = "Extended", Mandatory = $true)][System.Collections.IDictionary] $Target,
         [parameter(ParameterSetName = "Extended", Mandatory = $false)][int] $EventID,
-        [parameter(ParameterSetName = "Extended", Mandatory = $false)][int64] $EventRecordID
+        [parameter(ParameterSetName = "Extended", Mandatory = $false)][int64] $EventRecordID,
+        [parameter(ParameterSetName = "Manual")]
+        [parameter(ParameterSetName = "DateManual")]
+        [parameter(ParameterSetName = "DateRange")]
+        [ValidateScript( { $_ -in ( & $ReportScriptBlock ) } )][string[]] $Report,
+        [parameter(ParameterSetName = "DateRange")]
+        [ValidateScript( { $_ -in ( & $DatesRangeScriptBlock  ) })][string] $DatesRange
+
         <#,
         [ArgumentCompleter(
             {
@@ -69,7 +76,7 @@ function Find-Events {
         [parameter(ParameterSetName = "DateRange")][string] $DatesRange
         #>
     )
-
+    <#
     DynamicParam {
         # Defines Report / Dates Range dynamically from HashTables and saved files
         $ParameterSetsAttributesDateManual = New-Object System.Management.Automation.ParameterAttribute
@@ -84,7 +91,7 @@ function Find-Events {
         $ParameterSetsAttributes.Mandatory = $true
         $ParameterSetsAttributes.ParameterSetName = 'Manual'
 
-        # Definitions for Report
+                # Definitions for Report
         $Names = (Get-EventsDefinitions).Keys
         $ReportAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
         $ReportAttrib.Add($ParameterSetsAttributes)
@@ -92,6 +99,7 @@ function Find-Events {
         $ReportAttrib.Add($ParameterSetsAttributesDateManual)
         $ReportAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($Names)))
         $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('Report', [string[]], $ReportAttrib)
+
 
         # Definitions for Dates Range
         $DatesRange = (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
@@ -106,11 +114,12 @@ function Find-Events {
         $RuntimeParamDic.Add('DatesRange', $DatesRangeRuntimeParam)
         return $RuntimeParamDic
     }
+    #>
 
     Process {
         # This prevents duplication of reports on second script run
-        foreach ($Report in $Script:ReportDefinitions.Keys) {
-            $Script:ReportDefinitions[$Report].Enabled = $false
+        foreach ($R in $Script:ReportDefinitions.Keys) {
+            $Script:ReportDefinitions[$R].Enabled = $false
         }
         foreach ($Time in $Script:ReportTimes.Keys) {
             $Script:ReportTimes[$Time].Enabled = $false
@@ -138,16 +147,16 @@ function Find-Events {
                 return
             }
             # Fixes Reports variable
-            $Reports = foreach ($Report in $Definitions.Keys) {
-                if ($Definitions[$Report].Enabled -eq $true) {
-                    $Report
+            $Reports = foreach ($R in $Definitions.Keys) {
+                if ($Definitions[$R].Enabled -eq $true) {
+                    $R
                 }
             }
 
         } else {
             # Using standard case
             $Reports = $PSBoundParameters.Report
-            $DatesRange = $PSBoundParameters.DatesRange
+            #$DatesRange = $PSBoundParameters.DatesRange
 
             if (-not $Quiet) { $Logger.AddInfoRecord("Preparing reports: $($Reports -join ',')") }
 
@@ -177,8 +186,8 @@ function Find-Events {
                 return
             }
             # Fixes Definitions
-            foreach ($Report in $Reports) {
-                $Definitions[$Report].Enabled = $true
+            foreach ($R in $Reports) {
+                $Definitions[$R].Enabled = $true
             }
 
             $Target = New-TargetServers -Servers $Servers -UseDC:$DetectDC
@@ -202,8 +211,6 @@ function Find-Events {
             }
         }
         if (-not $Quiet) { $Logger.AddInfoRecord("Getting events for dates $($Dates.DateFrom) to $($Dates.DateTo)") }
-        #$ElapsedMiddle = Stop-TimeLog -Time $ExecutionTime -Option OneLiner -Continue
-        #if (-not $Quiet) { $Logger.AddInfoRecord("Preparation - Time elapsed: $ElapsedMiddle") }
         # Scan all events and get everything at once
         $SplatEvents = @{
             Verbose       = $Verbose
@@ -235,11 +242,21 @@ function Find-Events {
             $Results
         }
         # This prevents duplication of reports on second script run
-        foreach ($Report in $Script:ReportDefinitions.Keys) {
-            $Script:ReportDefinitions[$Report].Enabled = $false
+        foreach ($R in $Script:ReportDefinitions.Keys) {
+            $Script:ReportDefinitions[$R].Enabled = $false
         }
         foreach ($Time in $Script:ReportTimes.Keys) {
             $Script:ReportTimes[$Time].Enabled = $false
         }
     }
 }
+
+$ReportScriptBlock = {
+    (Get-EventsDefinitions).Keys
+}
+$DatesRangeScriptBlock = {
+    (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
+}
+
+Register-ArgumentCompleter -CommandName Find-Events -ParameterName Report -ScriptBlock $ReportScriptBlock
+Register-ArgumentCompleter -CommandName Find-Events -ParameterName DatesRange -ScriptBlock $DatesRangeScriptBlock
