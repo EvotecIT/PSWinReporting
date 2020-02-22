@@ -46,76 +46,7 @@ function Find-Events {
         [ValidateScript( { $_ -in ( & $ReportScriptBlock ) } )][string[]] $Report,
         [parameter(ParameterSetName = "DateRange")]
         [ValidateScript( { $_ -in ( & $DatesRangeScriptBlock  ) })][string] $DatesRange
-
-        <#,
-        [ArgumentCompleter(
-            {
-                param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
-                ((Get-EventsDefinitions).Keys)
-            }
-        )]
-        [ValidateScript(
-            {
-                $_ -in (((Get-EventsDefinitions).Keys))
-            }
-        )]
-        [parameter(ParameterSetName = "Manual")]
-        [parameter(ParameterSetName = "DateManual")]
-        [parameter(ParameterSetName = "DateRange")][string] $Report,
-        [ArgumentCompleter(
-            {
-                param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
-                (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
-            }
-        )]
-        [ValidateScript(
-            {
-                $_ -in (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
-            }
-        )]
-        [parameter(ParameterSetName = "DateRange")][string] $DatesRange
-        #>
     )
-    <#
-    DynamicParam {
-        # Defines Report / Dates Range dynamically from HashTables and saved files
-        $ParameterSetsAttributesDateManual = New-Object System.Management.Automation.ParameterAttribute
-        $ParameterSetsAttributesDateManual.Mandatory = $true
-        $ParameterSetsAttributesDateManual.ParameterSetName = 'DateManual'
-
-        $ParamAttribDatesRange = New-Object System.Management.Automation.ParameterAttribute
-        $ParamAttribDatesRange.Mandatory = $true
-        $ParamAttribDatesRange.ParameterSetName = 'DateRange'
-
-        $ParameterSetsAttributes = New-Object System.Management.Automation.ParameterAttribute
-        $ParameterSetsAttributes.Mandatory = $true
-        $ParameterSetsAttributes.ParameterSetName = 'Manual'
-
-                # Definitions for Report
-        $Names = (Get-EventsDefinitions).Keys
-        $ReportAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
-        $ReportAttrib.Add($ParameterSetsAttributes)
-        $ReportAttrib.Add($ParamAttribDatesRange)
-        $ReportAttrib.Add($ParameterSetsAttributesDateManual)
-        $ReportAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($Names)))
-        $ReportRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('Report', [string[]], $ReportAttrib)
-
-
-        # Definitions for Dates Range
-        $DatesRange = (Get-DatesDefinitions -Skip 'CustomDate', 'CurrentDayMinuxDaysX', 'CurrentDayMinusDayX', 'OnDay')
-        $DatesRangeAttrib = New-Object  System.Collections.ObjectModel.Collection[System.Attribute]
-        $DatesRangeAttrib.Add($ParamAttribDatesRange)
-        $DatesRangeAttrib.Add((New-Object System.Management.Automation.ValidateSetAttribute($DatesRange)))
-        $DatesRangeRuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('DatesRange', [string], $DatesRangeAttrib)
-
-        # Finalization
-        $RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
-        $RuntimeParamDic.Add('Report', $ReportRuntimeParam)
-        $RuntimeParamDic.Add('DatesRange', $DatesRangeRuntimeParam)
-        return $RuntimeParamDic
-    }
-    #>
-
     Process {
         # This prevents duplication of reports on second script run
         foreach ($R in $Script:ReportDefinitions.Keys) {
