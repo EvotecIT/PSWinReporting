@@ -12,7 +12,7 @@ $Configuration = @{
 
         Manifest          = @{
             # Version number of this module.
-            ModuleVersion   = '2.0.20'
+            ModuleVersion   = '2.0.21'
             # ID used to uniquely identify this module
             GUID            = 'ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe'
             # Author of this module
@@ -31,10 +31,10 @@ $Configuration = @{
             ProjectUri      = 'https://github.com/EvotecIT/PSWinReporting'
             #ReleaseNotes = ''
             RequiredModules = @(
-                @{ ModuleName = 'PSEventViewer'; ModuleVersion = "1.0.12"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
-                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "0.0.122"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
-                @{ ModuleName = 'PSWriteExcel'; ModuleVersion = "0.1.5"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
-                @{ ModuleName = 'PSWriteHTML'; ModuleVersion = '0.0.74'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
+                @{ ModuleName = 'PSEventViewer'; ModuleVersion = "Latest"; Guid = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc' }
+                @{ ModuleName = 'PSSharedGoods'; ModuleVersion = "Latest"; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
+                @{ ModuleName = 'PSWriteExcel'; ModuleVersion = "Latest"; Guid = '82232c6a-27f1-435d-a496-929f7221334b' }
+                @{ ModuleName = 'PSWriteHTML'; ModuleVersion = 'Latest'; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
             )
         }
     }
@@ -114,19 +114,14 @@ $Configuration = @{
                 #RemoveComments = $true
             }
         }
-        ImportModules     = @{
-            Self            = $true
-            RequiredModules = $false
-            Verbose         = $false
-        }
         PowerShellGallery = @{
             ApiKey   = 'C:\Support\Important\PowerShellGalleryAPI.txt'
             FromFile = $true
         }
         GitHub            = @{
-            ApiKey   = 'C:\Support\Important\GithubAPI.txt'
-            FromFile = $true
-            UserName = 'EvotecIT'
+            ApiKey         = 'C:\Support\Important\GithubAPI.txt'
+            FromFile       = $true
+            UserName       = 'EvotecIT'
             RepositoryName = 'PSWinReporting'
         }
         Documentation     = @{
@@ -135,14 +130,23 @@ $Configuration = @{
         }
     }
     Steps       = @{
-        BuildModule        = @{
-            Enable       = $true
-            Merge        = $true
-            MergeMissing = $true
-            Releases     = $true
+        BuildModule        = @{  # requires Enable to be on to process all of that
+            Enable           = $true
+            DeleteBefore     = $false
+            Merge            = $true
+            MergeMissing     = $true
+            SignMerged       = $true
+            Releases         = $true
+            ReleasesUnpacked = $false
+            RefreshPSD1Only  = $false
         }
         BuildDocumentation = $false
-        PublishModule      = @{
+        ImportModules      = @{
+            Self            = $true
+            RequiredModules = $false
+            Verbose         = $false
+        }
+        PublishModule      = @{  # requires Enable to be on to process all of that
             Enabled      = $false
             Prerelease   = ''
             RequireForce = $false
@@ -150,4 +154,4 @@ $Configuration = @{
         }
     }
 }
-New-PrepareModule -Configuration $Configuration -Verbose
+New-PrepareModule -Configuration $Configuration
