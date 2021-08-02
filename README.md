@@ -44,6 +44,7 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 
 - 2.0.21 - Unreleased
   - Changed Dynamic Parameters to ArgumentCompleter
+  - Fixed issue with Dates not being used in `Start-WinReporting`
 
 - 2.0.20 - 30.01.2020
   - Fix for executing Discord/Slack or Teams if it's not in use during Trigger
