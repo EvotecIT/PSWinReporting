@@ -18,13 +18,14 @@ function Get-EventLogSize {
             $EventOldest = (Get-WinEvent -MaxEvents 1 -LogName $result.LogName -Oldest -ComputerName $Server -ErrorAction Stop).TimeCreated
         } catch {
             $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
-            Write-Color @script:WriteParameters "[-] ", "Couldn't get single event from ", $Server, ': ', "from log ", $result.LogName, " (oldest). Error message:", $ErrorMessage -Color White, White, Yellow, White, Red
+            Write-Color @script:WriteParameters "[-] ", "Couldn't get single event from ", $Server, ' from log ', $result.LogName, " (oldest). Error message: ", $ErrorMessage -Color White, White, Yellow, White, Red
         }
         try {
             $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
             $EventNewest = (Get-WinEvent -MaxEvents 1 -LogName $result.LogName -ComputerName $Server -ErrorAction Stop).TimeCreated
         } catch {
-            Write-Color @script:WriteParameters "[-] ", "Couldn't get single event from ", $Server, ': ', "from log ", $result.LogName, " (newest). Error message:", $ErrorMessage -Color White, White, Yellow, White, Red
+            $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
+            Write-Color @script:WriteParameters "[-] ", "Couldn't get single event from ", $Server, ' from log ', $result.LogName, " (newest). Error message: ", $ErrorMessage -Color White, White, Yellow, White, Red
         }
         Add-Member -InputObject $result -MemberType NoteProperty -Name "Server" -Value $server
         Add-Member -InputObject $result -MemberType NoteProperty -Name "CurrentFileSize" -Value $CurrentFileSize
