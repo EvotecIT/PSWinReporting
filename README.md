@@ -19,6 +19,10 @@ This ***legacy edition*** will continue it's life as ***1.7.X***. If you want to
 
 ## ChangeLog
 
+- 1.8.1.6 - 25.09.2021
+  - Now checks for LogFile path existance before continuing.
+  - Now handles errors when dealing with event log size
+  - Fixes some outstanding issues
 - 1.8.1.5 - 30.01.2020
   - Fix for RGBColors to support newer PSTeams module
 
