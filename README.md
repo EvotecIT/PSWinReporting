@@ -42,7 +42,7 @@ Master edition is a complete rewrite and a new beginning. It provides the same f
 
 ### Changelog
 
-- 2.0.21 - Unreleased
+- 2.0.21 - 26.09.2021
   - Changed Dynamic Parameters to ArgumentCompleter
   - Fixed issue with Dates not being used in `Start-WinReporting`
 
