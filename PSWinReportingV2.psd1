@@ -20,7 +20,7 @@
             ModuleName    = 'PSEventViewer'
             Guid          = '5df72a79-cdf6-4add-b38d-bcacf26fb7bc'
         }, @{
-            ModuleVersion = '0.0.198'
+            ModuleVersion = '0.0.211'
             ModuleName    = 'PSSharedGoods'
             Guid          = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe'
         }, @{
@@ -28,7 +28,7 @@
             ModuleName    = 'PSWriteExcel'
             Guid          = '82232c6a-27f1-435d-a496-929f7221334b'
         }, @{
-            ModuleVersion = '0.0.145'
+            ModuleVersion = '0.0.158'
             ModuleName    = 'PSWriteHTML'
             Guid          = 'a7bdf640-f5cb-4acf-9de0-365b322d245c'
         })
