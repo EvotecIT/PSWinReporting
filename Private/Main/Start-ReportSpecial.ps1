@@ -23,7 +23,7 @@ function Start-ReportSpecial {
         }
     }
     # Scan all events and get everything at once
-    [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$true
+    [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose
 
     $Logger.AddInfoRecord("Found $($AllEvents.Count) events.")
     foreach ($Errors in $AllErrors) {

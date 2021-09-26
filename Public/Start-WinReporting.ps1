@@ -24,10 +24,6 @@ function Start-WinReporting {
     $Dates = Get-ChoosenDates -ReportTimes $Times
     foreach ($Date in $Dates) {
         $Logger.AddInfoRecord("Starting to build a report for dates $($Date.DateFrom) to $($Date.DateTo)")
-        Start-ReportSpecial `
-            -Dates $Date `
-            -Options $Options `
-            -Definitions $Definitions `
-            -Target $Target
+        Start-ReportSpecial -Dates $Date -Options $Options -Definitions $Definitions -Target $Target
     }
 }
