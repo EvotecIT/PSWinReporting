@@ -14,7 +14,7 @@ function Start-ReportSpecial {
     $AttachDynamicHTML = @()
     $AttachCSV = @()
 
-    [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target
+    [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates
     foreach ($Entry in $ExtendedInput) {
         if ($Entry.Type -eq 'Computer') {
             $Logger.AddInfoRecord("Computer $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')")
@@ -23,7 +23,7 @@ function Start-ReportSpecial {
         }
     }
     # Scan all events and get everything at once
-    [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$Verbose -DateFrom $Dates.DateFrom -DateTo $Dates.DateTo
+    [Array] $AllEvents = Get-Events -ExtendedInput $ExtendedInput -ErrorAction SilentlyContinue -ErrorVariable AllErrors -Verbose:$true
 
     $Logger.AddInfoRecord("Found $($AllEvents.Count) events.")
     foreach ($Errors in $AllErrors) {
