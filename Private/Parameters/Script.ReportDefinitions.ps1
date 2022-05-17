@@ -133,7 +133,10 @@ $Script:ReportDefinitions = [ordered] @{
                 'GatheredFrom'             = 'Gathered From'
                 'GatheredLogName'          = 'Gathered LogName'
             }
-
+            OverwriteByField = [ordered] @{
+                'User Object' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
+                'Field Value' = 'Action', 'A directory service object was moved.', 'NewObjectDN'
+            }
             SortBy      = 'Record ID'
             Descending  = $false
             IgnoreWords = @{
@@ -168,6 +171,12 @@ $Script:ReportDefinitions = [ordered] @{
                 'GatheredFrom'             = 'Gathered From'
                 'GatheredLogName'          = 'Gathered LogName'
             }
+
+            OverwriteByField = [ordered] @{
+                'Computer Object' = 'Action', 'A directory service object was moved.', 'OldObjectDN'
+                'Field Value' = 'Action', 'A directory service object was moved.', 'NewObjectDN'
+            }
+
             SortBy      = 'Record ID'
             Descending  = $false
             IgnoreWords = @{ }
