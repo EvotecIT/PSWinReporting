@@ -31,10 +31,9 @@ function Get-ServersList {
         }
         if ($Target.DomainControllers.Enabled) {
             if (-not $Quiet) { $Logger.AddInfoRecord("Preparing servers list - domain controllers autodetection") }
-            if($Credential){
+            if($Credential) {
                 [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty -Credential $Credential).HostName
-            }
-            else{
+            } else {
                 [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty).HostName
             }
             $Servers
