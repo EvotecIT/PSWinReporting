@@ -126,11 +126,7 @@ function Find-Events {
 
         # Real deal
         if ($EventRecordID -ne 0 -and $EventID -ne 0) {
-            if ($Credential) {
-                [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -Credential $Credential -RecordID $EventRecordID -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
-            } else {
-                [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -RecordID $EventRecordID -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
-            }
+            [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -RecordID $EventRecordID -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
         } else {
             if ($Credential) {
                 [Array] $ExtendedInput = Get-ServersList -Credential $Credential -Definitions $Definitions -Target $Target -Dates $Dates -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
