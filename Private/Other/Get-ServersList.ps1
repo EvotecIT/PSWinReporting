@@ -3,7 +3,7 @@ function Get-ServersList {
     param(
         [System.Collections.IDictionary] $Definitions,
         [System.Collections.IDictionary] $Target,
-        [System.Management.Automation.Credential()]$Credential = [System.Management.Automation.PSCredential]::Empty
+        [System.Management.Automation.Credential()]$Credential,
         [System.Collections.IDictionary] $Dates,
         [switch] $Quiet,
         [string] $Who,
