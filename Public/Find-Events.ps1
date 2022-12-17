@@ -128,7 +128,11 @@ function Find-Events {
         if ($EventRecordID -ne 0 -and $EventID -ne 0) {
             [Array] $ExtendedInput = Get-ServersListLimited -Target $Target -RecordID $EventRecordID -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
         } else {
-            [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
+            if ($Credential) {
+                [Array] $ExtendedInput = Get-ServersList -Credential $Credential -Definitions $Definitions -Target $Target -Dates $Dates -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
+            } else {
+                [Array] $ExtendedInput = Get-ServersList -Definitions $Definitions -Target $Target -Dates $Dates -Quiet:$Quiet -Who $Who -Whom $Whom -NotWho $NotWho -NotWhom $NotWhom
+            }
         }
         if (-not $ExtendedInput) {
             $Logger.AddErrorRecord("There are no logs/servers to scan. Please fix Targets and try again.")

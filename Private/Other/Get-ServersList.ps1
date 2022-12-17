@@ -3,6 +3,7 @@ function Get-ServersList {
     param(
         [System.Collections.IDictionary] $Definitions,
         [System.Collections.IDictionary] $Target,
+        [System.Management.Automation.Credential()]$Credential,
         [System.Collections.IDictionary] $Dates,
         [switch] $Quiet,
         [string] $Who,
@@ -30,7 +31,11 @@ function Get-ServersList {
         }
         if ($Target.DomainControllers.Enabled) {
             if (-not $Quiet) { $Logger.AddInfoRecord("Preparing servers list - domain controllers autodetection") }
-            [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty).HostName
+            if($Credential) {
+                [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty -Credential $Credential).HostName
+            } else {
+                [Array] $Servers = (Get-WinADDomainControllers -SkipEmpty).HostName
+            }
             $Servers
         }
     )
