@@ -6,13 +6,13 @@ $Configuration = @{
         ModuleName        = 'PSWinReportingV2'
 
         DirectoryProjects = 'C:\Support\GitHub'
-        DirectoryModules  = "$Env:USERPROFILE\Documents\WindowsPowerShell\Modules"
+        #DirectoryModules  = "$Env:USERPROFILE\Documents\WindowsPowerShell\Modules"
         FunctionsToExport = 'Public'
         AliasesToExport   = 'Public'
 
         Manifest          = @{
             # Version number of this module.
-            ModuleVersion   = '2.0.21'
+            ModuleVersion   = '2.0.X'
             # ID used to uniquely identify this module
             GUID            = 'ea2bd8d2-cca1-4dc3-9e1c-ff80b06e8fbe'
             # Author of this module
