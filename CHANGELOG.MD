@@ -1,5 +1,8 @@
 ﻿### Changelog
 
+#### - 2.0.23 - 18.12.2023
+  - In some situations, it is necessary to use credentials for getting the Domain Controller using the DetectDC parameter. [#77](https://github.com/EvotecIT/PSWinReporting/pull/77) by @ferwe
+
 #### - 2.0.22 - 18.05.2022
   - Fixes rare missing username in AD UserLockout events [#66](https://github.com/EvotecIT/PSWinReporting/issues/66)
   - Fixes ADUserChangesDetailed where moving user from one OU to another is not reported properly [#68](https://github.com/EvotecIT/PSWinReporting/issues/68)
