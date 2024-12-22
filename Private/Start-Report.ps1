@@ -27,7 +27,7 @@ function Start-Report {
     $TableExecutionTimes = ''
     $TableEventLogFiles = @()
 
-    Write-Color @script:WriteParameters '[i] Processing report for dates from: ', $Dates.DateFrom, ' to ', $Dates.DateTo -Color White, Yellow, White, Yellow
+    Write-Color @script:WriteParameters '[i] Processing report for dates from: ', $Dates.DateFrom.ToString(), ' to ', $Dates.DateTo.ToString()  -Color White, Yellow, White, Yellow
     Write-Color @script:WriteParameters '[i] Establishing servers list to ', 'process...' -Color White, Yellow
 
     $ServersAD = Get-DC
@@ -316,7 +316,7 @@ function Start-Report {
         if ($ReportOptions.SendMailOnlyOnEvents -eq $true -and $AtleastOneEvent -eq $false) {
             Write-Color @script:WriteParameters "[i] Sending email with reports... ", 'Skipped on demand. ', 'No events found.' -Color White, Yellow, Green
         } else {
-            $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
+            $TemporarySubject = $EmailParameters.EmailSubject -replace "<<DateFrom>>", "$($Dates.DateFrom.ToString())" -replace "<<DateTo>>", "$($Dates.DateTo.ToString())"
             Write-Color @script:WriteParameters "[i] Sending email with reports..." -Color White, Green -NoNewLine
             $SendMail = Send-Email -EmailParameters $EmailParameters -Body $EmailBody -Attachment $Reports -Subject $TemporarySubject
             if ($SendMail.Status) {
