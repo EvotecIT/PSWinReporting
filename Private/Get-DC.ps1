@@ -7,11 +7,10 @@ function Get-DC {
         $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
         Write-Color @script:WriteParameters "[i] Get-ADForest Error: ", $ErrorMessage -Color White, Red
         return
-        #return $ErrorMessage
     }
     foreach ($DomainName in $Forest.Domains) {
         try {
-            $Domain = Get-AdDomain -Server $DomainName -ErrorAction Stop
+            $Domain = Get-ADDomain -Server $DomainName -ErrorAction Stop
         } catch {
             $ErrorMessage = $_.Exception.Message -replace "`n", " " -replace "`r", " "
             Write-Color @script:WriteParameters "[i] Get-AdDomain on $DomainName error: ", $ErrorMessage -Color White, Red
@@ -44,5 +43,5 @@ function Get-DC {
         }
 
     }
-    return Format-TransposeTable $DCs
+    Format-TransposeTable -AllObjects $DCs -Legacy
 }

@@ -24,7 +24,7 @@ function Send-SqlInsert {
         [System.Collections.IDictionary] $SqlSettings
     )
     if ($SqlSettings.SqlTableTranspose) {
-        $Object = Format-TransposeTable -Object $Object
+        $Object = Format-TransposeTable -Object $Object -Legacy
     }
     $SqlTable = Get-SqlQueryColumnInformation -SqlServer $SqlSettings.SqlServer -SqlDatabase $SqlSettings.SqlDatabase -Table $SqlSettings.SqlTable
     $PropertiesFromAllObject = Get-ObjectPropertiesAdvanced -Object $Object -AddProperties 'AddedWhen', 'AddedWho'
