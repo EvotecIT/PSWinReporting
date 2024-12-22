@@ -26,6 +26,10 @@
             Guid          = '82232c6a-27f1-435d-a496-929f7221334b'
             ModuleName    = 'PSWriteExcel'
             ModuleVersion = '0.1.15'
+        }, @{
+            Guid          = '0b0ba5c5-ec85-4c2b-a718-874e55a8bc3f'
+            ModuleName    = 'PSWriteColor'
+            ModuleVersion = '1.0.1'
         }, 'ActiveDirectory')
     RootModule           = 'PSWinReporting.psm1'
 }
