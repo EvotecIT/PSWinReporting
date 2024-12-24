@@ -804,7 +804,7 @@ $Script:ReportDefinitions = [ordered] @{
                 'Action'                        = 'Action'
 
                 'SubjectUserSid'                = 'SecurityID'
-                'Computer'                      = 'Compuer'
+                'Computer'                      = 'Computer'
 
                 'SubjectUserName'               = 'AccountName'
                 'SubjectDomainName'             = 'Account Domain'
