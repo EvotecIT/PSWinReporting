@@ -188,7 +188,7 @@ function Start-ReportSpecial {
             $EmailBody = ''
         }
 
-        $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom)" -replace "<<DateTo>>", "$($Dates.DateTo)"
+        $TemporarySubject = $Options.SendMail.Parameters.Subject -replace "<<DateFrom>>", "$($Dates.DateFrom.ToString())" -replace "<<DateTo>>", "$($Dates.DateTo.ToString())"
         $Logger.AddInfoRecord('Sending email with reports')
         if ($Options.AsHTML.Formatting.CompanyBranding.Inline) {
             $SendMail = Send-Email -EmailParameters $Options.SendMail.Parameters -Body $EmailBody -Attachment $AttachedReports -Subject $TemporarySubject -InlineAttachments @{logo = $Options.AsHTML.Formatting.CompanyBranding.Logo } -Logger $Logger

@@ -23,7 +23,7 @@ function Start-WinReporting {
     # Run report
     $Dates = Get-ChoosenDates -ReportTimes $Times
     foreach ($Date in $Dates) {
-        $Logger.AddInfoRecord("Starting to build a report for dates $($Date.DateFrom) to $($Date.DateTo)")
+        $Logger.AddInfoRecord("Starting to build a report for dates $($Date.DateFrom.ToString()) to $($Date.DateTo.ToString())")
         Start-ReportSpecial -Dates $Date -Options $Options -Definitions $Definitions -Target $Target
     }
 }
