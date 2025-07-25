@@ -145,7 +145,7 @@ function Find-Events {
                 if (-not $Quiet) { $Logger.AddInfoRecord("File $($Entry.Server) added to scan $($Entry.LogName) log for events: $($Entry.EventID -join ', ')") }
             }
         }
-        if (-not $Quiet) { $Logger.AddInfoRecord("Getting events for dates $($Dates.DateFrom) to $($Dates.DateTo)") }
+        if (-not $Quiet) { $Logger.AddInfoRecord("Getting events for dates $($Dates.DateFrom.ToString()) to $($Dates.DateTo.ToString())") }
         # Scan all events and get everything at once
         $SplatEvents = @{
             Verbose       = $Verbose

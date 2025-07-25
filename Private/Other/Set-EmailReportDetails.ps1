@@ -3,7 +3,7 @@ function Set-EmailReportDetails($FormattingParameters, $Dates, $Warnings) {
     # HTML Report settings
     $Report = "<p style=`"background-color:white;font-family:$($FormattingParameters.FontFamily);font-size:$($FormattingParameters.FontSize)`">" +
     "<strong>Report Time:</strong> $DateReport <br>" +
-    "<strong>Report Period:</strong> $($Dates.DateFrom) to $($Dates.DateTo) <br>" +
+    "<strong>Report Period:</strong> $($Dates.DateFrom.ToString()) to $($Dates.DateTo.ToString()) <br>" +
     "<strong>Account Executing Report :</strong> $env:userdomain\$($env:username.toupper()) on $($env:ComputerName.toUpper()) <br>" +
     "<strong>Time to generate:</strong> **TimeToGenerateDays** days, **TimeToGenerateHours** hours, **TimeToGenerateMinutes** minutes, **TimeToGenerateSeconds** seconds, **TimeToGenerateMilliseconds** milliseconds"
 
