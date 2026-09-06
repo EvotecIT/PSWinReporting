@@ -5,7 +5,9 @@ param(
 
     [string] $ModuleRoot,
 
-    [string] $CliManifestPath
+    [string] $CliManifestPath,
+
+    [switch] $SkipCliArtifacts
 )
 
 $ErrorActionPreference = 'Stop'
@@ -18,22 +20,29 @@ if ([string]::IsNullOrWhiteSpace($ModuleRoot)) {
     $ModuleRoot = Join-Path $RepositoryRoot 'Artefacts\Unpacked\Modules\PSEventViewer'
 }
 $ModuleRoot = [System.IO.Path]::GetFullPath($ModuleRoot)
-if ([string]::IsNullOrWhiteSpace($CliManifestPath)) {
+if (-not $SkipCliArtifacts -and [string]::IsNullOrWhiteSpace($CliManifestPath)) {
     $CliManifestPath = Join-Path $RepositoryRoot `
         'Artefacts\Cli\Artifacts\DotNetPublish\manifest.json'
 }
-$CliManifestPath = [System.IO.Path]::GetFullPath($CliManifestPath)
+if (-not [string]::IsNullOrWhiteSpace($CliManifestPath)) {
+    $CliManifestPath = [System.IO.Path]::GetFullPath($CliManifestPath)
+}
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $expectedPackages = @(
     'EventViewerX'
-    'EventViewerX.Cli'
     'EventViewerX.Detection'
     'EventViewerX.Evtx'
     'EventViewerX.Reporting'
     'EventViewerX.Storage'
 )
+[array] $deferredCliPackages = Get-ChildItem -LiteralPath $PackageRoot `
+    -Filter 'EventViewerX.Cli.*.nupkg' -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -notlike '*.symbols.nupkg' }
+if ($deferredCliPackages.Count -ne 0) {
+    throw 'EventViewerX.Cli must not be present in the library/module release.'
+}
 $packageMetadata = @{}
 foreach ($packageId in $expectedPackages) {
     $packagePattern = '^' + [regex]::Escape($packageId) + '\.\d'
@@ -98,9 +107,6 @@ function Assert-PackageBoundary {
 
 Assert-PackageBoundary -PackageId 'EventViewerX' -Required @() `
     -Forbidden @('EventViewerX.Cli', 'EventViewerX.Detection', 'EventViewerX.Evtx', 'EventViewerX.Reporting', 'EventViewerX.Storage')
-Assert-PackageBoundary -PackageId 'EventViewerX.Cli' `
-    -Required @() `
-    -Forbidden @('EventViewerX', 'EventViewerX.Detection', 'EventViewerX.Evtx', 'EventViewerX.Reporting', 'EventViewerX.Storage')
 Assert-PackageBoundary -PackageId 'EventViewerX.Detection' -Required @('EventViewerX') `
     -Forbidden @('EventViewerX.Cli', 'EventViewerX.Evtx', 'EventViewerX.Reporting', 'EventViewerX.Storage')
 Assert-PackageBoundary -PackageId 'EventViewerX.Evtx' -Required @('EventViewerX') `
@@ -109,22 +115,6 @@ Assert-PackageBoundary -PackageId 'EventViewerX.Reporting' -Required @('EventVie
     -Forbidden @('EventViewerX.Cli', 'EventViewerX.Detection', 'EventViewerX.Evtx', 'EventViewerX.Storage')
 Assert-PackageBoundary -PackageId 'EventViewerX.Storage' -Required @('EventViewerX') `
     -Forbidden @('EventViewerX.Cli', 'EventViewerX.Detection', 'EventViewerX.Evtx', 'EventViewerX.Reporting')
-if ('DotnetTool' -notin $packageMetadata['EventViewerX.Cli'].PackageTypes) {
-    throw 'EventViewerX.Cli must be packed as a .NET tool.'
-}
-$expectedCliAssemblies = @(
-    'EventViewerX.dll'
-    'EventViewerX.Detection.dll'
-    'EventViewerX.Evtx.dll'
-    'EventViewerX.Reporting.dll'
-    'EventViewerX.Storage.dll'
-)
-foreach ($assemblyName in $expectedCliAssemblies) {
-    if ("tools/net10.0/any/$assemblyName" -notin $packageMetadata['EventViewerX.Cli'].Files) {
-        throw "EventViewerX.Cli does not contain the canonical $assemblyName assembly."
-    }
-}
-
 $manifest = Import-PowerShellDataFile -LiteralPath (Join-Path $moduleRoot 'PSEventViewer.psd1')
 if ([version] $manifest.ModuleVersion -ne [version] $version) {
     throw "PSEventViewer $($manifest.ModuleVersion) does not match package version $version."
@@ -143,27 +133,30 @@ foreach ($assembly in $moduleAssemblies) {
     }
 }
 
-$cliManifest = Get-Content -LiteralPath $CliManifestPath -Raw | ConvertFrom-Json
-$isUnifiedReleaseManifest = $null -ne $cliManifest.PSObject.Properties['assetEntries']
-if ($isUnifiedReleaseManifest) {
-    [array] $cliEntries = $cliManifest.assetEntries | Where-Object { $_.category -eq 'Tool' }
-} else {
-    [array] $cliEntries = $cliManifest | Where-Object {
-        $_.category -eq 'Publish' -and
-        $_.target -eq 'EventViewerX.Cli' -and
-        -not [string]::IsNullOrWhiteSpace([string] $_.zipPath)
+$cliEntries = @()
+if (-not $SkipCliArtifacts) {
+    $cliManifest = Get-Content -LiteralPath $CliManifestPath -Raw | ConvertFrom-Json
+    $isUnifiedReleaseManifest = $null -ne $cliManifest.PSObject.Properties['assetEntries']
+    if ($isUnifiedReleaseManifest) {
+        [array] $cliEntries = $cliManifest.assetEntries | Where-Object { $_.category -eq 'Tool' }
+    } else {
+        [array] $cliEntries = $cliManifest | Where-Object {
+            $_.category -eq 'Publish' -and
+            $_.target -eq 'EventViewerX.Cli' -and
+            -not [string]::IsNullOrWhiteSpace([string] $_.zipPath)
+        }
     }
-}
-if ($cliEntries.Count -ne 12) {
-    throw "Expected 12 CLI runtime/style assets, found $($cliEntries.Count)."
-}
-if ($isUnifiedReleaseManifest -and
-    @($cliEntries | Where-Object { $_.Version -ne $version }).Count -ne 0) {
-    throw "One or more CLI assets do not match release version $version."
-}
-if (-not $isUnifiedReleaseManifest -and
-    @($cliEntries | Where-Object { $_.sourceDirty -ne $false }).Count -ne 0) {
-    throw 'One or more CLI assets do not have clean source provenance.'
+    if ($cliEntries.Count -ne 12) {
+        throw "Expected 12 CLI runtime/style assets, found $($cliEntries.Count)."
+    }
+    if ($isUnifiedReleaseManifest -and
+        @($cliEntries | Where-Object { $_.Version -ne $version }).Count -ne 0) {
+        throw "One or more CLI assets do not match release version $version."
+    }
+    if (-not $isUnifiedReleaseManifest -and
+        @($cliEntries | Where-Object { $_.sourceDirty -ne $false }).Count -ne 0) {
+        throw 'One or more CLI assets do not have clean source provenance.'
+    }
 }
 
 [pscustomobject] @{

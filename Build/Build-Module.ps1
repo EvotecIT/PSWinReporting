@@ -31,13 +31,50 @@ param(
 
     [switch] $PowerForgeReleaseStage,
 
-    [switch] $SkipInstall
+    [switch] $SkipInstall,
+
+    [ValidatePattern('^[0-9a-fA-F]{40}$')]
+    [string] $ExpectedCommit,
+
+    [string] $PublishConfirmation
 )
 
 $ErrorActionPreference = 'Stop'
 
 if ($RunMode -eq 'Publish') {
-    throw 'Direct module publication is disabled. Use Build-Release.ps1 -RunMode Publish so commit, checkout, confirmation, and staged-artifact guards are enforced.'
+    [array] $unsupportedPublishParameters = @(
+        'PreReleaseTag'
+        'Configuration'
+        'NoDotnetBuild'
+        'StagingPath'
+        'ReuseStaging'
+        'IncludeProjectPackages'
+        'IncludeModulePublishing'
+        'PowerForgeUnifiedGitHubRelease'
+        'PowerForgeReleaseStage'
+    ) | Where-Object { $PSBoundParameters.ContainsKey($_) }
+    if ($unsupportedPublishParameters.Count -ne 0) {
+        throw "The guarded package/module publish lane does not support: $($unsupportedPublishParameters -join ', ')."
+    }
+
+    $releaseSplat = @{
+        RunMode      = 'Publish'
+        Version      = $ModuleVersion
+        SignModule   = $SignModule
+        SkipCli      = $true
+        SkipInstall  = $SkipInstall
+    }
+    if (-not [string]::IsNullOrWhiteSpace($ExpectedCommit)) {
+        $releaseSplat.ExpectedCommit = $ExpectedCommit
+    }
+    if (-not [string]::IsNullOrWhiteSpace($PublishConfirmation)) {
+        $releaseSplat.Confirmation = $PublishConfirmation
+    }
+    if ($PSBoundParameters.ContainsKey('Framework')) {
+        $releaseSplat.ModuleFramework = $Framework
+    }
+    & (Join-Path $PSScriptRoot 'Build-Release.ps1') @releaseSplat
+    return
 }
 
 Import-Module PSPublishModule -Force

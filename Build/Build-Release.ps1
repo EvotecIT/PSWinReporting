@@ -11,6 +11,10 @@ param(
     [ValidateSet('auto', 'net472', 'net8.0', 'net10.0')]
     [string] $ModuleFramework,
 
+    [switch] $SkipCli,
+
+    [switch] $SkipInstall,
+
     [ValidatePattern('^[0-9a-fA-F]{40}$')]
     [string] $ExpectedCommit,
 
@@ -21,7 +25,8 @@ $ErrorActionPreference = 'Stop'
 
 $repositoryRoot = [System.IO.Path]::GetFullPath(
     (Join-Path $PSScriptRoot '..'))
-$configPath = Join-Path $PSScriptRoot 'release.json'
+$configName = if ($SkipCli) { 'release.module.json' } else { 'release.json' }
+$configPath = Join-Path $PSScriptRoot $configName
 
 if ($RunMode -eq 'Publish') {
     if ([string]::IsNullOrWhiteSpace($ExpectedCommit)) {
@@ -54,6 +59,9 @@ $invokeSplat = @{
 }
 if ($PSBoundParameters.ContainsKey('ModuleFramework')) {
     $invokeSplat.ModuleFramework = $ModuleFramework
+}
+if ($SkipInstall) {
+    $invokeSplat.ModuleSkipInstall = $true
 }
 switch ($RunMode) {
     'Plan' {

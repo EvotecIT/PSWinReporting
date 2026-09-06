@@ -1,6 +1,6 @@
 param(
     [Alias('ConfigurationGateMode')]
-    [ValidateSet('Manifest', 'Build', 'Publish')]
+    [ValidateSet('Manifest', 'Plan', 'Build', 'Publish')]
     [string] $RunMode = 'Build',
 
     [bool] $SignModule = $true,
@@ -13,6 +13,8 @@ param(
 
     [switch] $SkipCli,
 
+    [switch] $SkipInstall,
+
     [ValidatePattern('^[0-9a-fA-F]{40}$')]
     [string] $ExpectedCommit,
 
@@ -21,15 +23,21 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if ($RunMode -eq 'Publish' -or ($RunMode -eq 'Build' -and -not $SkipCli)) {
+if ($RunMode -ne 'Manifest') {
     $releaseSplat = @{
         RunMode        = $RunMode
         Version        = $Version
         SignModule     = $SignModule
+        SkipCli        = $SkipCli
+        SkipInstall    = $SkipInstall
     }
     if ($RunMode -eq 'Publish') {
-        $releaseSplat.ExpectedCommit = $ExpectedCommit
-        $releaseSplat.Confirmation = $PublishConfirmation
+        if (-not [string]::IsNullOrWhiteSpace($ExpectedCommit)) {
+            $releaseSplat.ExpectedCommit = $ExpectedCommit
+        }
+        if (-not [string]::IsNullOrWhiteSpace($PublishConfirmation)) {
+            $releaseSplat.Confirmation = $PublishConfirmation
+        }
     }
     if ($PSBoundParameters.ContainsKey('ModuleFramework')) {
         $releaseSplat.ModuleFramework = $ModuleFramework
@@ -40,6 +48,7 @@ if ($RunMode -eq 'Publish' -or ($RunMode -eq 'Build' -and -not $SkipCli)) {
         RunMode      = $RunMode
         SignModule   = $SignModule
         ModuleVersion = $Version
+        SkipInstall  = $SkipInstall
     }
     if ($PSBoundParameters.ContainsKey('ModuleFramework')) {
         $moduleBuildSplat.Framework = $ModuleFramework

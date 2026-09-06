@@ -1138,22 +1138,29 @@ rejects a 32-bit Desktop host before loading it.
 
 ## Development and release
 
-The root build wrapper delegates versioning, library packaging, module
-packaging, signing, artifacts, NuGet, PowerShell Gallery, and GitHub release
-coordination to PSPublishModule/PowerForge. EventViewerX and PSEventViewer are
-built and released from one version source and validated as packed artifacts.
+The build wrappers delegate versioning, library packaging, module packaging,
+signing, artifacts, NuGet, PowerShell Gallery, and GitHub release coordination
+to PSPublishModule/PowerForge. EventViewerX and PSEventViewer use one version
+source and are validated as packed artifacts. The package/module release is
+independent from the standalone CLI archives.
 
 ```powershell
-# Inspect the complete module, NuGet, and CLI release without producing assets.
-.\Build\Build-Release.ps1 -RunMode Plan -Version 4.0.0 -SignModule:$false
+# Inspect the EventViewerX NuGet and PSEventViewer release without producing assets.
+.\Build\Build-All.ps1 -RunMode Plan -SkipCli -Version 4.0.0 -SignModule:$false
 
-# Produce and validate one unsigned release candidate. Nothing is published.
-.\Build\Build-Release.ps1 -RunMode Build -Version 4.0.0 -SignModule:$false
+# Produce and validate those packages without publishing standalone CLI archives.
+.\Build\Build-All.ps1 -RunMode Build -SkipCli -Version 4.0.0 -SignModule:$false
 
-# Publication is a separate, guarded operator action after the candidate settles.
+# Publish EventViewerX library packages to NuGet and PSEventViewer to PowerShell Gallery.
 $commit = git rev-parse HEAD
-.\Build\Build-Release.ps1 -RunMode Publish -Version 4.0.0 `
-    -ExpectedCommit $commit -Confirmation "publish:4.0.0:$commit"
+.\Build\Build-Module.ps1 -RunMode Publish -ModuleVersion 4.0.0 `
+    -ExpectedCommit $commit -PublishConfirmation "publish:4.0.0:$commit"
+
+# Build the standalone CLI archives locally. This command does not upload them.
+.\Build\Build-Cli.ps1 -RunMode Build
+
+# Plan the complete package, module, CLI, and unified GitHub release.
+.\Build\Build-All.ps1 -RunMode Plan -Version 4.0.0 -SignModule:$false
 ```
 
 Browse [the event query benchmark contract](Benchmarks/EventLogParsing/README.md),

@@ -38,6 +38,12 @@ jobs:
         run: .\Build\Test-ReleaseGuards.ps1
         shell: pwsh
 
+      - name: Test release selection
+        run: |
+          .\Build\Test-ReleaseConfiguration.ps1
+          .\Build\Test-ReleasePlans.ps1
+        shell: pwsh
+
       - name: Refresh module manifest
         run: |
           .\Build\Build-Module.ps1 -ConfigurationGateMode Manifest

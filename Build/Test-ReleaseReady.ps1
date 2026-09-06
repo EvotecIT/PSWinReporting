@@ -3,7 +3,9 @@ param(
     [ValidatePattern('^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$')]
     [string] $Version,
 
-    [string] $CliManifestPath
+    [string] $CliManifestPath,
+
+    [switch] $SkipCliArtifacts
 )
 
 $ErrorActionPreference = 'Stop'
@@ -31,7 +33,8 @@ $moduleRoot = $null
 $packageRoot = $null
 $moduleValidationRoot = $null
 if ($null -ne $context) {
-    if ([string]::IsNullOrWhiteSpace($CliManifestPath) -and
+    if (-not $SkipCliArtifacts -and
+        [string]::IsNullOrWhiteSpace($CliManifestPath) -and
         -not [string]::IsNullOrWhiteSpace([string] $context.ReleaseManifestPath)) {
         $CliManifestPath = [string] $context.ReleaseManifestPath
     }
@@ -43,13 +46,13 @@ if ($null -ne $context) {
         throw "Expected one staged PSEventViewer $Version archive, found $($modulePackages.Count)."
     }
 
-    [array] $cliPackages = @($context.StagedAssets | Where-Object {
-        [System.IO.Path]::GetFileName([string] $_) -ieq "EventViewerX.Cli.$Version.nupkg"
+    [array] $eventViewerPackages = @($context.StagedAssets | Where-Object {
+        [System.IO.Path]::GetFileName([string] $_) -ieq "EventViewerX.$Version.nupkg"
     })
-    if ($cliPackages.Count -ne 1) {
-        throw "Expected one staged EventViewerX.Cli $Version package, found $($cliPackages.Count)."
+    if ($eventViewerPackages.Count -ne 1) {
+        throw "Expected one staged EventViewerX $Version package, found $($eventViewerPackages.Count)."
     }
-    $packageRoot = Split-Path -Parent ([string] $cliPackages[0])
+    $packageRoot = Split-Path -Parent ([string] $eventViewerPackages[0])
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $validationRoot = Join-Path $repositoryRoot 'Artefacts\Validation'
@@ -75,12 +78,6 @@ try {
     }
     & (Join-Path $PSScriptRoot 'Test-ModuleRuntime.ps1') @moduleRuntimeSplat
 
-    $cliPackageSplat = @{ Version = $Version }
-    if (-not [string]::IsNullOrWhiteSpace($packageRoot)) {
-        $cliPackageSplat.PackageRoot = $packageRoot
-    }
-    & (Join-Path $PSScriptRoot 'Test-CliPackage.ps1') @cliPackageSplat
-
     $architectureSplat = @{ RepositoryRoot = $repositoryRoot }
     if (-not [string]::IsNullOrWhiteSpace($packageRoot)) {
         $architectureSplat.PackageRoot = $packageRoot
@@ -90,6 +87,9 @@ try {
     }
     if (-not [string]::IsNullOrWhiteSpace($CliManifestPath)) {
         $architectureSplat.CliManifestPath = $CliManifestPath
+    }
+    if ($SkipCliArtifacts) {
+        $architectureSplat.SkipCliArtifacts = $true
     }
     & (Join-Path $PSScriptRoot 'Test-ReleaseArchitecture.ps1') @architectureSplat
 } finally {
