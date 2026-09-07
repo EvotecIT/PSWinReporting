@@ -12,7 +12,6 @@
     "ArtifactPaths": [
       "Artefacts/Packed/PSEventViewer.v{ModuleVersionWithPreRelease}.zip",
       "Artefacts/ProjectBuild/packages/EventViewerX.{ModuleVersionWithPreRelease}.nupkg",
-      "Artefacts/ProjectBuild/packages/EventViewerX.Cli.{ModuleVersionWithPreRelease}.nupkg",
       "Artefacts/ProjectBuild/packages/EventViewerX.Detection.{ModuleVersionWithPreRelease}.nupkg",
       "Artefacts/ProjectBuild/packages/EventViewerX.Evtx.{ModuleVersionWithPreRelease}.nupkg",
       "Artefacts/ProjectBuild/packages/EventViewerX.Reporting.{ModuleVersionWithPreRelease}.nupkg",

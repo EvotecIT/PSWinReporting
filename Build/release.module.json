@@ -1,0 +1,44 @@
+{
+  "$schema": "https://raw.githubusercontent.com/EvotecIT/PSPublishModule/main/Schemas/powerforge.release.schema.json",
+  "SchemaVersion": 1,
+  "Module": {
+    "RepositoryRoot": "..",
+    "ModuleName": "PSEventViewer",
+    "ConfigPath": "Build/module.json",
+    "IncludesPackages": true,
+    "ModuleVersion": "4.0.X",
+    "SignModule": true,
+    "TimeoutSeconds": 7200,
+    "ArtifactPaths": [
+      "Artefacts/Packed/PSEventViewer.v{ModuleVersionWithPreRelease}.zip",
+      "Artefacts/ProjectBuild/packages/EventViewerX.{ModuleVersionWithPreRelease}.nupkg",
+      "Artefacts/ProjectBuild/packages/EventViewerX.Detection.{ModuleVersionWithPreRelease}.nupkg",
+      "Artefacts/ProjectBuild/packages/EventViewerX.Evtx.{ModuleVersionWithPreRelease}.nupkg",
+      "Artefacts/ProjectBuild/packages/EventViewerX.Reporting.{ModuleVersionWithPreRelease}.nupkg",
+      "Artefacts/ProjectBuild/packages/EventViewerX.Storage.{ModuleVersionWithPreRelease}.nupkg"
+    ]
+  },
+  "Outputs": {
+    "Staging": {
+      "RootPath": "../Artefacts/UploadReady/ModuleRelease",
+      "ModulesPath": "module",
+      "PackagesPath": "nuget",
+      "PortablePath": "portable",
+      "InstallerPath": "installer",
+      "StorePath": "store",
+      "ToolsPath": "cli",
+      "MetadataPath": "metadata",
+      "OtherPath": "assets"
+    }
+  },
+  "Validation": {
+    "AfterStaging": [
+      {
+        "Name": "Validate EventViewerX NuGet and PSEventViewer release artifacts",
+        "FilePath": "Test-ModuleReleaseReady.ps1",
+        "WorkingDirectory": "..",
+        "TimeoutSeconds": 1800
+      }
+    ]
+  }
+}

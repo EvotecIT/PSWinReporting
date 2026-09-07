@@ -15,10 +15,43 @@ if ([string] $release.GitHub.TokenEnvName -ne 'GITHUB_TOKEN' -or
     -not [string]::IsNullOrWhiteSpace([string] $release.GitHub.TokenFilePath)) {
     throw 'The unified GitHub release must use GITHUB_TOKEN without a machine-specific token path.'
 }
+if ($null -eq $release.Tools -or $release.GitHub.Publish -ne $true) {
+    throw 'The full release must include CLI tools and the unified GitHub release.'
+}
+if (@($release.Module.ArtifactPaths | Where-Object { $_ -like '*EventViewerX.Cli.*.nupkg' }).Count -ne 0) {
+    throw 'The full release must not publish the deferred EventViewerX.Cli .NET tool package.'
+}
+
+$moduleRelease = Get-Content -LiteralPath `
+    (Join-Path $RepositoryRoot 'Build\release.module.json') -Raw |
+    ConvertFrom-Json
+if ($null -ne $moduleRelease.Tools -or $null -ne $moduleRelease.GitHub) {
+    throw 'The module release must not include CLI tools or a unified GitHub release.'
+}
+if ($moduleRelease.Module.IncludesPackages -ne $true -or
+    [string] $moduleRelease.Module.ConfigPath -ne 'Build/module.json') {
+    throw 'The module release must include the canonical EventViewerX package configuration.'
+}
+if (@($moduleRelease.Module.ArtifactPaths | Where-Object { $_ -like '*EventViewerX.Cli.*.nupkg' }).Count -ne 0) {
+    throw 'The module release must not publish the deferred EventViewerX.Cli .NET tool package.'
+}
+[array] $fullModuleAssets = @($release.Module.ArtifactPaths | Sort-Object)
+[array] $moduleOnlyAssets = @($moduleRelease.Module.ArtifactPaths | Sort-Object)
+if (($fullModuleAssets -join "`n") -cne ($moduleOnlyAssets -join "`n")) {
+    throw 'The full and module-only release profiles must use the same package/module artifact set.'
+}
+[array] $moduleReleaseValidations = @($moduleRelease.Validation.AfterStaging)
+if ($moduleReleaseValidations.Count -ne 1 -or
+    [string] $moduleReleaseValidations[0].FilePath -ne 'Test-ModuleReleaseReady.ps1') {
+    throw 'The module release must validate its exact staged package and module artifacts.'
+}
 
 $projectBuild = Get-Content -LiteralPath `
     (Join-Path $RepositoryRoot 'Sources\Build\project.build.json') -Raw |
     ConvertFrom-Json
+if ($null -ne $projectBuild.ExpectedVersionMap.PSObject.Properties['EventViewerX.Cli']) {
+    throw 'The EventViewerX.Cli .NET tool package must remain outside the library/module release.'
+}
 if ([string] $projectBuild.PublishApiKeyEnvName -ne 'NUGET_API_KEY' -or
     -not [string]::IsNullOrWhiteSpace([string] $projectBuild.PublishApiKeyFilePath)) {
     throw 'NuGet publication must use NUGET_API_KEY without a machine-specific API-key path.'
@@ -56,4 +89,7 @@ if (@($legacyGitHubSegments | Where-Object {
     NuGetCredential = 'NUGET_API_KEY'
     GitHubCredential = 'GITHUB_TOKEN'
     PowerShellGalleryCredential = $galleryKeyPath
+    FullReleaseIncludesCli = $true
+    ModuleReleaseIncludesCli = $false
+    CliNuGetPackageIncluded = $false
 }
