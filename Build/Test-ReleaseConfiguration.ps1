@@ -8,6 +8,22 @@ if ([string]::IsNullOrWhiteSpace($RepositoryRoot)) {
     $RepositoryRoot = Split-Path -Parent $PSScriptRoot
 }
 $RepositoryRoot = [System.IO.Path]::GetFullPath($RepositoryRoot)
+$minimumPSPublishModuleVersion = '3.0.139'
+
+foreach ($dependencyFile in @(
+        'Build\Build-Release.ps1'
+        'Build\Build-Module.ps1'
+        'Build\Build-Cli.ps1'
+        '.github\workflows\test-powershell.yml'
+    )) {
+    $dependencyContent = Get-Content -LiteralPath `
+        (Join-Path $RepositoryRoot $dependencyFile) -Raw
+    if ($dependencyContent -notmatch (
+            'MinimumVersion\s+' + [regex]::Escape($minimumPSPublishModuleVersion)
+        )) {
+        throw "$dependencyFile must require PSPublishModule $minimumPSPublishModuleVersion or newer."
+    }
+}
 
 $release = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'Build\release.json') -Raw |
     ConvertFrom-Json
@@ -17,6 +33,14 @@ if ([string] $release.GitHub.TokenEnvName -ne 'GITHUB_TOKEN' -or
 }
 if ($null -eq $release.Tools -or $release.GitHub.Publish -ne $true) {
     throw 'The full release must include CLI tools and the unified GitHub release.'
+}
+$cliBuildScript = Get-Content -LiteralPath `
+    (Join-Path $RepositoryRoot 'Build\Build-Cli.ps1') -Raw
+if ($cliBuildScript -notmatch 'StageRoot\s*=\s*Join-Path\s+\$repositoryRoot\s+''Artefacts\\UploadReady\\Cli''') {
+    throw 'The CLI-only wrapper must use its dedicated Artefacts\UploadReady\Cli staging root.'
+}
+if ($null -ne $release.Module.PSObject.Properties['ModuleVersion']) {
+    throw 'The full release profile must inherit its module version from Build/module.json.'
 }
 if (@($release.Module.ArtifactPaths | Where-Object { $_ -like '*EventViewerX.Cli.*.nupkg' }).Count -ne 0) {
     throw 'The full release must not publish the deferred EventViewerX.Cli .NET tool package.'
@@ -31,6 +55,9 @@ if ($null -ne $moduleRelease.Tools -or $null -ne $moduleRelease.GitHub) {
 if ($moduleRelease.Module.IncludesPackages -ne $true -or
     [string] $moduleRelease.Module.ConfigPath -ne 'Build/module.json') {
     throw 'The module release must include the canonical EventViewerX package configuration.'
+}
+if ($null -ne $moduleRelease.Module.PSObject.Properties['ModuleVersion']) {
+    throw 'The module release profile must inherit its module version from Build/module.json.'
 }
 if (@($moduleRelease.Module.ArtifactPaths | Where-Object { $_ -like '*EventViewerX.Cli.*.nupkg' }).Count -ne 0) {
     throw 'The module release must not publish the deferred EventViewerX.Cli .NET tool package.'
@@ -52,9 +79,16 @@ $projectBuild = Get-Content -LiteralPath `
 if ($null -ne $projectBuild.ExpectedVersionMap.PSObject.Properties['EventViewerX.Cli']) {
     throw 'The EventViewerX.Cli .NET tool package must remain outside the library/module release.'
 }
+[array] $libraryVersions = @($projectBuild.ExpectedVersionMap.PSObject.Properties.Value |
+    Select-Object -Unique)
+if ($libraryVersions.Count -ne 1 -or [string] $libraryVersions[0] -ne '4.0.X') {
+    throw 'All EventViewerX library packages must use the configured 4.0.X version track.'
+}
+$nuGetKeyPath = [string] $projectBuild.PublishApiKeyFilePath
 if ([string] $projectBuild.PublishApiKeyEnvName -ne 'NUGET_API_KEY' -or
-    -not [string]::IsNullOrWhiteSpace([string] $projectBuild.PublishApiKeyFilePath)) {
-    throw 'NuGet publication must use NUGET_API_KEY without a machine-specific API-key path.'
+    [System.IO.Path]::IsPathRooted($nuGetKeyPath) -or
+    $nuGetKeyPath -ne '../../.secrets/NugetOrgEvotec.txt') {
+    throw 'NuGet publication must use the ignored repo-local key path with NUGET_API_KEY as fallback.'
 }
 if ([string] $projectBuild.GitHubAccessTokenEnvName -ne 'GITHUB_TOKEN' -or
     -not [string]::IsNullOrWhiteSpace([string] $projectBuild.GitHubAccessTokenFilePath)) {
@@ -63,6 +97,21 @@ if ([string] $projectBuild.GitHubAccessTokenEnvName -ne 'GITHUB_TOKEN' -or
 
 $moduleBuild = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'Build\module.json') -Raw |
     ConvertFrom-Json
+if ([string] $moduleBuild.Build.Version -ne '4.0.X') {
+    throw 'Build/module.json must remain the module version source with the 4.0.X track.'
+}
+[array] $excludedDirectories = @($moduleBuild.Build.ExcludeDirectories)
+foreach ($requiredExclusion in @(
+        '.codex-artifacts'
+        '.dotnet'
+        '.secrets'
+        'Artifacts'
+        'BenchmarkDotNet.Artifacts'
+    )) {
+    if ($excludedDirectories -cnotcontains $requiredExclusion) {
+        throw "Module packaging must exclude the repo-local '$requiredExclusion' directory."
+    }
+}
 [array] $gallerySegments = @($moduleBuild.Segments | Where-Object {
     $_.Type -eq 'GalleryNuget' -and $_.Configuration.Enabled -eq $true
 })
@@ -71,7 +120,7 @@ if ($gallerySegments.Count -ne 1) {
 }
 $galleryKeyPath = [string] $gallerySegments[0].Configuration.ApiKeyFilePath
 if ([System.IO.Path]::IsPathRooted($galleryKeyPath) -or
-    $galleryKeyPath -ne '../.secrets/PowerShellGalleryAPI.txt') {
+    $galleryKeyPath -ne '.secrets/PowerShellGalleryAPI.txt') {
     throw 'PowerShell Gallery publication must use the ignored repo-local .secrets key path.'
 }
 
@@ -86,9 +135,12 @@ if (@($legacyGitHubSegments | Where-Object {
 }
 
 [pscustomobject] @{
-    NuGetCredential = 'NUGET_API_KEY'
+    NuGetCredential = $nuGetKeyPath
+    MinimumPSPublishModuleVersion = $minimumPSPublishModuleVersion
     GitHubCredential = 'GITHUB_TOKEN'
     PowerShellGalleryCredential = $galleryKeyPath
+    LocalRuntimeAndOutputExcluded = $true
+    CliStagingIsolated = $true
     FullReleaseIncludesCli = $true
     ModuleReleaseIncludesCli = $false
     CliNuGetPackageIncluded = $false

@@ -19,14 +19,51 @@ if (-not [string]::IsNullOrWhiteSpace($env:POWERFORGE_CONTEXT) -and
         ConvertFrom-Json
 }
 
-if ([string]::IsNullOrWhiteSpace($Version)) {
-    if ($null -eq $context) {
-        throw 'Version is required outside a PowerForge lifecycle action.'
-    }
-    $Version = [string] $context.ResolvedVersion
+$expectedCliStagingRoot = [System.IO.Path]::GetFullPath(
+    (Join-Path $repositoryRoot 'Artefacts\UploadReady\Cli')
+).TrimEnd('\', '/')
+$isCliOnly = $false
+if ($null -ne $context -and
+    -not [string]::IsNullOrWhiteSpace([string] $context.StagingRoot)) {
+    $actualStagingRoot = [System.IO.Path]::GetFullPath(
+        [string] $context.StagingRoot
+    ).TrimEnd('\', '/')
+    $isCliOnly = $actualStagingRoot -ieq $expectedCliStagingRoot
 }
-if ([string]::IsNullOrWhiteSpace($Version)) {
+
+$resolvedVersion = $Version
+if ([string]::IsNullOrWhiteSpace($resolvedVersion) -and $isCliOnly) {
+    if ([string]::IsNullOrWhiteSpace([string] $context.ReleaseManifestPath)) {
+        throw 'The CLI-only staged release did not provide a release manifest.'
+    }
+    $cliReleaseManifest = Get-Content -LiteralPath `
+        ([string] $context.ReleaseManifestPath) -Raw | ConvertFrom-Json
+    [array] $cliVersions = @($cliReleaseManifest.assetEntries |
+        Where-Object { $_.category -eq 'Tool' } |
+        ForEach-Object { [string] $_.Version } |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        Sort-Object -Unique)
+    if ($cliVersions.Count -ne 1) {
+        throw "Expected one CLI release version, found $($cliVersions.Count)."
+    }
+    $resolvedVersion = [string] $cliVersions[0]
+}
+if ([string]::IsNullOrWhiteSpace($resolvedVersion) -and $null -ne $context) {
+    $resolvedVersion = [string] $context.ResolvedVersion
+}
+if ($resolvedVersion -notmatch '^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$') {
     throw 'The release version could not be resolved.'
+}
+$Version = $resolvedVersion
+
+if ($isCliOnly) {
+    & (Join-Path $PSScriptRoot 'Test-CliReleaseArtifacts.ps1') `
+        -Version $Version `
+        -CliManifestPath ([string] $context.ReleaseManifestPath) `
+        -StagingRoot ([string] $context.StagingRoot) `
+        -StagedAssets @($context.StagedAssets) `
+        -RequireCliOnly
+    return
 }
 
 $moduleRoot = $null
@@ -72,6 +109,37 @@ if ($null -ne $context) {
 }
 
 try {
+    if (-not [string]::IsNullOrWhiteSpace($packageRoot)) {
+        [array] $expectedPackageNames = @(
+            'EventViewerX',
+            'EventViewerX.Detection',
+            'EventViewerX.Evtx',
+            'EventViewerX.Reporting',
+            'EventViewerX.Storage'
+        )
+        foreach ($packageName in $expectedPackageNames) {
+            $packagePath = Join-Path $packageRoot "$packageName.$Version.nupkg"
+            if (-not (Test-Path -LiteralPath $packagePath -PathType Leaf)) {
+                throw "Expected staged package was not found: $packagePath"
+            }
+
+            [array] $verificationOutput = & dotnet nuget verify `
+                --all `
+                --certificate-fingerprint 'D13C03BFEEC0CBF7FD0E0E7FFAF3F3D2076E62B1AF64665E806917B9191CFFDE' `
+                $packagePath 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                $verificationDetails = ($verificationOutput | Out-String).Trim()
+                throw "NuGet signature verification failed for $packageName $Version.`n$verificationDetails"
+            }
+            if (@($verificationOutput | Where-Object {
+                [string] $_ -match '^\s*Signature type:\s*Author\s*$'
+            }).Count -eq 0) {
+                $verificationDetails = ($verificationOutput | Out-String).Trim()
+                throw "NuGet author signature evidence was not found for $packageName $Version.`n$verificationDetails"
+            }
+        }
+    }
+
     $moduleRuntimeSplat = @{}
     if (-not [string]::IsNullOrWhiteSpace($moduleRoot)) {
         $moduleRuntimeSplat.ModulePath = $moduleRoot
