@@ -1155,7 +1155,10 @@ The release wrappers require PSPublishModule 3.0.141 or newer.
 
 # Resolve the configured 4.0.X version, publish the EventViewerX libraries to
 # NuGet, and publish PSEventViewer to PowerShell Gallery.
-.\Build\Build-Module.ps1 -RunMode Publish
+$releaseCommit = (git rev-parse HEAD).Trim()
+.\Build\Build-Module.ps1 -RunMode Publish `
+    -ExpectedCommit $releaseCommit `
+    -PublishConfirmation "publish:4.0.0:$($releaseCommit.ToLowerInvariant())"
 
 # Build the standalone CLI archives locally. This command does not upload them.
 .\Build\Build-Cli.ps1 -RunMode Build

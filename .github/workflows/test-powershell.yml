@@ -36,6 +36,7 @@ jobs:
 
       - name: Test release selection
         run: |
+          .\Build\Test-ReleaseGuards.ps1
           .\Build\Test-ReleaseConfiguration.ps1
           .\Build\Test-ReleasePlans.ps1
         shell: pwsh
