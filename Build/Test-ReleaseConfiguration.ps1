@@ -10,6 +10,24 @@ if ([string]::IsNullOrWhiteSpace($RepositoryRoot)) {
 $RepositoryRoot = [System.IO.Path]::GetFullPath($RepositoryRoot)
 $minimumPSPublishModuleVersion = '3.0.141'
 
+$buildModulePath = Join-Path $RepositoryRoot 'Build\Build-Module.ps1'
+$tokens = $null
+$parseErrors = $null
+$buildModuleAst = [System.Management.Automation.Language.Parser]::ParseFile(
+    $buildModulePath,
+    [ref] $tokens,
+    [ref] $parseErrors)
+if (@($parseErrors).Count -ne 0) {
+    throw 'Build\Build-Module.ps1 must parse before its release defaults are validated.'
+}
+$runModeParameter = $buildModuleAst.ParamBlock.Parameters | Where-Object {
+    $_.Name.VariablePath.UserPath -eq 'RunMode'
+}
+if ($null -eq $runModeParameter -or
+    [string] $runModeParameter.DefaultValue.SafeGetValue() -cne 'Build') {
+    throw 'Build\Build-Module.ps1 must default to Build; publication requires an explicit RunMode.'
+}
+
 foreach ($dependencyFile in @(
         'Build\Build-Release.ps1'
         'Build\Build-Module.ps1'

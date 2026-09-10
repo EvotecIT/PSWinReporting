@@ -2,7 +2,7 @@
 param(
     [Alias('ConfigurationGateMode')]
     [ValidateSet('Manifest', 'Documentation', 'Plan', 'Build', 'Publish')]
-    [string] $RunMode = 'Publish',
+    [string] $RunMode = 'Build',
 
     [ValidatePattern('^[0-9a-fA-F]{40}$')]
     [string] $ExpectedCommit,
