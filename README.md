@@ -1144,7 +1144,7 @@ to PSPublishModule/PowerForge. EventViewerX and PSEventViewer use one version
 source and are validated as packed artifacts. The package/module release is
 independent from the standalone CLI archives.
 
-The release wrappers require PSPublishModule 3.0.139 or newer.
+The release wrappers require PSPublishModule 3.0.141 or newer.
 
 ```powershell
 # Inspect the EventViewerX NuGet and PSEventViewer release without producing assets.

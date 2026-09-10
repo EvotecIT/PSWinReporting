@@ -31,7 +31,7 @@ jobs:
 
       - name: Setup PowerShell modules
         run: |
-          Install-Module PSPublishModule -MinimumVersion 3.0.139 -Force -Scope CurrentUser -AllowClobber
+          Install-Module PSPublishModule -MinimumVersion 3.0.141 -Force -Scope CurrentUser -AllowClobber
         shell: pwsh
 
       - name: Test release selection

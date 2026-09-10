@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-Import-Module PSPublishModule -MinimumVersion 3.0.139 -Force -ErrorAction Stop
+Import-Module PSPublishModule -MinimumVersion 3.0.141 -Force -ErrorAction Stop
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $invokeSplat = @{

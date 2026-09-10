@@ -8,7 +8,7 @@ if ([string]::IsNullOrWhiteSpace($RepositoryRoot)) {
     $RepositoryRoot = Split-Path -Parent $PSScriptRoot
 }
 $RepositoryRoot = [System.IO.Path]::GetFullPath($RepositoryRoot)
-$minimumPSPublishModuleVersion = '3.0.139'
+$minimumPSPublishModuleVersion = '3.0.141'
 
 foreach ($dependencyFile in @(
         'Build\Build-Release.ps1'

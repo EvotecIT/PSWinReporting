@@ -12,7 +12,7 @@ if ($RunMode -in @('Plan', 'Build', 'Publish')) {
         -RunMode $RunMode `
         -ConfigPath (Join-Path $PSScriptRoot 'release.module.json')
 } else {
-    Import-Module PSPublishModule -MinimumVersion 3.0.139 -Force -ErrorAction Stop
+    Import-Module PSPublishModule -MinimumVersion 3.0.141 -Force -ErrorAction Stop
     Invoke-ModuleBuild `
         -ConfigPath (Join-Path $PSScriptRoot 'module.json') `
         -RunMode $RunMode
