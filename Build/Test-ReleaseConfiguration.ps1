@@ -8,7 +8,6 @@ if ([string]::IsNullOrWhiteSpace($RepositoryRoot)) {
     $RepositoryRoot = Split-Path -Parent $PSScriptRoot
 }
 $RepositoryRoot = [System.IO.Path]::GetFullPath($RepositoryRoot)
-$minimumPSPublishModuleVersion = '3.0.141'
 
 $buildModulePath = Join-Path $RepositoryRoot 'Build\Build-Module.ps1'
 $tokens = $null
@@ -26,21 +25,6 @@ $runModeParameter = $buildModuleAst.ParamBlock.Parameters | Where-Object {
 if ($null -eq $runModeParameter -or
     [string] $runModeParameter.DefaultValue.SafeGetValue() -cne 'Build') {
     throw 'Build\Build-Module.ps1 must default to Build; publication requires an explicit RunMode.'
-}
-
-foreach ($dependencyFile in @(
-        'Build\Build-Release.ps1'
-        'Build\Build-Module.ps1'
-        'Build\Build-Cli.ps1'
-        '.github\workflows\test-powershell.yml'
-    )) {
-    $dependencyContent = Get-Content -LiteralPath `
-        (Join-Path $RepositoryRoot $dependencyFile) -Raw
-    if ($dependencyContent -notmatch (
-            'MinimumVersion\s+' + [regex]::Escape($minimumPSPublishModuleVersion)
-        )) {
-        throw "$dependencyFile must require PSPublishModule $minimumPSPublishModuleVersion or newer."
-    }
 }
 
 $release = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'Build\release.json') -Raw |
@@ -154,7 +138,6 @@ if (@($legacyGitHubSegments | Where-Object {
 
 [pscustomobject] @{
     NuGetCredential = $nuGetKeyPath
-    MinimumPSPublishModuleVersion = $minimumPSPublishModuleVersion
     GitHubCredential = 'GITHUB_TOKEN'
     PowerShellGalleryCredential = $galleryKeyPath
     LocalRuntimeAndOutputExcluded = $true

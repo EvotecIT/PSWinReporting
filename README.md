@@ -1144,7 +1144,7 @@ to PSPublishModule/PowerForge. EventViewerX and PSEventViewer use one version
 source and are validated as packed artifacts. The package/module release is
 independent from the standalone CLI archives.
 
-The release wrappers require PSPublishModule 3.0.141 or newer.
+Install or update PSPublishModule to the latest version before running the release wrappers.
 
 ```powershell
 # Inspect the EventViewerX NuGet and PSEventViewer release without producing assets.
@@ -1155,10 +1155,7 @@ The release wrappers require PSPublishModule 3.0.141 or newer.
 
 # Resolve the configured 4.0.X version, publish the EventViewerX libraries to
 # NuGet, and publish PSEventViewer to PowerShell Gallery.
-$releaseCommit = (git rev-parse HEAD).Trim()
-.\Build\Build-Module.ps1 -RunMode Publish `
-    -ExpectedCommit $releaseCommit `
-    -PublishConfirmation "publish:4.0.0:$($releaseCommit.ToLowerInvariant())"
+.\Build\Build-Module.ps1 -RunMode Publish
 
 # Build the standalone CLI archives locally. This command does not upload them.
 .\Build\Build-Cli.ps1 -RunMode Build
