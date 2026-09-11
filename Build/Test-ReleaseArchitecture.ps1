@@ -133,30 +133,12 @@ foreach ($assembly in $moduleAssemblies) {
     }
 }
 
-$cliEntries = @()
+$cliAssetCount = 0
 if (-not $SkipCliArtifacts) {
-    $cliManifest = Get-Content -LiteralPath $CliManifestPath -Raw | ConvertFrom-Json
-    $isUnifiedReleaseManifest = $null -ne $cliManifest.PSObject.Properties['assetEntries']
-    if ($isUnifiedReleaseManifest) {
-        [array] $cliEntries = $cliManifest.assetEntries | Where-Object { $_.category -eq 'Tool' }
-    } else {
-        [array] $cliEntries = $cliManifest | Where-Object {
-            $_.category -eq 'Publish' -and
-            $_.target -eq 'EventViewerX.Cli' -and
-            -not [string]::IsNullOrWhiteSpace([string] $_.zipPath)
-        }
-    }
-    if ($cliEntries.Count -ne 12) {
-        throw "Expected 12 CLI runtime/style assets, found $($cliEntries.Count)."
-    }
-    if ($isUnifiedReleaseManifest -and
-        @($cliEntries | Where-Object { $_.Version -ne $version }).Count -ne 0) {
-        throw "One or more CLI assets do not match release version $version."
-    }
-    if (-not $isUnifiedReleaseManifest -and
-        @($cliEntries | Where-Object { $_.sourceDirty -ne $false }).Count -ne 0) {
-        throw 'One or more CLI assets do not have clean source provenance.'
-    }
+    $cliValidation = & (Join-Path $PSScriptRoot 'Test-CliReleaseArtifacts.ps1') `
+        -Version $version `
+        -CliManifestPath $CliManifestPath
+    $cliAssetCount = [int] $cliValidation.CliAssets
 }
 
 [pscustomobject] @{
@@ -164,6 +146,6 @@ if (-not $SkipCliArtifacts) {
     Packages = $expectedPackages.Count
     ModuleAssemblies = $moduleAssemblies.Count
     ModuleArchitecture = [string] $manifest.ProcessorArchitecture
-    CliAssets = $cliEntries.Count
+    CliAssets = $cliAssetCount
     StorageDependsOnReporting = $packageMetadata['EventViewerX.Storage'].Dependencies -contains 'EventViewerX.Reporting'
 } | ConvertTo-Json -Compress
